@@ -1,0 +1,20 @@
+var express=require("express")
+const collection=require("../model/mongodb")
+const router=express.Router()
+const controller=require("../controller/userController")
+
+router.get("/",controller.home)
+router.get("/home",controller.home)
+router.get("/login",controller.login)
+router.post("/login",controller.dologin)
+router.post("/login",controller.home)
+router.get("/signup",controller.signup)
+router.post("/dosignup",controller.dosignup)
+router.get("/otp",controller.sendOtp)
+router.post("/otp",controller.sendOtp)
+router.post("/validateotp",controller.validateotp)
+router.post("/resendOTP",controller.resendotp)
+// router.get("/dosignup",controller.sendotp)
+// router.post("/signup")
+
+module.exports=router
