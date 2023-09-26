@@ -1,4 +1,4 @@
-<%-include("../partials/userheader")-%>
+<%-include("../partials/usersignupheader")-%>
 
 <!-- <div class="col-lg-1"></div> -->
 
@@ -62,7 +62,7 @@
         var confirmpassword = document.getElementById('confirmpassword').value;
 
         if (username === '' || username.trim() === '') {
-            document.getElementById('username-error').innerHTML = 'Username is required';
+            document.getElementById('username-error').innerHTML = 'Username is required.';
             setTimeout(function() {
                 document.getElementById('username-error').innerHTML = '';
             }, 5000);
@@ -70,6 +70,13 @@
         }
 
         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email === '' || email.trim() === '') {
+            document.getElementById('email-error').innerHTML = 'Email field cannot be empty.';
+            setTimeout(function () {
+                document.getElementById('email-error').innerHTML = '';
+            }, 5000);
+            return false;
+        }
         if (!email.match(emailRegex)) {
             document.getElementById('email-error').innerText = 'Enter a valid email address.';
             setTimeout(function() {
@@ -88,8 +95,9 @@
         }
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,16}$/;
-        if (password.match(passwordRegex)) {
-            document.getElementById('password-error').innerText = 'enter a strong password';
+        
+        if (!password.match(passwordRegex)) {
+            document.getElementById('password-error').innerText = 'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one digit.';
             setTimeout(function() {
                 document.getElementById('password-error').innerHTML = '';
             }, 5000);

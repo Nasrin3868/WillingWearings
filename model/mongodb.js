@@ -26,9 +26,9 @@ const loginSchema=new mongoose.Schema({
         type: String,
         required: true,
     },
-    confirmpassword:{
-        type:String,
-        required: true
+    otp:{
+        type:Number,
+        default: null
     }
 });
 const collection=mongoose.model("logincollection",loginSchema)
