@@ -132,9 +132,19 @@ const userlist=async(req,res)=>{
 }
 
 const user_block=async(req,res)=>{
-    
+    const userId=req.params.id
+    console.log(userId)
+    const user= await collection.findById(userId)
+    if(user.blocked==true){
+        user.blocked=false
+    }else{
+        user.blocked=true
+    }
+    await user.save()
+    res.redirect('/admin/user_list')
+    // await collection.updateOne()
 }
 
 module.exports={
-    dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist
+    dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block
 }

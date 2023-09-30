@@ -32,7 +32,7 @@ router.get("/edit-product/:id",controller.editproductpage)
 // router.post("/edit-product/:id",controller.editonaddproduct)
 
 router.get("/user_list",controller.userlist)
-router.post("/userblock",controller.user_block)
+router.get("/userblock/:id",controller.user_block)
 
 
 

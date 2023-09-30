@@ -51,9 +51,9 @@
                             <td>
                                 <div class="info pl-3">
                                     <% if (user.blocked==true) { %>
-                                        <a class="btn btn-primary btn-sm rounded" style="background-color: red;" href="/admin/userblock?email=<%= user.email %>">Unblock</a>
+                                        <a class="btn btn-primary btn-sm rounded" style="background-color: red;" href="/admin/userblock/<%= user._id %>">Unblock</a>
                                     <% } else { %>
-                                        <a class="btn btn-primary btn-sm rounded" style="background-color: green;" href="/admin/userblock?email=<%= user.email %>">Block</a>                                       
+                                        <a class="btn btn-primary btn-sm rounded" style="background-color: green;" href="/admin/userblock/<%= user._id %>">Block</a>                                       
                                     <% } %>                                      
                                 </div>
                             </td>
