@@ -1,0 +1,253 @@
+<%-include("../partials/adminheader")-%>
+
+        <section class="content-main">
+            <div class="row">
+                <div class="col-9">
+                    <div class="content-header">
+                        <h2 class="content-title">Product Management</h2>
+                        <div>
+                            <!-- <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4>Basic</h4>
+                        </div>
+                        <div class="card-body">
+                            <form action="/admin/editproduct" method="post" enctype="multipart/form-data">
+                                <div class="mb-4">
+                                    <label for="product_name" class="form-label">Product Name</label>
+                                    <input type="text"placeholder="Type here" class="form-control" id="product_name" name="name" value="<%= foundproduct.name %>">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Description</label>
+                                    <textarea placeholder="Type here" class="form-control" rows="4" name="description" ><%= foundproduct.description %></textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label"> price</label>
+                                            <div class="row gx-2">
+                                                <input placeholder="Rs." type="text" class="form-control" name="price" value="<%= foundproduct.price %>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Selling price</label>
+                                            <input placeholder="Rs." type="text" class="form-control" name="sellingprice" value="<%= foundproduct.sellingprice %>">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Size</label>
+                                            <select class="form-select" name="size">
+                                                <option <%= foundproduct.size === 'S' ? 'selected' : '' %>>S</option>
+                                                <option <%= foundproduct.size === 'M' ? 'selected' : '' %>>M</option>
+                                                <option <%= foundproduct.size === 'L' ? 'selected' : '' %>>L</option>
+                                                <option <%= foundproduct.size === 'X' ? 'selected' : '' %>>X</option>
+                                                <option <%= foundproduct.size === 'XL' ? 'selected' : '' %>>XL</option>
+                                                <option <%= foundproduct.size === 'XXL' ? 'selected' : '' %>>XXL</option>
+                                                <option <%= foundproduct.size === 'Free Size' ? 'selected' : '' %>>Free Size</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Brand</label>
+                                            <select class="form-select" name="brand" value="<%= foundproduct.brand %>">
+                                                <option> fwd </option>
+                                                <option> soch </option>
+                                                <option> aurelia </option>
+                                                <option> forever 21 </option>
+                                                <option> nike </option>
+                                                <option> puma </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Stock</label>
+                                            <input placeholder="Type here" type="text" class="form-control" name="stock" value="<%= foundproduct.stock %>">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Colour</label>
+                                            <input placeholder="Type here type="text" class="form-control" name="colour" value="<%= foundproduct.colour %>">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="mb-4">
+                                            <label class="form-label">Type</label>
+                                            <select class="form-select" name="type" value="<%= foundproduct.type %>">
+                                                <option <%= foundproduct.type === 'Ethinic'? 'selected' : '' %>> Ethinic </option>
+                                                <option <%= foundproduct.type === 'Western'? 'selected' : '' %>> Western </option>
+                                                <option <%= foundproduct.type === 'Sports'? 'selected' : '' %>> Sports </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- for images -->
+                                <div class="col-lg-6">
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h4>Media</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="input-upload">
+                                                <img src="/admin-assets/imgs/theme/upload.svg" alt="">
+                                                
+                                                <div id="existingImages">
+                                                    <% if (foundproduct.images && foundproduct.images.length > 0) { %>
+                                                        <% foundproduct.images.forEach(function(imageUrl, index) { %>
+                                                            <div class="image-container">
+                                                                <img src="<%= imageUrl %>" alt="Product Image">
+                                                                <button class="remove-image" data-index="<%= index %>">Remove</button>
+                                                            </div>
+                                                        <% }); %>
+                                                    <% } %>
+                                                </div>
+                                
+                                                <!-- Container for newly added images -->
+                                                <div id="newImages"></div>
+                                
+                                                <input
+                                                    type="file"
+                                                    id="productImage"
+                                                    name="images"
+                                                    accept="image/*"
+                                                    multiple
+                                                    required
+                                                />
+                                                <button id="addImage">Add Image</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                            </div>
+                                        </div>
+                                    </div> <!-- card end// -->
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <h4>Organization</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row gx-2">
+                                                <div class="col-sm-6 mb-3">
+                                                    <label class="form-label">Category</label>
+                                                    <select class="form-select" name="category" >
+                                                        <option <%= foundproduct.category === 'Saree' ? 'selected' : '' %>> Saree </option>
+                                                        <option <%= foundproduct.category === 'kurthie' ? 'selected' : '' %>> kurthie </option>
+                                                        <option <%= foundproduct.category === 'Lehanga' ? 'selected' : '' %>> Lehanga </option>
+                                                        <option <%= foundproduct.category === 'Tops' ? 'selected' : '' %>> Tops </option>
+                                                        <option <%= foundproduct.category === 'Jeans' ? 'selected' : '' %>> Jeans </option>
+                                                        <option <%= foundproduct.category === 'Pants' ? 'selected' : '' %>> Pants </option>
+                                                        <option <%= foundproduct.category === 'Tracksuit' ? 'selected' : '' %>> Tracksuit </option>
+                                                        <option <%= foundproduct.category === 'Sports bra' ? 'selected' : '' %>> Sports bra </option>
+                                                        <option <%= foundproduct.category === 'Tights' ? 'selected' : '' %> > Tights </option>
+                                                    </select>
+                                                </div>
+                                                
+                                            </div> <!-- row.// -->
+                                        </div>
+                                    </div> <!-- card end// -->
+                                </div>
+                            <button type="submit" class="btn btn-md rounded font-sm hover-up">Publish</button>
+                            </form>
+                        </div>
+                    </div> <!-- card end// -->
+                </div>
+                
+            </div>
+        </section> <!-- content-main end// -->
+
+        
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Handle image removal
+                const removeButtons = document.querySelectorAll('.remove-image');
+                removeButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const index = button.getAttribute('data-index');
+                        // Remove the image from the existingImages div
+                        const imageContainer = button.parentElement;
+                        imageContainer.remove();
+                        // If needed, update a hidden input or JavaScript array to track removed images.
+                    });
+                });
+        
+                // Handle adding new images
+                const addImageBtn = document.getElementById('addImage');
+                const newImagesContainer = document.getElementById('newImages');
+                const productImage = document.getElementById('productImage');
+        
+                addImageBtn.addEventListener('click', function () {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.name = 'images';
+                    input.accept = 'image/*';
+                    input.required = true;
+        
+                    // Append the new input element to the newImages div
+                    newImagesContainer.appendChild(input);
+        
+                    // Listen for changes to newly added file inputs
+                    input.addEventListener('change', function () {
+                        const files = Array.from(input.files);
+                        files.forEach(function (file) {
+                            const reader = new FileReader();
+                            reader.onload = function (event) {
+                                const imageUrl = event.target.result;
+                                // Create an image element and append it to the newImages container
+                                const img = document.createElement('img');
+                                img.src = imageUrl;
+                                newImagesContainer.appendChild(img);
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    });
+        
+                    // Clear the selected file in the original file input
+                    productImage.value = '';
+                });
+            });
+        </script>
+        
+        <!-- <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Handle image removal
+                const removeButtons = document.querySelectorAll('.remove-image');
+                removeButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const index = button.getAttribute('data-index');
+                        // Remove the image from the existingImages div
+                        const imageContainer = button.parentElement;
+                        imageContainer.remove();
+                        // If needed, update a hidden input or JavaScript array to track removed images.
+                    });
+                });
+        
+                // Handle adding new images
+                const addImageBtn = document.getElementById('addImage');
+                const existingImages = document.getElementById('existingImages');
+        
+                addImageBtn.addEventListener('click', function () {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.name = 'images';
+                    input.accept = 'image/*';
+                    input.required = true;
+                    
+                    // Append the new input element to the existingImages div
+                    existingImages.appendChild(input);
+                });
+            });
+        </script> -->
+<%-include("../partials/adminfooter")-%>
+
+

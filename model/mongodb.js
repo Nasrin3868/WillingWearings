@@ -26,6 +26,10 @@ const loginSchema=new mongoose.Schema({
         type: String,
         required: true,
     },
+    blocked:{
+        type: Boolean,
+       default : false
+    },
     otp:{
         type:Number,
         default: null

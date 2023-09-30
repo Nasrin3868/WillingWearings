@@ -1,0 +1,84 @@
+<%-include("../partials/adminheader")-%>
+
+<section class="content-main">
+    <div class="content-header">
+        <h2 class="content-title">User Details</h2>
+        
+    </div>
+    <div class="card mb-4">
+        
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <!-- <th>Last name</th> -->
+                            <th>Email</th>                            
+                            <th>Phone no.</th>
+                            <th>Status</th>
+                            <th> Action </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(function(user) { %>
+                         
+                        <tr>
+                            <td width="20%">                               
+                                    <div class="info pl-3">
+                                        <h6 class="mb-0 title"><%= user.username %></h6>                                       
+                                    </div>
+                            </td>
+                            <td>
+                                <div class="info pl-3">
+                                    <h6 class="mb-0 title"><%= user.email %></h6>                                       
+                                </div>
+                            </td>
+                            <td>
+                                <div class="info pl-3">
+                                    <h6 class="mb-0 title"><%= user.mobile %></h6>                                       
+                                </div>
+                            </td>
+                            <td>
+                                <div class="info pl-3">
+                                    <% if (user.blocked==true) { %>
+                                        <p>blocked</p>
+                                    <% } else { %>
+                                        <p>unblocked</p>                                        
+                                    <% } %>                                      
+                                </div>
+                            </td>
+                            <td>
+                                <div class="info pl-3">
+                                    <% if (user.blocked==true) { %>
+                                        <a class="btn btn-primary btn-sm rounded" style="background-color: red;" href="/admin/userblock?email=<%= user.email %>">Unblock</a>
+                                    <% } else { %>
+                                        <a class="btn btn-primary btn-sm rounded" style="background-color: green;" href="/admin/userblock?email=<%= user.email %>">Block</a>                                       
+                                    <% } %>                                      
+                                </div>
+                            </td>
+                            
+                        </tr>
+                        <% }); %>
+                        
+                    </tbody>
+                </table> <!-- table-responsive.// -->
+            </div>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <div class="pagination-area mt-15 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            </ul>
+        </nav>
+    </div>
+</section> <!-- content-main end// -->
+
+<%-include("../partials/adminfooter")-%>
+

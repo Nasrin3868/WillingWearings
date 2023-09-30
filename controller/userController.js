@@ -89,33 +89,6 @@ const signup=async(req,res)=>{
 }
 
 
-//authentication
-
-// const signup=async(req,res)=>{
-//     console.log("reached signup");
-//     if(req.session.user){
-//         const isAuthenticated=true
-//         const err=req.query.err
-//         const msg=req.query.msg
-//         if(err){
-//             res.render("user/signup",{errmessage:msg,isAuthenticated})
-//         }else{
-//             res.render("user/signup",{isAuthenticated})
-//         }
-//     }else{
-//         const isAuthenticated=true
-//         const err=req.query.err
-//         const msg=req.query.msg
-//         if(err){
-//             res.render("user/signup",{errmessage:msg,isAuthenticated})
-//         }else{
-//             res.render("user/signup",{isAuthenticated})
-//         }
-
-//     }
-// }
-
-
 
 const dosignup = async (req, res) => {
     const data = {
@@ -126,9 +99,9 @@ const dosignup = async (req, res) => {
     }
     globalEmail=req.body.email
     const check = await collection.findOne({ email: data.email })
-
+    const isAuthenticated=false
     if (check) {
-        res.render("user/signup",{errordata:"email already exists"})
+        res.render("user/signup",{errordata:"email already exists",isAuthenticated})
     }else {
         const saltRounds=10
         bcrypt.hash(data.password,saltRounds,async(err,hashedpassword)=>{
@@ -138,6 +111,7 @@ const dosignup = async (req, res) => {
             }else{
                 data.password=hashedpassword
                 await collection.insertOne(data)
+                
                 res.redirect("otp") 
 
             }
@@ -219,6 +193,7 @@ const sendOtp = async (req, res) => {
 
 const validateotp=async(req,res)=>{
 console.log("reached validateotp");
+console.log("reached......=>")
     if(generatedOTP===req.body.enterotp){
         // Save OTP to MongoDB
         const email=globalEmail
