@@ -480,8 +480,30 @@ const productview=async(req,res)=>{
 
 }
 
+const wishlist=async(req,res)=>{
+    console.log("Reached wishlist");
+    if(req.session.user){
+        const isAuthenticated=true
+        res.render("user/wishlist",{isAuthenticated})
+    }else{
+        const isAuthenticated=false
+        res.render("user/login",{isAuthenticated,errmessage : "You have to login to get wishlist", message : "" })
+    }
+}
+
+const cart=async(req,res)=>{
+    console.log("Reached cart");
+    if(req.session.user){
+        const isAuthenticated=true
+        res.render("user/cart",{isAuthenticated})
+    }else{
+        const isAuthenticated=false
+        res.render("user/login",{isAuthenticated,errmessage : "You have to login to get cart", message : "" })
+    }
+}
+
 module.exports={
     home,login,signup,logout,dosignup,sendOtp,dologin,validateotp,resendotp,Toemail,checkemail,otpchecks,otpcheckpage,
     allpage,showbycategory,ethinicpage,ethinicshowbycategory,westernpage,westernshowbycategory,sportspage,Sportsshowbycategory,
-    productview
+    productview,wishlist,cart
 }

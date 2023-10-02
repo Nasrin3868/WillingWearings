@@ -36,29 +36,27 @@
                     </div>
                     <div class="header-right">
                         <div class="search-style-2">
-                            <form action="#">
-                                <select class="select-active">
-                                    <option>All Categories</option>
-                                    <option>Saree</option>
-                                    <option>Lehanga</option>
-                                    <option>crop top</option>
-                                    <option>sports bra</option>
-                                    <option>kurthie</option>
-                                    <option>jeans</option>
+                            <form action="#" id="categorySearchForm">
+                                <select class="select-active" onchange="location = this.value;">
+                                    <option value="/">All Categories</option>
+                                    <% categories.forEach(function(category) { %>
+                                        <option value="/showbycategory/<%= category.name %>"><%= category.name %></option>
+                                    <% }); %>
                                 </select>
-                                <input type="text" placeholder="Search for items...">
+                                <input type="text" id="categorySearchInput" placeholder="Search for items...">
                             </form>
+                            
                         </div>
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">
-                                    <a href="shop-wishlist.html">
+                                    <a href="/wishlist">
                                         <img class="svgInject" alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
                                     
                                     </a>
                                 </div>
                                 <div class="header-action-icon-2">
-                                    <a class="mini-cart-icon" href="shop-cart.html">
+                                    <a class="mini-cart-icon" href="/cart">
                                         <img alt="Evara" src="assets/imgs/theme/icons/icon-cart.svg">
                                         
                                     </a>
@@ -174,3 +172,19 @@
             </div>
         </div>
     </header>
+
+    <script>
+        document.getElementById('categorySearchForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const searchInput = document.getElementById('categorySearchInput').value.toLowerCase();
+            const categoryOptions = document.querySelectorAll('.select-active option');
+    
+            for (const option of categoryOptions) {
+                const categoryName = option.textContent.toLowerCase();
+                if (categoryName === searchInput) {
+                    location.href = option.value;
+                    break;
+                }
+            }
+        });
+    </script>

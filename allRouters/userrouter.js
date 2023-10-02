@@ -39,6 +39,9 @@ router.get("/Sportsshowbycategory/:name",controller.Sportsshowbycategory)
 
 router.get("/productview/:id",controller.productview)
 
+router.get("/wishlist",controller.wishlist)
+router.get("/cart",controller.cart)
+
 
 
 
