@@ -34,6 +34,12 @@ router.get("/edit-product/:id",controller.editproductpage)
 router.get("/user_list",controller.userlist)
 router.get("/userblock/:id",controller.user_block)
 
+router.get("/categorylist",controller.categoryredirection)
+router.post("/addcategory",controller.toaddcategory)
+router.get("/categoryredirection",controller.categoryredirection)
+router.get("/categoryblock/:id",controller.category_block)
+router.post("/editcategory",controller.editcategorypage)
 
+router.get("/productblock/:id",controller.product_block)
 
 module.exports=router

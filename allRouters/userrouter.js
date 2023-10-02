@@ -25,4 +25,25 @@ router.post("/otpcheck",controller.otpchecks)
 // router.get("/dosignup",controller.sendotp)
 // router.post("/signup")
 
+router.get("/all",controller.allpage)
+router.get("/showbycategory/:name",controller.showbycategory)
+
+router.get("/ethinic",controller.ethinicpage)
+router.get("/ethinicshowbycategory/:name",controller.ethinicshowbycategory)
+
+router.get("/western",controller.westernpage)
+router.get("/westernshowbycategory/:name",controller.westernshowbycategory)
+
+router.get("/sports",controller.sportspage)
+router.get("/Sportsshowbycategory/:name",controller.Sportsshowbycategory)
+
+router.get("/productview/:id",controller.productview)
+
+
+
+
+
+
+
+
 module.exports=router

@@ -119,15 +119,9 @@
                                                 <div class="col-sm-6 mb-3">
                                                     <label class="form-label">Category</label>
                                                     <select class="form-select" name="category">
-                                                        <option> Saree </option>
-                                                        <option> kurthie </option>
-                                                        <option> Lehanga </option>
-                                                        <option> Tops </option>
-                                                        <option> Jeans </option>
-                                                        <option> Pants </option>
-                                                        <option> Tracksuit </option>
-                                                        <option> Sports bra </option>
-                                                        <option> Tights </option>
+                                                        <% categories.forEach(function(category) { %>
+                                                            <option> <%= category.name %> </option>
+                                                        <% }); %>
                                                     </select>
                                                 </div>
                                                 

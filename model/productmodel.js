@@ -46,9 +46,9 @@ const productschema = new mongoose.Schema({
       type: Number,
       required: true,
     },
-    status:{
-      default:"unblocked",
-      type:String,
+    blocked:{
+      type : Boolean,
+      default: false
     },
     images: [
       {

@@ -1,12 +1,20 @@
-const mongoose=require("mongoose")
+const mongoose=require ("mongoose")
 
 const categoryschema = new mongoose.Schema({
     name:{
         type: String,
-        default: active
+        required: true        
+    },
+    type:{
+        type: String,
+        required: true
+    },
+    blocked:{
+        type : Boolean,
+        default: false
     }
 })
 
 
-const admincollection = mongoose.model("CategoryCollection", categoryschema);
-module.exports=admincollection
+module.exports = mongoose.model("CategoryCollection", categoryschema);
+

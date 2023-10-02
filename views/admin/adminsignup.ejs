@@ -42,7 +42,7 @@
             <div class="card mx-auto card-login">
                 <div class="card-body">
                     <h4 class="card-title mb-4">Admin Sign in</h4>
-                        <form onsubmit="return userloginValidation()" method="post" action="/admin/adminsignin">
+                        <form onsubmit="return adminloginValidation()" method="post" action="/admin/adminsignin">
                             <% if (errmessage) { %>
                                 <div class="alert alert-danger text-center" role="alert">
                                     <%= errmessage %>
@@ -71,7 +71,7 @@
             </div>
         </section>
         <script>
-            function userloginValidation() {
+            function adminloginValidation() {
           // Input fields
           const email = document.getElementById('email');
           const password = document.getElementById('password');

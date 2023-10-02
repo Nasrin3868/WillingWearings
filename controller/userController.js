@@ -2,19 +2,24 @@ const bcrypt=require("bcrypt")
 const nodemailer=require("nodemailer")
 // const otpgenerator=require("otp-generator")
 const randomstring = require('randomstring');
-
-
-
-const { collection } = require("../model/mongodb");
+const collection= require("../model/mongodb");
+const Products=require("../model/productmodel")
+const CategoryCollection=require("../model/categorymodel")
 
 const home= async(req,res)=>{
     console.log("Reached home");
     if(req.session.user){
         const isAuthenticated=true
-        res.render("user/home",{isAuthenticated})
+        const categories=await CategoryCollection.find({blocked:false})
+        const products=await Products.find({blocked:false})
+        console.log(products);
+        res.render("user/home",{isAuthenticated,products,categories})
     }else{
         const isAuthenticated=false
-        res.render("user/home",{isAuthenticated})   
+        const categories=await CategoryCollection.find({blocked:false})
+        const products=await Products.find({blocked:false})
+        console.log(products);
+        res.render("user/home",{isAuthenticated,products,categories})
     }
 }
 
@@ -308,10 +313,175 @@ const otpchecks=async(req,res)=>{
     }
 }
 
+const allpage=async(req,res)=>{
+    console.log("reached all wears");
+    
+    if(req.session.user){
+        const isAuthenticated=true
+        const categories=await CategoryCollection.find({blocked:false})
+        const products=await Products.find({blocked:false})
+        res.render("user/all",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const categories=await CategoryCollection.find({blocked:false})
+        const products=await Products.find({blocked:false})        
+        res.render("user/all",{isAuthenticated,products,categories})   
+    }    
+}
 
+const showbycategory=async(req,res)=>{
+    console.log("reached showbycategory")
+    if(req.session.user){
+        const name=req.params.name   
+        const isAuthenticated=true
+        const categories=await CategoryCollection.find({blocked:false})
+        const products=await Products.find({blocked:false,category:name})
+        res.render("user/all",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const name=req.params.name
+        const categories=await CategoryCollection.find({blocked:false})
+        const products=await Products.find({blocked:false,category:name})        
+        res.render("user/all",{isAuthenticated,products,categories})   
+    }
+}
 
+const ethinicpage=async(req,res)=>{
+    console.log("reached ethinic wears");
+    
+    if(req.session.user){
+        const isAuthenticated=true
+        const type = "Ethinic"; // Change 'dress' to 'type'
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
+        res.render("user/ethinic",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const type = "Ethinic"; // Change 'dress' to 'type'
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
+        console.log(products)        
+        res.render("user/ethinic",{isAuthenticated,products,categories})   
+    }    
+}
 
+const ethinicshowbycategory=async(req,res)=>{
+    console.log("reached ethinicshowbycategory")
+    if(req.session.user){
+        const name=req.params.name  
+        const isAuthenticated=true
+        const type = "Ethinic";
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false,category:name, type });
+        res.render("user/ethinic",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const name=req.params.name
+        const type = "Ethinic";
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false,category:name, type });        
+        res.render("user/ethinic",{isAuthenticated,products,categories})   
+    }
+}
+
+const westernpage=async(req,res)=>{
+    console.log("reached western wears");
+    
+    if(req.session.user){
+        const isAuthenticated=true
+        const type = "Western"; // Change 'dress' to 'type'
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
+        res.render("user/western",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const type = "Western"; // Change 'dress' to 'type'
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
+        console.log(products)        
+        res.render("user/western",{isAuthenticated,products,categories})   
+    }    
+}
+
+const westernshowbycategory=async(req,res)=>{
+    console.log("reached westernshowbycategory")
+    if(req.session.user){
+        const name=req.params.name  
+        const isAuthenticated=true
+        const type = "Western";
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false,category:name, type });
+        res.render("user/western",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const name=req.params.name
+        const type = "Western";
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false,category:name, type });        
+        res.render("user/western",{isAuthenticated,products,categories})   
+    }
+}
+
+const sportspage=async(req,res)=>{
+    console.log("reached sports wears");
+    
+    if(req.session.user){
+        const isAuthenticated=true
+        const type = "Sports"; // Change 'dress' to 'type'
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
+        res.render("user/sports",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const type = "Sports"; // Change 'dress' to 'type'
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
+        console.log(products)        
+        res.render("user/sports",{isAuthenticated,products,categories})   
+    }    
+}
+
+const Sportsshowbycategory=async(req,res)=>{
+    console.log("reached Sportsshowbycategory")
+    if(req.session.user){
+        const name=req.params.name  
+        const isAuthenticated=true
+        const type = "Sports";
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false,category:name, type });
+        res.render("user/sports",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const name=req.params.name
+        const type = "Sports";
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false,category:name, type });        
+        res.render("user/sports",{isAuthenticated,products,categories})   
+    }
+}
+
+const productview=async(req,res)=>{
+    console.log("reached productview")
+    if(req.session.user){
+        const id=req.params.id  
+        const isAuthenticated=true
+        const categories=await CategoryCollection.find({blocked:false})
+        const product = await Products.findOne({_id:id});
+        console.log(product);
+        res.render("user/productview",{isAuthenticated,product,categories})
+    }else{
+        const isAuthenticated=false
+        const id=req.params.id  
+        const categories=await CategoryCollection.find({blocked:false})
+        const product = await Products.findOne({_id:id});
+        console.log(product);
+        res.render("user/productview",{isAuthenticated,product,categories})  
+    }
+
+}
 
 module.exports={
-    home,login,signup,logout,dosignup,sendOtp,dologin,validateotp,resendotp,Toemail,checkemail,otpchecks,otpcheckpage
+    home,login,signup,logout,dosignup,sendOtp,dologin,validateotp,resendotp,Toemail,checkemail,otpchecks,otpcheckpage,
+    allpage,showbycategory,ethinicpage,ethinicshowbycategory,westernpage,westernshowbycategory,sportspage,Sportsshowbycategory,
+    productview
 }
