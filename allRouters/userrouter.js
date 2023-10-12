@@ -6,7 +6,7 @@ const middleware=require("../middleware/userAuth")
 
 
 router.get("/",controller.home)
-router.get("/home",controller.home)
+router.get("/home",middleware.islogin,controller.loadHomeAfterLogin)
 router.get("/login",controller.login)
 router.post("/login",controller.dologin)
 router.get("/logout",middleware.islogout,controller.logout)
@@ -22,7 +22,10 @@ router.get("/forgetpassword",controller.Toemail)
 router.post("/emailcheck",controller.checkemail)
 router.get("/otpcheck",controller.otpcheckpage)
 router.post("/otpcheck",controller.otpchecks)
-// router.get("/dosignup",controller.sendotp)
+router.post("/resendOTP_for_forgrtpassword",controller.resendOTP_for_forgrtpassword)
+router.get("/confirmpassword",controller.confirmpassword)
+router.post("/confirm_password_check",controller.confirm_password_check)
+
 // router.post("/signup")
 
 router.get("/all",controller.allpage)
@@ -39,8 +42,22 @@ router.get("/Sportsshowbycategory/:name",controller.Sportsshowbycategory)
 
 router.get("/productview/:id",controller.productview)
 
-router.get("/wishlist",controller.wishlist)
-router.get("/cart",controller.cart)
+router.get("/wishlist",middleware.cartAuth,controller.wishlist)
+router.post("/productQuantityUpdate",middleware.cartAuth,controller.productQuantityUpdate)
+router.get("/doCart/:id",middleware.cartAuth,controller.doCart)
+router.get("/cart",middleware.cartAuth,controller.cart)
+router.post("/cartUpdate",controller.cartUpdate)
+router.get("/cart",middleware.cartAuth,controller.calculateCartSubtotal)
+router.get("/placeorder/:total",middleware.cartAuth,controller.placeorder)
+
+router.get("/checkout",middleware.cartAuth,controller.checkout)
+router.get("/cartproductdelete/:id",middleware.cartAuth,controller.cartproductdelete)
+
+router.get("/addAddress",middleware.cartAuth,controller.addAddress)
+
+// router.post("/cartTotalUpdate",controller.cartTotalUpdate)
+
+// router.post("/cartUpdate",controller.calculateCartSubtotal)
 
 
 

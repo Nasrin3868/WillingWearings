@@ -1,6 +1,5 @@
 <%-include("../partials/userheader")-%>
 
-
 <section class="product-tabs pt-25 pb-20 wow fadeIn animated">
     <div class="container">
         <div class="row">
@@ -88,7 +87,7 @@
                                                     <span class="old-price"><%= product.price%></span>
                                                 </div>
                                                 <div class="product-action-1 show">
-                                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="/cart"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="/doCart/<%= product._id%>"><i class="fi-rs-shopping-bag-add" ></i></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -113,3 +112,7 @@
 </section>
 
 <%-include("../partials/userfooter")-%>
+
+<script>
+
+</script>

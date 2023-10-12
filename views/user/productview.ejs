@@ -15,7 +15,9 @@
                                     <div class="product-image-slider">
                                         <% if (product && product.images && product.images.length > 0) { %>
                                             <% product.images.forEach(function (image, index) { %>
-                                                <img class="<%= index === 0 ? 'default-img' : 'hidden' %>" src="<%= image %>" alt="">
+                                                <figure class="border-radius-10">
+                                                    <img src="<%= image %>" alt="product image">
+                                                </figure>
                                             <% }); %>
                                         <% } %>
                                     </div>
@@ -97,7 +99,7 @@
                                         </li>
                                     </ul>
                                     
-                            </div>
+                                </div>
                                 <!-- Detail Info -->
                             </div>
                         </div>

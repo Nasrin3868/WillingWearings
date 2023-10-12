@@ -1,0 +1,52 @@
+const mongoose = require('mongoose');
+
+const addressSchema = new mongoose.Schema({
+   name: {
+      type: String,
+      required: true
+   },
+   city_town_district: {
+     type: String,
+    required: true
+   },
+   state: {
+     type: String,
+    required: true
+   },
+   address: {
+     type: String,
+    required: true
+   },
+   pincode: {
+     type: Number,
+    required: true
+   },
+   landmark: {
+     type: String,
+    required: true
+   },
+   mobile: {
+     type: Number,
+    required: true
+   },
+   alt_mobile: {
+     type: Number,
+    required: true
+   },
+   userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user', 
+    required: true,
+  },
+   type: {
+     type: String,
+      required: true
+    },
+   blocked: {
+    type: Boolean,
+    default: false,
+  }
+})
+
+module.exports = mongoose.model("addresscollection", adminschema,"admincollection");
+// module.exports = mongoose.model('address', addressModel, 'address');

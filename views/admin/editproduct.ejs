@@ -1,7 +1,7 @@
 <%-include("../partials/adminheader")-%>
 
         <section class="content-main">
-            <div class="row">
+            <div class="row"> <!-- 1st card -->
                 <div class="col-9">
                     <div class="content-header">
                         <h2 class="content-title">Product Management</h2>
@@ -16,7 +16,7 @@
                             <h4>Basic</h4>
                         </div>
                         <div class="card-body">
-                            <form action="/admin/editproduct" method="post" enctype="multipart/form-data">
+                            <form action="/admin/editproduct/<%= foundproduct._id %>" method="post" enctype="multipart/form-data">
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Product Name</label>
                                     <input type="text"placeholder="Type here" class="form-control" id="product_name" name="name" value="<%= foundproduct.name %>">
@@ -76,7 +76,7 @@
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label class="form-label">Colour</label>
-                                            <input placeholder="Type here type="text" class="form-control" name="colour" value="<%= foundproduct.colour %>">
+                                            <input placeholder="Type here" type="text" class="form-control" name="colour" value="<%= foundproduct.colour %>">
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
@@ -90,7 +90,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- for images -->
+                                <!-- for images.................... -->
                                 <div class="col-lg-6">
                                     <div class="card mb-4">
                                         <div class="card-header">
@@ -105,7 +105,6 @@
                                                         <% foundproduct.images.forEach(function(imageUrl, index) { %>
                                                             <div class="image-container">
                                                                 <img src="<%= imageUrl %>" alt="Product Image">
-                                                                <button class="remove-image" data-index="<%= index %>">Remove</button>
                                                             </div>
                                                         <% }); %>
                                                     <% } %>
@@ -113,7 +112,7 @@
                                 
                                                 <!-- Container for newly added images -->
                                                 <div id="newImages"></div>
-                                
+
                                                 <input
                                                     type="file"
                                                     id="productImage"
@@ -121,16 +120,18 @@
                                                     accept="image/*"
                                                     multiple
                                                     required
+                                                    style="display: none;" 
                                                 />
-                                                <button id="addImage">Add Image</button>
+
+                                                <!-- Add Image button -->
+                                                <button id="addImage">Choose Image</button>
+                                                <button id="deleteImages" type="button">Delete All Images</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                            </div>
-                                        </div>
-                                    </div> <!-- card end// -->
+                                <!-- for images.................... -->
+                            
                                     <div class="card mb-4">
                                         <div class="card-header">
                                             <h4>Organization</h4>
@@ -155,8 +156,8 @@
                                             </div> <!-- row.// -->
                                         </div>
                                     </div> <!-- card end// -->
-                                </div>
-                            <button type="submit" class="btn btn-md rounded font-sm hover-up">Publish</button>
+                                
+                                    <button type="submit" onclick="window.location.href(`/admin/editproduct/<%= foundproduct._id %>`)" class="btn btn-md rounded font-sm hover-up">Publish</button>
                             </form>
                         </div>
                     </div> <!-- card end// -->
@@ -169,85 +170,44 @@
         
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Handle image removal
-                const removeButtons = document.querySelectorAll('.remove-image');
-                removeButtons.forEach(button => {
-                    button.addEventListener('click', function () {
-                        const index = button.getAttribute('data-index');
-                        // Remove the image from the existingImages div
-                        const imageContainer = button.parentElement;
-                        imageContainer.remove();
-                        // If needed, update a hidden input or JavaScript array to track removed images.
-                    });
-                });
-        
-                // Handle adding new images
-                const addImageBtn = document.getElementById('addImage');
+                const deleteImagesBtn = document.getElementById('deleteImages');
+                const chooseImageBtn = document.getElementById('addImage');
                 const newImagesContainer = document.getElementById('newImages');
                 const productImage = document.getElementById('productImage');
-        
-                addImageBtn.addEventListener('click', function () {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.name = 'images';
-                    input.accept = 'image/*';
-                    input.required = true;
-        
-                    // Append the new input element to the newImages div
-                    newImagesContainer.appendChild(input);
-        
-                    // Listen for changes to newly added file inputs
-                    input.addEventListener('change', function () {
-                        const files = Array.from(input.files);
-                        files.forEach(function (file) {
-                            const reader = new FileReader();
-                            reader.onload = function (event) {
-                                const imageUrl = event.target.result;
-                                // Create an image element and append it to the newImages container
-                                const img = document.createElement('img');
-                                img.src = imageUrl;
-                                newImagesContainer.appendChild(img);
-                            };
-                            reader.readAsDataURL(file);
-                        });
+            
+                // Handle image removal
+                deleteImagesBtn.addEventListener('click', function () {
+                    // Remove all images from the newImages div
+                    newImagesContainer.innerHTML = '';
+                });
+            
+                // Handle adding new images
+                chooseImageBtn.addEventListener('click', function () {
+                    // Trigger the hidden file input
+                    productImage.click();
+                });
+            
+                // Listen for changes to newly added file inputs
+                productImage.addEventListener('change', function () {
+                    const files = Array.from(productImage.files);
+                    files.forEach(function (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            const imageUrl = event.target.result;
+                            // Create an image element and append it to the newImages container
+                            const img = document.createElement('img');
+                            img.src = imageUrl;
+                            newImagesContainer.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
                     });
-        
                     // Clear the selected file in the original file input
                     productImage.value = '';
                 });
             });
-        </script>
+            </script>
         
-        <!-- <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Handle image removal
-                const removeButtons = document.querySelectorAll('.remove-image');
-                removeButtons.forEach(button => {
-                    button.addEventListener('click', function () {
-                        const index = button.getAttribute('data-index');
-                        // Remove the image from the existingImages div
-                        const imageContainer = button.parentElement;
-                        imageContainer.remove();
-                        // If needed, update a hidden input or JavaScript array to track removed images.
-                    });
-                });
         
-                // Handle adding new images
-                const addImageBtn = document.getElementById('addImage');
-                const existingImages = document.getElementById('existingImages');
-        
-                addImageBtn.addEventListener('click', function () {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.name = 'images';
-                    input.accept = 'image/*';
-                    input.required = true;
-                    
-                    // Append the new input element to the existingImages div
-                    existingImages.appendChild(input);
-                });
-            });
-        </script> -->
 <%-include("../partials/adminfooter")-%>
 
 

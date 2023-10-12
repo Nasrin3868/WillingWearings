@@ -1,9 +1,9 @@
 
 const islogin=async(req,res,next)=>{
-    if(req.sesion.user){
+    if(req.session.user){
         next()
     }else{
-        res.redirect("/home")
+        res.redirect("/")
     }
     
 }
@@ -16,4 +16,12 @@ const islogout=async(req,res,next)=>{
     next()
 }
 
-module.exports={islogout,islogin}
+const cartAuth=async(req,res,next)=>{
+    if(req.session.user){
+        next()
+    }else{
+        res.redirect("/login")
+    }
+}
+
+module.exports={islogout,islogin,cartAuth}

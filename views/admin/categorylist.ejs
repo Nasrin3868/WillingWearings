@@ -44,7 +44,7 @@
                                 <label for="product_name" class="form-label">Name</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="editCategoryName" name="name">
                                 <span id="editnameError" style="color: red;"></span><br>
-                                <select class="form-select" name="editcategory">
+                                <select class="form-select" name="editcategory" id="editcategoryType">
                                     <% const uniqueCategoryTypesForEdit = Array.from(new Set(categories.map(category => category.type))) %>
                                     <% uniqueCategoryTypesForEdit.forEach(function(categoryType) { %>
                                         <option> <%= categoryType %> </option>
@@ -73,7 +73,7 @@
                                         <td class="text-center" width="20%"><b><%= category.name %></b></td>
                                         <td class="text-center" width="20%"><b><%= category.type %></b></td>
                                         <td class="text-center">
-                                            <a onclick="showEditCategoryForm( '<%= category._id %>', '<%= category.name %>') " class="btn btn-primary btn-sm rounded" >Edit</a>
+                                            <a onclick="showEditCategoryForm( '<%= category._id %>', '<%= category.name %>','<%= category.type %>') " class="btn btn-primary btn-sm rounded" >Edit</a>
                                         </td>
                                         <td>
                                             <div width="20%" class="info pl-3 text-center">
@@ -99,11 +99,15 @@
 
     <script>
 
-    function showEditCategoryForm(categoryId, categoryName) {
+    function showEditCategoryForm(categoryId, categoryName, categoryType){
         document.getElementById('createCategoryForm').style.display = 'none';
         document.getElementById('editCategoryForm').style.display = 'block';
         document.getElementById('editCategoryName').value = categoryName;
         document.getElementById('editCategoryId').value = categoryId;
+        document.getElementById('editcategoryType').value = categoryType;
+
+
+        
     }
     function categorynameValidation() {
       // Input fields

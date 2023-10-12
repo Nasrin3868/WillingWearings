@@ -1,109 +1,108 @@
 <%-include("../partials/adminheader")-%>
 
 
-        <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <h2 class="content-title card-title">Products List</h2>
-                    <p>Lorem ipsum dolor sit amet.</p>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Products List</h2>
+            <p>Lorem ipsum dolor sit amet.</p>
+        </div>
+        <div>
+            <a href="/admin/addproduct" class="btn btn-primary btn-sm rounded">Create new</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col col-check flex-grow-0">
+                    <div class="form-check ms-2">
+                        <input class="form-check-input" type="checkbox" value="">
+                    </div>
                 </div>
-                <div>
-                    <a href="/admin/addproduct" class="btn btn-primary btn-sm rounded">Create new</a>
+                <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                    <select class="form-select">
+                        <option selected>All category</option>
+                        <option>Electronics</option>
+                        <option>Clothes</option>
+                        <option>Automobile</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-6">
+                    <input type="date" value="02.05.2021" class="form-control">
+                </div>
+                <div class="col-md-2 col-6">
+                    <select class="form-select">
+                        <option selected>Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
                 </div>
             </div>
-            <div class="card mb-4">
-                <header class="card-header">
-                    <div class="row align-items-center">
-                        <div class="col col-check flex-grow-0">
-                            <div class="form-check ms-2">
-                                <input class="form-check-input" type="checkbox" value="">
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            <article class="itemlist">
+                    <% products.forEach(function(product) { %>
+                        <div class="row align-items-center mb-3">
+                            <div class="col col-check flex-grow-0">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox">
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                                <a class="itemside" href="#">
+                                    <div class="left">
+                                        <% if (product.images && product.images.length > 0) { %>
+                                            <img class="img-sm img-thumbnail" src="<%= product.images[0] %>" alt="">
+                                          <% } else { %>
+                                            <!-- Handle the case when there are no images for the product -->
+                                            <p>No images available</p>
+                                          <% } %>
+                                          
+                                    </div>
+                                    <div class="info">
+                                        <h6 class="mb-0"><%= product.name %></h6>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-price">
+                                <span><%= product.price %>/-</span>
+                            </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-status">
+                                    <% if (product.blocked==true) { %>
+                                        <span class="badge rounded-pill alert-danger">Blocked</span>
+                                    <% } else { %>
+                                        <span class="badge rounded-pill alert-success">Unblocked</span>                                      
+                                    <% } %> 
+                            
+                            </div>
+                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
+                                <a href="/admin/edit-product/<%= product._id %>" class="btn btn-sm font-sm rounded btn-brand">
+                                    <i class="material-icons md-edit"></i> Edit
+                                </a>
+                                    <% if (product.blocked==true) { %>
+                                        <a class="btn btn-sm font-sm rounded btn-brand" style="background-color: red;" href="/admin/productblock/<%= product._id %>">Unblock</a>
+                                    <% } else { %>
+                                        <a class="btn btn-sm font-sm rounded btn-brand" style="background-color: green;" href="/admin/productblock/<%= product._id %>">Block</a>                                       
+                                    <% } %> 
+                                
                             </div>
                         </div>
-                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                            <select class="form-select">
-                                <option selected>All category</option>
-                                <option>Electronics</option>
-                                <option>Clothes</option>
-                                <option>Automobile</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <input type="date" value="02.05.2021" class="form-control">
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <select class="form-select">
-                                <option selected>Status</option>
-                                <option>Active</option>
-                                <option>Disabled</option>
-                                <option>Show all</option>
-                            </select>
-                        </div>
-                    </div>
-                </header> <!-- card-header end// -->
-                <div class="card-body">
-                    <article class="itemlist">
-                            <% products.forEach(function(product) { %>
-                                <div class="row align-items-center mb-3">
-                                    <div class="col col-check flex-grow-0">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox">
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
-                                        <a class="itemside" href="#">
-                                            <div class="left">
-                                                <% if (product.images && product.images.length > 0) { %>
-                                                    <img class="default-img" src="<%= product.images[0] %>" alt="">
-                                                  <% } else { %>
-                                                    <!-- Handle the case when there are no images for the product -->
-                                                    <p>No images available</p>
-                                                  <% } %>
-                                                  
-                                            </div>
-                                            <div class="info">
-                                                <h6 class="mb-0"><%= product.name %></h6>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-2 col-4 col-price">
-                                        <span><%= product.price %>/-</span>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-2 col-4 col-status">
-                                            <% if (product.blocked==true) { %>
-                                                <span class="badge rounded-pill alert-danger">Blocked</span>
-                                            <% } else { %>
-                                                <span class="badge rounded-pill alert-success">Unblocked</span>                                      
-                                            <% } %> 
-                                    
-                                    </div>
-                                    <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
-                                        <a href="/admin/edit-product/<%= product._id %>" class="btn btn-sm font-sm rounded btn-brand">
-                                            <i class="material-icons md-edit"></i> Edit
-                                        </a>
-                                            <% if (product.blocked==true) { %>
-                                                <a class="btn btn-sm font-sm rounded btn-brand" style="background-color: red;" href="/admin/productblock/<%= product._id %>">Unblock</a>
-                                            <% } else { %>
-                                                <a class="btn btn-sm font-sm rounded btn-brand" style="background-color: green;" href="/admin/productblock/<%= product._id %>">Block</a>                                       
-                                            <% } %> 
-                                        
-                                    </div>
-                                </div>
-                            <% }); %>
-                    </article> 
-                </div> <!-- card-body end// -->
-            </div> <!-- card end// -->
-            <div class="pagination-area mt-30 mb-50">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-start">
-                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                        <li class="page-item"><a class="page-link" href="#">02</a></li>
-                        <li class="page-item"><a class="page-link" href="#">03</a></li>
-                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#">16</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-                    </ul>
-                </nav>
-            </div>
-        </section> <!-- content-main end// -->
-        
+                    <% }); %>
+            </article> 
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            </ul>
+        </nav>
+    </div>
+</section> <!-- content-main end// -->
 <%-include("../partials/adminfooter")-%>

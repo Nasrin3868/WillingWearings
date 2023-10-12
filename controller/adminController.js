@@ -25,6 +25,7 @@ const upload = multer({ storage: storage });
 const dashboard=async(req,res)=>{
     console.log("reached admin dashboard");
     res.render("admin/dashboard.ejs")
+ 
 }
 
 // const productlist=async(req,res)=>{
@@ -41,8 +42,18 @@ const addproductpage=async(req,res)=>{
 const addproduct = async (req, res) => {
     console.log("reached")
    
-      try {
-        const { name, description, price, sellingprice, category, size, brand, stock,status,colour,type } = req.body;
+      
+        const name=req.body.name
+        const description=req.body.description
+        const price=req.body.price
+        const sellingprice=req.body.sellingprice
+        const category=req.body.category
+        const size=req.body.size
+        const brand=req.body.brand
+        const stock=req.body.stock
+        const status=req.body.status
+        const colour=req.body.colour
+        const type=req.body.type
         const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
         console.log('image urls is =>',imageUrls)
         const product = new Product({
@@ -69,10 +80,7 @@ const addproduct = async (req, res) => {
         console.log("products variable added")
 
         res.redirect("/admin/productredirection")
-      } catch (error) {
-        console.error("Error uploading product:", error);
-        res.status(500).send("Error uploading product.");
-      }
+      
     }
 
 const productredirection=async(req,res)=>{
@@ -97,7 +105,8 @@ const dosignin=async(req,res)=>{
         if(data.length>0){
             if(data[0].password===password){
                 req.session.admin=data[0]._id
-                res.render("admin/dashboard");
+                console.log(req.session.admin);
+                res.redirect("/admin/");
             }else if(data[0].password!==password){
                 res.render("admin/adminsignup",{errmessage:"incorrect password"});
             }
@@ -124,9 +133,17 @@ const editproductpage=async(req,res)=>{
     // res.redirect("editproduct/id=${productId}")
 }
 
-// const doedit=async(req,res)=>{
-//     data
-// }
+
+const editproduct=async(req,res)=>{
+    console.log("reached editproduct");
+    const productId=req.params.id
+    // const name=req.body.name
+    const { name, description, price, sellingprice, category, size, brand, stock,colour,type } = req.body;
+    const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
+    await Product.findOneAndUpdate({ _id: productId }, { name: name,description:description,price:price,sellingprice:sellingprice,category:category,size:size,brand:brand,stock:stock,colour:colour,type:type});
+    res.redirect("/productredirection")
+
+}
 
 const userlist=async(req,res)=>{
     console.log("reached usermanagement");
@@ -148,11 +165,7 @@ const user_block=async(req,res)=>{
     // await collection.updateOne()
 }
 
-// const categorypage=async(req,res)=>{
-//     console.log("reached categorypage")
 
-//     res.render('admin/categorylist',{errmessage:""})
-// }
 
 const toaddcategory=async(req,res)=>{
     const category=req.body.name
@@ -212,9 +225,15 @@ const  product_block=async(req,res)=>{
     res.redirect('/admin/product_list')
 }
 
+const logout=async(req,res)=>{
+    if(req.session.admin){
+        req.session.admin=null
+        res.redirect('/admin/adminsignin')
+    }
+}
 
 module.exports={
     dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block,
-    toaddcategory,categoryredirection,category_block
-    ,editcategorypage,product_block
+    toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout
+    
 }

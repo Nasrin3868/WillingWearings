@@ -30,6 +30,32 @@ const loginSchema=new mongoose.Schema({
         type: Boolean,
        default : false
     },
+    cart:[
+        {
+            product:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'productCollection'
+            },
+            quantity:{
+                type:Number,
+                default:1
+            }
+        }
+    ],
+    wishlist:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'productCollection'
+        }
+    ],
+    address:[
+        {
+            Address:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'addresscollection'
+            }
+        }
+    ],
     otp:{
         type:Number,
         default: null
