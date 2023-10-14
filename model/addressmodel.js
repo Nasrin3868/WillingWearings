@@ -5,7 +5,7 @@ const addressSchema = new mongoose.Schema({
       type: String,
       required: true
    },
-   city_town_district: {
+   address: {
      type: String,
     required: true
    },
@@ -13,7 +13,11 @@ const addressSchema = new mongoose.Schema({
      type: String,
     required: true
    },
-   address: {
+   district: {
+     type: String,
+    required: true
+   },
+   city: {
      type: String,
     required: true
    },
@@ -21,32 +25,20 @@ const addressSchema = new mongoose.Schema({
      type: Number,
     required: true
    },
-   landmark: {
-     type: String,
-    required: true
-   },
    mobile: {
-     type: Number,
-    required: true
-   },
-   alt_mobile: {
      type: Number,
     required: true
    },
    userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user', 
+    ref: 'logincollection', 
     required: true,
   },
-   type: {
-     type: String,
-      required: true
-    },
    blocked: {
     type: Boolean,
     default: false,
   }
 })
 
-module.exports = mongoose.model("addresscollection", adminschema,"admincollection");
+module.exports = mongoose.model("addresscollection", addressSchema);
 // module.exports = mongoose.model('address', addressModel, 'address');

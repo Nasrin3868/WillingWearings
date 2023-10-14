@@ -50,10 +50,8 @@ const loginSchema=new mongoose.Schema({
     ],
     address:[
         {
-            Address:{
-                type:mongoose.Schema.Types.ObjectId,
-                ref:'addresscollection'
-            }
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'addresscollection'
         }
     ],
     otp:{

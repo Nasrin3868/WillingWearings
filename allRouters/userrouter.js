@@ -43,7 +43,7 @@ router.get("/Sportsshowbycategory/:name",controller.Sportsshowbycategory)
 router.get("/productview/:id",controller.productview)
 
 router.get("/wishlist",middleware.cartAuth,controller.wishlist)
-router.post("/productQuantityUpdate",middleware.cartAuth,controller.productQuantityUpdate)
+router.post("/productQuantityUpdate",controller.productQuantityUpdate)
 router.get("/doCart/:id",middleware.cartAuth,controller.doCart)
 router.get("/cart",middleware.cartAuth,controller.cart)
 router.post("/cartUpdate",controller.cartUpdate)
@@ -54,16 +54,18 @@ router.get("/checkout",middleware.cartAuth,controller.checkout)
 router.get("/cartproductdelete/:id",middleware.cartAuth,controller.cartproductdelete)
 
 router.get("/addAddress",middleware.cartAuth,controller.addAddress)
+router.post("/newAddress",middleware.cartAuth,controller.newAddress)
+router.get("/editAddress/:id",middleware.cartAuth,controller.editAddress)
+router.post("/editedAddress/:id",middleware.cartAuth,controller.editedAddress)
+router.get("/deleteAddress/:id",middleware.cartAuth,controller.deleteAddress)
+
+router.get("/myaccount",middleware.cartAuth,controller.myaccount)
+router.post("/OrderSubmit",controller.OrderSubmit)
+router.get("/placedOrder/:id",middleware.cartAuth,controller.placedOrder)
 
 // router.post("/cartTotalUpdate",controller.cartTotalUpdate)
 
 // router.post("/cartUpdate",controller.calculateCartSubtotal)
-
-
-
-
-
-
 
 
 module.exports=router

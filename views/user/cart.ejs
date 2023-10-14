@@ -174,6 +174,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12">
+                        <% if (userdata && userdata.cart.length > 0) { %>
                         <div class="table-responsive">
                             <table class="table shopping-summery text-center clean">
                                 <thead>
@@ -187,56 +188,63 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% if (userdata && userdata.cart.length > 0) { %>
-                                        <% userdata.cart.forEach(cartItem => { %>
-                                            <tr>
-                                                <td class="image product-thumbnail">
-                                                    <img src="<%= cartItem.product.images[0] %>" alt="Product Image">
-                                                </td>
-                                                <td class="product-des product-name">
-                                                    <h5 class="product-name">
-                                                        <a href="shop-product-right.html"><%= cartItem.product.name %></a>
-                                                    </h5>
-                                                    <p class="font-xs"><%= cartItem.product.description %></p>
-                                                </td>
-                                                <td class="price" data-title="Price">
-                                                    <span>Rs.<%= cartItem.product.sellingprice %></span>
-                                                </td>
-                                                <!-- Update the quantity and total price based on user interactions -->
-                                                <td class="text-center" data-title="Stock">
-                                                    <div class="detail-qty border radius m-auto">
-                                                        <a class="qty-up" onclick="increaseQuantity('<%= cartItem.product._id %>','<%= cartItem.product.sellingprice %>')">
-                                                            <i class="fi-rs-angle-small-up"></i>
-                                                        </a>
-                                                        <span class="qty-val" id="qty-<%= cartItem.product._id %>"> <%= cartItem.quantity %> </span>
-                                                        <a class="qty-down" onclick="decreaseQuantity('<%= cartItem.product._id %>','<%= cartItem.product.sellingprice %>')">
-                                                            <i class="fi-rs-angle-small-down"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                                
-                                                <td class="text-right" data-title="Cart">
-                                                    <span id="total-price-<%= cartItem.product._id %>">Rs.<span id="total-<%= cartItem.product._id %>"><%= cartItem.product.sellingprice * cartItem.quantity %></span></span>
-                                                </td>
-                                                <td class="action" data-title="Remove">
-                                                    <a href="/cartproductdelete/<%= cartItem.product._id %>" class="text-muted"><i class="fi-rs-trash"></i></a>
-                                                </td>
-                                            </tr>
-                                        <% }); %>
-                                    <% } else { %>
+                                    <% userdata.cart.forEach(cartItem => { %>
                                         <tr>
-                                            <td colspan="6" class="text-center">No items in the cart</td>
+                                            <td class="image product-thumbnail">
+                                                <img src="<%= cartItem.product.images[0] %>" alt="Product Image">
+                                            </td>
+                                            <td class="product-des product-name">
+                                                <h5 class="product-name">
+                                                    <a href="shop-product-right.html"><%= cartItem.product.name %></a>
+                                                </h5>
+                                                <p class="font-xs"><%= cartItem.product.description %></p>
+                                            </td>
+                                            <td class="price" data-title="Price">
+                                                <span>Rs.<%= cartItem.product.sellingprice %></span>
+                                            </td>
+                                            <!-- Update the quantity and total price based on user interactions -->
+                                            <td class="text-center" data-title="Stock">
+                                                <div class="detail-qty border radius m-auto">
+                                                    <a class="qty-up" onclick="increaseQuantity('<%= cartItem.product._id %>','<%= cartItem.product.sellingprice %>')">
+                                                        <i class="fi-rs-angle-small-up"></i>
+                                                    </a>
+                                                    <span class="qty-val" id="qty-<%= cartItem.product._id %>"> <%= cartItem.quantity %> </span>
+                                                    <a class="qty-down" onclick="decreaseQuantity('<%= cartItem.product._id %>','<%= cartItem.product.sellingprice %>')">
+                                                        <i class="fi-rs-angle-small-down"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td class="text-right" data-title="Cart">
+                                                <span id="total-price-<%= cartItem.product._id %>">Rs.<span id="total-<%= cartItem.product._id %>"><%= cartItem.product.sellingprice * cartItem.quantity %></span></span>
+                                            </td>
+                                            <td class="action" data-title="Remove">
+                                                <a href="/cartproductdelete/<%= cartItem.product._id %>" class="text-muted"><i class="fi-rs-trash"></i></a>
+                                            </td>
                                         </tr>
-                                    <% } %>
+                                    <% }); %>
                                 </tbody>
                             </table>
                         </div>
                         <div class="cart-action text-end">
-                           
-                             <a class="btn   mr-10 mb-sm-15" href="/placeorder/<%= cartSubtotal %>"><i class="fi-rs-shuffle mr-10"></i>proceed to pay</a>
+                            <a class="btn   mr-10 mb-sm-15" href="/placeorder/<%= cartSubtotal %>"><i class="fi-rs-shuffle mr-10"></i>proceed to pay</a>
                             <a class="btn " href="/home"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
-                        </div>
-                        
+                        </div> 
+                        <% } else { %>
+                            <div class="container ">
+                                <div class="row justify-content-center align-items-center pt-50 pb-50">
+                                    <div class="col-lg-5">
+                                        <div class="padding_eight_all bg-white">
+                                            <div class="alert text-center" role="alert">
+                                                <h4>No items in the cart...!</h4>
+                                            </div>
+                                            <div class="text-center ">
+                                            <a class="btn " href="/home"><i class="fi-rs-shopping-bag mr-10"></i>Go to Shopping</a>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
             </div>
@@ -271,12 +279,6 @@ const updateCartTotal={
     quantity:quantity
 }
 updateCartItemInDatabase(updatedCartItem)
-
-        // Update cart subtotal
-    //     const cartSubtotalElement = document.getElementById('cart-subtotal');
-    // const cartSubtotal = calculateCartSubtotal(); // Calculate the new cart subtotal
-    // cartSubtotalElement.textContent = cartSubtotal;
-    // cartSubtotalElement.innerText = cartSubtotal;
 
     calculateCartSubtotalAsync()
         .then(cartSubtotal => {

@@ -1,15 +1,141 @@
 <%-include("../partials/userheader")-%>
 
+<style>
+    .radio-group input[type="radio"] {
+        display: none;
+    }
+
+    .radio-group label {
+        position: relative;
+        padding-left: 30px;
+        cursor: pointer;
+    }
+
+    .radio-group label:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 6%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgb(44, 126, 121);
+        border-radius: 50%;
+        background-color: white;
+    }
+
+    .radio-group input[type="radio"]:checked+label:before {
+        background-color: rgb(4, 105, 99);
+    }
+
+    .address-section {
+        margin-bottom: 20px;
+    }
+
+
+    .radio-group .form-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .radio-group .radio-group-input[type="radio"] {
+        margin-right: 100px;
+    }
+
+    /* Add spacing to table cells */
+    .table-responsive {
+        margin-bottom: 20px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        padding: 8px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* Add borders to table rows and cells */
+    .table th,
+    .table td {
+        border: 1px solid #ddd;
+    }
+
+    /* Style the product image */
+    .product-image img {
+        max-width: 100px;
+        max-height: 100px;
+        width: auto;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+    /* Add spacing between table rows */
+    .cart-item {
+        margin-bottom: 10px;
+    }
+</style>
+
 <section class="mt-50 mb-50">
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
-                <div class="mb-25">
-                    <h4>Select Address</h4>
+            <div class="col-lg-5">
+                <div class="text-center" style="margin-bottom: 30px;">
+                    <a class="btn btn-primary" href="/addAddress?org=checkout">+ Add New Address</a>
+                    <div class="row mt-5 mb-5 ">
+                        <% if (errmessage) { %>
+                            <div class="alert alert-danger text-center" role="alert">
+                                <%= errmessage %>
+                            </div>
+                        <% } else if (message) { %>
+                            <div class="alert alert-success text-center" role="alert">
+                                <%= message %>
+                            </div>
+                        <% } %>
+                    </div>
                 </div>
-                <form method="get">
-                    <a href="/addAddress" class="btn btn-fill-out btn-block mt-30">Add Address</a>
-                </form>
+                <div class="widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
+                    <div class="padding_eight_all bg-white">
+                        <div class="heading_s1">
+                            <h4 class="mb-30">Choose Your Address</h4>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="address-section">
+                                    <form id="selectAddressForm" action="/placedOrder" method="post">
+                                    <div class="radio-group">
+                                        <% useraddress.forEach(userAddress => { %>
+                                            <div class="border-radius-10 mb-10" style="border: 1px solid #e2e9e1;padding: 10px;border-radius: 10px;">
+                                            <div class="form-group">
+                                                <input type="radio"
+                                                    name="selectedShippingAddress"
+                                                    value="<%= userAddress._id %>"
+                                                    id="<%= userAddress._id %>"
+                                                    onclick="submitForm(`${id}`)">
+                                                <label for="<%= userAddress._id %>">
+                                                    <%= userAddress.name %><br>
+                                                    <%= userAddress.address %><br>
+                                                    <%= userAddress.state %>,
+                                                    <%= userAddress.district %>,
+                                                    <%= userAddress.pincode %><br>
+                                                    Mobile: <%=userAddress.mobile%> <br> <br>
+                                                    <a class="mt-30" href="/editAddress/<%= userAddress._id %>?org=checkout">Edit address</a>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-md-6">
                 <div class="order_review">
@@ -65,7 +191,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="#" class="btn btn-fill-out btn-block mt-30">Place Order</a>
+                    <button onclick="submitPlaceOrder()" class="btn btn-fill-out btn-block mt-30">Place Order</button>
                 </div>
             </div>
         </div>
@@ -74,3 +200,44 @@
 
 
 <%-include("../partials/userfooter")-%>
+
+<script>
+
+let addressId=''
+
+function submitForm(Id) {
+    addressId = Id; // Set the global variable addressId
+    console.log(addressId);
+}
+
+function submitPlaceOrder() {
+    const apiUrl = '/OrderSubmit';
+
+    // Use the correct variable name addressId
+    const addressIdToSend = addressId;
+
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ addressId: addressIdToSend }) // Wrap addressId in an object
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Cart item updated successfully:', data);
+        if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+        }
+    })
+    .catch(error => {
+        console.error('Error updating cart item:', error);
+    });
+}
+
+</script>

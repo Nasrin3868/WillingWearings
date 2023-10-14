@@ -5,6 +5,9 @@ const randomstring = require('randomstring');
 const collection = require("../model/mongodb");
 const Products=require("../model/productmodel")
 const CategoryCollection=require("../model/categorymodel")
+const Address= require("../model/addressmodel");
+const { Collection } = require("mongoose");
+const Orders=require("../model/ordermodel")
 
 const home=async(req,res)=>{
     const isAuthenticated=false
@@ -624,18 +627,52 @@ const doCart = async (req, res) => {
     // res.redirect("/cart")
 };
 
-const productQuantityUpdate=async (req,res)=>{
-    console.log("reached productQuantityUpdate");
+const productQuantityUpdate = async (req, res) => {
+    console.log("Reached productQuantityUpdate");
    
-    const userId = req.session.user._id;
-    const cartItem = req.body;
-    console.log(cartItem)
-    const user = await collection.findOne({ _id: userId });
-    const CartItem = user.cart.find(item => item.product.toString() === cartItem);
-    CartItem.quantity = quantity;
-      console.log(CartItem);
-      await user.save();
+    if (req.session.user) {
+        const userId = req.session.user._id;
+        const cartItem = req.body;
+        console.log(cartItem);
+        const user = await collection.findOne({ _id: userId });
+        const CartItem = user.cart.find(item => item.product.toString() === cartItem);
+        
+        if (CartItem) {
+            CartItem.quantity++  // Make sure quantity is defined somewhere.
+            console.log(CartItem);
+            await user.save();
+            const msg = "Product updated successfully";
+            return res.json({ msg });
+        } else {
+            const msg = "Product not updated";
+            return res.json({ msg });
+        }
+    } else {
+        // If the user is not authenticated, you should redirect to the login page.
+        return res.redirect("/login");
+    }
 }
+
+// const productQuantityUpdate=async (req,res)=>{
+//     console.log("reached productQuantityUpdate");
+   
+//     if(req.session.user){
+//     const userId = req.session.user._id;
+//     const cartItem = req.body;
+//     console.log(cartItem)
+//     const msg = "product updated"
+//     const user = await collection.findOne({ _id: userId });
+//     const CartItem = user.cart.find(item => item.product.toString() === cartItem);
+//     CartItem.quantity = quantity;
+//     console.log(CartItem);
+//     await user.save();
+//     res.json(msg)
+//     }else{
+//         const msg= "product not updated"
+//         res.json(msg)
+//     }
+    
+// }
 
 const cartUpdate = async (req, res) => {
     console.log("reached cartupdate");
@@ -657,13 +694,21 @@ const cartUpdate = async (req, res) => {
     }
   };
 
-  const calculateCartSubtotal = (user) => {
+const calculateCartSubtotal = (user) => {
     let cartSubtotal = 0;
     user.cart.forEach(cartItem => {
         cartSubtotal += cartItem.product.sellingprice * cartItem.quantity;
     });
     return cartSubtotal;
 };
+
+const calculateCartTotal=(user)=>{
+    let cartTotal = 0;
+    user.cart.forEach(cartItem => {
+        cartTotal += cartItem.product.price * cartItem.quantity;
+    });
+    return cartTotal;
+}
 
 const cart = async (req, res) => {
     console.log("Reached cart");
@@ -711,24 +756,265 @@ const placeorder = async (req, res) => {
 
 const checkout=async(req,res)=>{
     console.log("reached checkout page");
+    const err = req.query.err;
+    const msg = req.query.msg;
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate('cart.product');
+    const useraddress = await Address.find({ userId, blocked: false });
     const categories = await CategoryCollection.find({ blocked: false });
     const cartSubtotal = calculateCartSubtotal(user);
-    res.render("user/checkout",{isAuthenticated:true,categories,user,cartSubtotal})
+    if (err === 'true') {
+        res.render("user/checkout", { errmessage : msg, message : "" ,isAuthenticated:true,categories,user,cartSubtotal,useraddress});
+    } else {
+        res.render("user/checkout", { errmessage : "", message : msg ,isAuthenticated:true,categories,user,cartSubtotal,useraddress});
+    }
 }
   
 const addAddress=async(req,res)=>{
     console.log("reached addAddress");
+    const org=req.query.org
     const categories = await CategoryCollection.find({ blocked: false });
-    res.render("user/addAddress",{isAuthenticated:true,categories})
+    res.render("user/addAddress",{isAuthenticated:true,categories,org})
+}
+
+const newAddress=async(req,res)=>{
+    console.log("reached newAddress");
+    // console.log(userId);
+    const msg=req.query.org
+    const name= req.body.username
+    const address= req.body.address
+    const state= req.body.state
+    const district= req.body.district
+    const city= req.body.city
+    const pincode= req.body.pincode
+    const mobile= req.body.mobileno
+    const userId=req.session.user._id
+    const data = new Address({
+        name,
+        address,
+        state,
+        district,
+        city,
+        pincode,
+        mobile,
+        userId
+      });
+    // const newAddress=new Address(data)
+    await data.save()
+    let saveAddress= await collection.findByIdAndUpdate(userId,{$push: {address: data.userId}})
+    if(msg=='account'){
+        res.redirect("/myaccount")
+    }else if(saveAddress){
+        res.redirect(`/checkout?err=${""}&msg=New address added successfully`)
+    }
+   
+}
+
+const editAddress=async(req,res)=>{
+    console.log("reached editAddress")
+    const addressId=req.params.id
+    const editaddress= await Address.findById(addressId)
+    const categories = await CategoryCollection.find({ blocked: false });
+    const org=req.query.org
+    console.log(org);
+    res.render("user/editAddress",{isAuthenticated:true,categories,editaddress,org})
+}
+
+const editedAddress=async(req,res)=>{
+    console.log("reached editedAddress");
+    const msg=req.query.org
+    console.log(msg)
+    const addressId=req.params.id
+    const name= req.body.username
+    const address= req.body.address
+    const state= req.body.state
+    const district= req.body.district
+    const city= req.body.city
+    const pincode= req.body.pincode
+    const mobile= req.body.mobileno
+    await Address.findOneAndUpdate({ _id: addressId }, { name: name,address:address,state:state,district:district,city:city,pincode:pincode,mobile:mobile});
+    if(msg=='account'){
+        res.redirect("/myaccount")
+    }else{
+        res.redirect("/checkout")
+    }
+}
+
+const deleteAddress=async(req,res)=>{
+    console.log("reached deleteAddress");
+    const addressId=req.params.id
+    await Address.findOneAndUpdate({ _id: addressId }, {blocked:true});
+    res.redirect("/myaccount")
+}
+
+const myaccount=async(req,res)=>{
+    console.log("reached myaccount");
+    const categories = await CategoryCollection.find({ blocked: false });
+    const userId = req.session.user._id;
+    const user=await collection.findById(userId)
+    console.log(user);
+    const useraddress = await Address.find({ userId, blocked: false });
+    res.render("user/myaccount",{isAuthenticated:true,categories,Address:useraddress,user})
+}
+
+const placedOrder=async(req,res)=>{
+    console.log("reached placedOrder");
+    const addressId=req.params.id
+    if(!addressId){
+        return res.redirect('/checkout?err=true&msg=please select an address')
+    }
+    const categories = await CategoryCollection.find({ blocked: false });
+    console.log(addressId);
+    const address=await Address.findById(addressId)
+    console.log(address);
+    res.render("user/orderPlacedSuccessfully",{isAuthenticated:true,categories,errmessage:"",message:"Order Placed Successfully..!"})
+    const userId=req.session.user._id
+    await collection.findByIdAndUpdate(userId,{ $set: { cart: [] } });
+    console.log("cart cleared");
+}
+
+const OrderSubmit=async(req,res)=>{
+    console.log("reached OrderSubmit");
+    console.log(req.body.addressId);
+    console.log(req.session.user._id);
+    const userId=req.session.user._id
+    const user = await collection.findById(userId).populate('cart.product');
+    const cartSubtotal = calculateCartSubtotal(user);
+    const cartTotal= calculateCartTotal(user)
+
+    // Create an array of items from the user's cart
+    const items = user.cart.map(cartItem => ({
+        product_id: cartItem.product._id,
+        quantity: cartItem.quantity,
+        sales_price: cartItem.quantity*cartItem.product.sellingprice
+    }));
+
+    const newOrder= new Orders({
+        user_id: userId,
+        address: req.body.addressId,
+        items,
+        actualTotalAmount: cartSubtotal,
+        totalAmount: cartTotal,
+    })
+    await newOrder.save();
+    const response={
+        message: "Order created successfully",
+        redirectUrl: `/placedOrder/${req.body.addressId}`
+    }
+    return res.status(200).json(response)
 }
 
 
+//...............................................................................................................
+// let orderId=""
+// const orderdetails = async (req, res) => {
+//   const { address, city, pincode, mobil, paymentype } = req.body;
+
+  
+//   try {
+//     const userId = req.session.user[0]._id;
+//     const username = await User.findOne({ _id: userId }, 'username');
+
+//     const [orderDetails, cartDetails] = await Promise.all([
+//       Order.findOne({ userId }),
+//       Cart.findOne({ userId }).populate({
+//         path: "products.productId",
+//         model: "productCollection",
+//       })
+//     ]);
+//      orderId=orderDetails._id;
+//     console.log("orderId is===>",orderId)
+
+//     let totalPrice = 0;
+//     let originalPrice = 0;
+//     const stockUpdates = [];
+
+//     if (cartDetails && cartDetails.products.length > 0) {
+//       cartDetails.products.forEach((product) => {
+//         const quantity = product.quantity;
+//         const productId = product.productId._id;
+
+//         const price = product.productId.selling_price;
+//         const actualPrice = product.productId.price;
+        
+//         const stockUpdate = {
+//           updateOne: {
+//             filter: { _id: productId },
+//             update: { $inc: { stock: -quantity } }
+//           }
+//         };
+
+//         stockUpdates.push(stockUpdate);
+
+//         const productTotal = quantity * price;
+//         originalPrice += quantity * actualPrice;
+//         totalPrice += productTotal;
+//       });
+
+//       await Product.bulkWrite(stockUpdates, { ordered: false });
+//     }
+
+
+//     const newOrder = new Order({
+//       userId,
+//       date: Date.now(),
+//       totalAmount: totalPrice,
+//       actualTotalAmount: originalPrice,
+//       paymentMethod: paymentype,
+//       products: cartDetails.products,
+//       address: {
+//         name: username.username,
+//         mobile: mobil,
+//         homeAddress: address,
+//         city: city,
+//         postalCode: pincode,
+//       },
+//       orderStatus: "Pending",
+//       returnOrderStatus: {
+//         status: "Not requested",
+//         reason: "No reason",
+//       },
+//     });
+
+//     await newOrder.save();
+   
+//     if(newOrder.paymentMethod=="COD"){
+//       newOrder.paymentMethod="placed"
+//       await newOrder.save();
+//       if(cartDetails){
+//         cartDetails.products = [];
+//             await cartDetails.save();
+            
+//       }
+      
+//       return res.json({status:'COD',placedOrderId:newOrder._id})
+      
+  
+//     }else{
+     
+//       userHelper.generateRazorPay(orderId,newOrder.totalAmount).then((response)=>{
+//         console.log("razorpay response is===>",response)
+//        return res.json({status:'RAZORPAY',response:response});
+       
+//       })
+//       if(cartDetails){
+//         cartDetails.products = [];
+//         await cartDetails.save()
+//      }
+     
+//     }
+//   } catch (error) {
+//     console.error("Error creating order:", error);
+//     return res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
+//.................................................................................................
 
 module.exports={
     home,login,signup,logout,dosignup,sendOtp,dologin,validateotp,resendotp,Toemail,checkemail,otpchecks,otpcheckpage,
     allpage,showbycategory,ethinicpage,ethinicshowbycategory,westernpage,westernshowbycategory,sportspage,Sportsshowbycategory,
     productview,wishlist,cart,resendOTP_for_forgrtpassword,confirmpassword,confirm_password_check,loadHomeAfterLogin,productQuantityUpdate,
-    cartUpdate,doCart,calculateCartSubtotal,placeorder,checkout,cartproductdelete,addAddress
+    cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,deleteAddress,
+    myaccount,OrderSubmit,placedOrder
 }
