@@ -839,23 +839,42 @@ const editedAddress=async(req,res)=>{
         res.redirect("/checkout")
     }
 }
-
-const deleteAddress=async(req,res)=>{
+const deleteAddress = async (req, res) => {
     console.log("reached deleteAddress");
-    const addressId=req.params.id
-    await Address.findOneAndUpdate({ _id: addressId }, {blocked:true});
-    res.redirect("/myaccount")
+    const addressId = req.params.id;
+    const orderWithAddress = await Orders.findOne({ address: addressId });
+    if (orderWithAddress) {
+        await Address.findOneAndUpdate({ _id: addressId }, { blocked: true });
+    } else {
+        await Address.findByIdAndRemove(addressId);
+        const userId = req.session.user._id;
+        await collection.updateOne(
+            { _id: userId },
+            { $pop: { address: 1 } } 
+        );
+    }
+    res.redirect("/myaccount");
 }
 
-const myaccount=async(req,res)=>{
+const myaccount = async (req, res) => {
     console.log("reached myaccount");
     const categories = await CategoryCollection.find({ blocked: false });
     const userId = req.session.user._id;
-    const user=await collection.findById(userId)
+    const user = await collection.findById(userId);
     console.log(user);
     const useraddress = await Address.find({ userId, blocked: false });
-    res.render("user/myaccount",{isAuthenticated:true,categories,Address:useraddress,user})
+    const orders = await Orders.find({ user_id: userId }).populate('address').populate('items.product_id');
+    // Calculate the total quantity for each order
+    const ordersWithQuantity = orders.map(order => {
+        const totalQuantity = order.items.reduce((acc, item) => acc + item.quantity, 0);
+        return {
+            ...order.toObject(),
+            quantity: totalQuantity,
+        };
+    });
+    res.render("user/myaccount", { isAuthenticated: true, categories, Address: useraddress, user, order: ordersWithQuantity });
 }
+
 
 const placedOrder=async(req,res)=>{
     console.log("reached placedOrder");

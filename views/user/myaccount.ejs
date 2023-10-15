@@ -1,3 +1,15 @@
+
+<script>
+    function calculateTotalQuantity(items) {
+        let totalQuantity = 0;
+        items.forEach(item => {
+            totalQuantity += item.quantity;
+        });
+        return totalQuantity;
+    }
+</script>
+
+
 <%-include("../partials/userheader")-%>
 
 <section class="pt-150 pb-150">
@@ -18,10 +30,10 @@
                                     <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
+                                    <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>My Profile</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="page-login-register.html"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                    <a class="nav-link" href="/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
                                 </li>
                             </ul>
                         </div>
@@ -47,8 +59,8 @@
                                         <div class="table-responsive">
                                             <table class="table">
                                                 <thead>
-                                                    <tr>
-                                                        <th>Order</th>
+                                                    <tr class="text-center">
+                                                        <th >Order Id</th>
                                                         <th>Date</th>
                                                         <th>Status</th>
                                                         <th>Total</th>
@@ -56,27 +68,16 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>#1357</td>
-                                                        <td>March 45, 2020</td>
-                                                        <td>Processing</td>
-                                                        <td>$125.00 for 2 item</td>
-                                                        <td><a href="#" class="btn-small d-block">View</a></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>#2468</td>
-                                                        <td>June 29, 2020</td>
-                                                        <td>Completed</td>
-                                                        <td>$364.00 for 5 item</td>
-                                                        <td><a href="#" class="btn-small d-block">View</a></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>#2366</td>
-                                                        <td>August 02, 2020</td>
-                                                        <td>Completed</td>
-                                                        <td>$280.00 for 3 item</td>
-                                                        <td><a href="#" class="btn-small d-block">View</a></td>
-                                                    </tr>
+                                                    <% order.forEach(Order => { %>
+                                                        <tr>
+                                                            <td><%= Order._id %></td>
+                                                            <td><%= Order.created_on %></td>
+                                                            <td><%= Order.order_status %></td>
+                                                            <!-- Update the line to display quantity for each order -->
+                                                            <td><%= Order.actualTotalAmount %> for <%= Order.quantity %> item</td>
+                                                            <td><a href="#" class="btn-small d-block">View Details</a></td>
+                                                        </tr>
+                                                    <%}) %>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -108,34 +109,41 @@
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                                <div class="text-center" style="margin-bottom: 30px;">
+                                    <a class="btn btn-primary" href="/addAddress?org=account">+ Add New Address</a>
+                                </div>
                                 <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="text-center" style="margin-bottom: 30px;">
-                                            <a class="btn btn-primary" href="/addAddress?org=account">+ Add New Address</a>
-                                        </div>
-                                        <% Address.forEach(userAddress => { %>
+                                    <% Address.forEach((userAddress, index) => { %>
+                                    <div class="col-lg-6 col-md-6 col-sm-12">
                                         <div class="card mt-15">
                                             <div class="card-header">
-                                                <h5 class="mb-0 ">Shipping Address</h5>
+                                                <h5 class="mb-0">Shipping Address</h5>
                                             </div>
                                             <div class="form-group ml-3 pl-10 pt-20">
                                                 <label for="shippingAddress_<%= userAddress._id %>">
                                                     Name: <%= userAddress.name %><br>
                                                     Address: <%= userAddress.address %><br>
                                                     State: <%= userAddress.state %><br>
-                                                    DIstrict: <%= userAddress.district %><br>
+                                                    District: <%= userAddress.district %><br>
                                                     Pincode: <%= userAddress.pincode %><br>
-                                                    Mobile: <%=userAddress.mobile%><br>
+                                                    Mobile: <%= userAddress.mobile %><br>
                                                 </label>
-                                                <a class="mt-30 btn btn-fill-out btn-block hover-up" href="/editAddress/<%= userAddress._id %>?org=account" >Edit</a>
-                                                <a class="mt-30 btn btn-fill-out btn-block hover-up ml-125" href="/deleteAddress/<%= userAddress._id %>" >Delete</a>
+                                                <div class="mt-30">
+                                                    <a class="btn btn-fill-out btn-block hover-up" href="/editAddress/<%= userAddress._id %>?org=account">Edit</a>
+                                                    <a class="btn btn-fill-out btn-block hover-up" style="background-color: rgb(187, 77, 77);" href="/deleteAddress/<%= userAddress._id %>">Delete</a>
+                                                </div>
                                             </div>
                                         </div>
-                                        <% }); %>
                                     </div>
-                                </div>`
+                                    <% if (index % 2 === 1) { %>
+                                    </div><div class="row">
+                                    <% } %>
+                                    <% }); %>
+                                </div>
                             </div>
+                            
                             <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
                                 <div class="card">
                                     <div class="card-header">
