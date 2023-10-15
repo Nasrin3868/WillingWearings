@@ -72,10 +72,10 @@
                                                         <tr>
                                                             <td><%= Order._id %></td>
                                                             <td><%= Order.created_on %></td>
-                                                            <td><%= Order.order_status %></td>
+                                                            <td><span class="badge rounded-pill alert-warning"><%= Order.order_status %></span></td>
                                                             <!-- Update the line to display quantity for each order -->
                                                             <td><%= Order.actualTotalAmount %> for <%= Order.quantity %> item</td>
-                                                            <td><a href="#" class="btn-small d-block">View Details</a></td>
+                                                            <td><a href="/orderDetails/<%= Order._id %>" class="btn-small d-block">View Details</a></td>
                                                         </tr>
                                                     <%}) %>
                                                 </tbody>

@@ -54,7 +54,7 @@ router.get("/checkout",middleware.cartAuth,controller.checkout)
 router.get("/cartproductdelete/:id",middleware.cartAuth,controller.cartproductdelete)
 
 router.get("/addAddress",middleware.cartAuth,controller.addAddress)
-router.post("/newAddress",middleware.cartAuth,controller.newAddress)
+router.post("/newAddress",controller.newAddress)
 router.get("/editAddress/:id",middleware.cartAuth,controller.editAddress)
 router.post("/editedAddress/:id",middleware.cartAuth,controller.editedAddress)
 router.get("/deleteAddress/:id",middleware.cartAuth,controller.deleteAddress)
@@ -62,6 +62,7 @@ router.get("/deleteAddress/:id",middleware.cartAuth,controller.deleteAddress)
 router.get("/myaccount",middleware.cartAuth,controller.myaccount)
 router.post("/OrderSubmit",controller.OrderSubmit)
 router.get("/placedOrder/:id",middleware.cartAuth,controller.placedOrder)
+router.get("/orderDetails/:id",middleware.cartAuth,controller.orderDetails)
 
 // router.post("/cartTotalUpdate",controller.cartTotalUpdate)
 

@@ -861,7 +861,6 @@ const myaccount = async (req, res) => {
     const categories = await CategoryCollection.find({ blocked: false });
     const userId = req.session.user._id;
     const user = await collection.findById(userId);
-    console.log(user);
     const useraddress = await Address.find({ userId, blocked: false });
     const orders = await Orders.find({ user_id: userId }).populate('address').populate('items.product_id');
     // Calculate the total quantity for each order
@@ -923,6 +922,13 @@ const OrderSubmit=async(req,res)=>{
     return res.status(200).json(response)
 }
 
+const orderDetails=async(req,res)=>{
+    console.log("reached orderDetails");
+    const orderId=req.params.id
+    const orders = await Orders.findById({_id: orderId }).populate('address').populate('items.product_id').populate('user_id');
+    const categories = await CategoryCollection.find({ blocked: false });
+    res.render("user/orderDetails",{isAuthenticated: true,categories,orders})
+}
 
 //...............................................................................................................
 // let orderId=""
@@ -1035,5 +1041,5 @@ module.exports={
     allpage,showbycategory,ethinicpage,ethinicshowbycategory,westernpage,westernshowbycategory,sportspage,Sportsshowbycategory,
     productview,wishlist,cart,resendOTP_for_forgrtpassword,confirmpassword,confirm_password_check,loadHomeAfterLogin,productQuantityUpdate,
     cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,deleteAddress,
-    myaccount,OrderSubmit,placedOrder
+    myaccount,OrderSubmit,placedOrder,orderDetails
 }
