@@ -46,5 +46,8 @@ router.get("/categoryblock/:id",controller.category_block)
 router.post("/editcategory",controller.editcategorypage)
 
 router.get("/productblock/:id",controller.product_block)
+router.get("/orderManagement",controller.orderManagement)
+router.get("/orderDetails/:id",controller.orderDetails)
+router.post("/changestatus/:id/:status", controller.changestatus);
 
 module.exports=router

@@ -2,6 +2,8 @@
 const multer=require("multer")
 const Product=require("../model/productmodel")
 const collection=require("../model/mongodb")
+const Address= require("../model/addressmodel");
+const Orders=require("../model/ordermodel")
 
 
 const admincollection=require("../model/admincollection")
@@ -165,8 +167,6 @@ const user_block=async(req,res)=>{
     // await collection.updateOne()
 }
 
-
-
 const toaddcategory=async(req,res)=>{
     const category=req.body.name
     const categorytype=req.body.category
@@ -232,8 +232,34 @@ const logout=async(req,res)=>{
     }
 }
 
+const orderManagement=async(req,res)=>{
+    console.log("reached orderManagement");
+    const orders = await Orders.find().populate('address').populate('items.product_id').populate('user_id');
+    res.render('admin/orderManagement',{orders})
+}
+
+const orderDetails=async(req,res)=>{
+    console.log("reached orderDetails");
+    const orderId=req.params.id
+    const orders = await Orders.findById(orderId).populate('address').populate('items.product_id').populate('user_id');
+    res.render('admin/orderDetails',{orders})
+}
+
+const changestatus = async (req, res) => {
+    try {
+        const status = req.params.status;
+        const orderId = req.params.id;
+        await Orders.findByIdAndUpdate(orderId, { order_status: status });
+        res.redirect(`/admin/orderDetails/${orderId}`);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
 module.exports={
     dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block,
-    toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout
+    toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout,orderManagement,orderDetails,
+    changestatus
     
 }
