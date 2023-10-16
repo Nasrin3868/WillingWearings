@@ -25,7 +25,6 @@ router.post("/otpcheck",controller.otpchecks)
 router.post("/resendOTP_for_forgrtpassword",controller.resendOTP_for_forgrtpassword)
 router.get("/confirmpassword",controller.confirmpassword)
 router.post("/confirm_password_check",controller.confirm_password_check)
-
 // router.post("/signup")
 
 router.get("/all",controller.allpage)
@@ -63,10 +62,12 @@ router.get("/myaccount",middleware.cartAuth,controller.myaccount)
 router.post("/OrderSubmit",controller.OrderSubmit)
 router.get("/placedOrder/:id",middleware.cartAuth,controller.placedOrder)
 router.get("/orderDetails/:id",middleware.cartAuth,controller.orderDetails)
+router.post("/cancelOrder/:id",controller.cancelOrder)
+router.post("/returnOrder/:id",controller.returnOrder)
 
 // router.post("/cartTotalUpdate",controller.cartTotalUpdate)
 
 // router.post("/cartUpdate",controller.calculateCartSubtotal)
-
+router.post("/quantityIncrease/:id",middleware.cartAuth,controller.quantityIncrease)
 
 module.exports=router

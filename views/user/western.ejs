@@ -88,7 +88,7 @@
                                                     <span class="old-price"><%= product.price%></span>
                                                 </div>
                                                 <div class="product-action-1 show">
-                                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="/doCart/<%= product._id%>"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                    <a aria-label="Add To Cart" class="action-btn hover-up" onclick="itemsToCart('<%= product._id%>')"><i class="fi-rs-shopping-bag-add"></i></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -113,3 +113,20 @@
 </section>
 
 <%-include("../partials/userfooter")-%>
+
+<script>
+
+function itemsToCart(productId){
+            fetch(`/quantityIncrease/${productId}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+</script>

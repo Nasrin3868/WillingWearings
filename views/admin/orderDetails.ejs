@@ -129,7 +129,13 @@
                                                     <dl class="dlist">
                                                         <dt class="text-muted">Status:</dt>
                                                         <dd>
-                                                            <span class="badge rounded-pill alert-success text-success"><%= orders.order_status %></span>
+                                                            <% if (orders.order_status == 'cancelled'||orders.order_status == 'returned') { %>
+                                                                <span class="badge rounded-pill alert-warning"><%= orders.order_status %></span>
+                                                            <% }else if (orders.order_status != 'delivered') { %>
+                                                                <span class="badge rounded-pill alert-info "><%= orders.order_status %></span>
+                                                            <% } else { %>
+                                                                <span class="badge rounded-pill alert-success text-success"><%= orders.order_status %></span>
+                                                            <% } %>
                                                         </dd>
                                                     </dl>
                                                 </article>

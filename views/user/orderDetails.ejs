@@ -19,8 +19,17 @@
                             <small class="text-muted">Order ID: <%= orders._id %></small>
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <a class="btn btn-primary" href="#">Cancel Order</a>
+                            <% if (orders.order_status == 'cancelled') { %>
+                                <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order Cancelled</a>
+                            <% }else if (orders.order_status == 'returned') { %>
+                                <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order returned</a>
+                            <% }else if (orders.order_status != 'delivered') { %>
+                                <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="saveStatus('<%= orders._id %>')">Cancel Order</a>
+                            <% } else { %>
+                                <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="returnorder('<%= orders._id %>')">Return Order</a>
+                            <% } %>
                         </div>
+                        
                     </div>
                 </header> <!-- card-header end// -->
                 <div class="card-body">
@@ -121,7 +130,13 @@
                                                     <dl class="dlist">
                                                         <dt class="text-muted">Status:</dt>
                                                         <dd>
-                                                            <span class="badge rounded-pill alert-success text-success"><%= orders.order_status %></span>
+                                                            <% if (orders.order_status == 'cancelled'||orders.order_status == 'returned') { %>
+                                                                <span class="badge rounded-pill alert-warning"><%= orders.order_status %></span>
+                                                            <% }else if (orders.order_status != 'delivered') { %>
+                                                                <span class="badge rounded-pill alert-info "><%= orders.order_status %></span>
+                                                            <% } else { %>
+                                                                <span class="badge rounded-pill alert-success text-success"><%= orders.order_status %></span>
+                                                            <% } %>
                                                         </dd>
                                                     </dl>
                                                 </article>
@@ -157,3 +172,33 @@
 </div>
 
 <%-include("../partials/userfooter")-%>
+
+<script>
+    function saveStatus(orderID) {
+            fetch(`/cancelOrder/${orderID}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function returnorder(orderID) {   
+        fetch(`/returnOrder/${orderID}`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>

@@ -212,16 +212,23 @@ function submitForm(Id) {
 
 function submitPlaceOrder() {
     const apiUrl = '/OrderSubmit';
-
+    if (!addressId) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please select an address!',
+        });
+        return;
+    }
     // Use the correct variable name addressId
-    const addressIdToSend = addressId;
+    // const addressIdToSend = addressId;
 
     fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ addressId: addressIdToSend }) // Wrap addressId in an object
+        body: JSON.stringify({ addressId }) // Wrap addressId in an object
     })
     .then(response => {
         if (!response.ok) {
@@ -241,3 +248,5 @@ function submitPlaceOrder() {
 }
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+

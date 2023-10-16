@@ -55,7 +55,15 @@
                             <td><b><%= order.user_id.username %></b></td>
                             <td><%= order.user_id.email %></td>
                             <td>Rs.<%= order.actualTotalAmount %></td>
-                            <td><span class="badge rounded-pill alert-warning"><%= order.order_status %></span></td>
+                            <td>
+                                <% if (order.order_status == 'cancelled'||order.order_status == 'returned') { %>
+                                    <span class="badge rounded-pill alert-warning"><%= order.order_status %></span>
+                                <% }else if (order.order_status != 'delivered') { %>
+                                    <span class="badge rounded-pill alert-info "><%= order.order_status %></span>
+                                <% } else { %>
+                                    <span class="badge rounded-pill alert-success text-success"><%= order.order_status %></span>
+                                <% } %>
+                            </td>
                             <td><%= order.payment_method %></td>
                             <td><%= order.created_on %></td>
                             <td class="text-end">

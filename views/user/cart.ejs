@@ -205,11 +205,11 @@
                                             <!-- Update the quantity and total price based on user interactions -->
                                             <td class="text-center" data-title="Stock">
                                                 <div class="detail-qty border radius m-auto">
-                                                    <a class="qty-up" onclick="increaseQuantity('<%= cartItem.product._id %>','<%= cartItem.product.sellingprice %>')">
+                                                    <a class="qty-up" onclick="increaseQuantity('<%= cartItem.product._id %>','<%= cartItem.product.sellingprice %>','<%= cartItem.product.stock %>')">
                                                         <i class="fi-rs-angle-small-up"></i>
                                                     </a>
                                                     <span class="qty-val" id="qty-<%= cartItem.product._id %>"> <%= cartItem.quantity %> </span>
-                                                    <a class="qty-down" onclick="decreaseQuantity('<%= cartItem.product._id %>','<%= cartItem.product.sellingprice %>')">
+                                                    <a class="qty-down" onclick="decreaseQuantity('<%= cartItem.product._id %>','<%= cartItem.product.sellingprice %>','<%= cartItem.product.stock %>')">
                                                         <i class="fi-rs-angle-small-down"></i>
                                                     </a>
                                                 </div>
@@ -290,15 +290,17 @@ updateCartItemInDatabase(updatedCartItem)
 
     }
 
-    function increaseQuantity(product,price) {
+    function increaseQuantity(product,price,stock) {
         const qtyElement = document.getElementById(`qty-${product}`);
         let quantity = parseInt(qtyElement.textContent, 10);
-        quantity++;
+        if(stock>quantity){
+            quantity++;
+        }
         updateQuantity(product,price, quantity);
        
     }
 
-    function decreaseQuantity(product,price) {
+    function decreaseQuantity(product,price,stock) {
         const qtyElement = document.getElementById(`qty-${product}`);
         let quantity = parseInt(qtyElement.textContent, 10);
         if (quantity > 1) {

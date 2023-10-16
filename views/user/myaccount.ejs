@@ -72,7 +72,15 @@
                                                         <tr>
                                                             <td><%= Order._id %></td>
                                                             <td><%= Order.created_on %></td>
-                                                            <td><span class="badge rounded-pill alert-warning"><%= Order.order_status %></span></td>
+                                                            <td>
+                                                                <% if (Order.order_status == 'cancelled'||Order.order_status == 'returned') { %>
+                                                                    <span class="badge rounded-pill alert-warning"><%= Order.order_status %></span>
+                                                                <% }else if (Order.order_status != 'delivered') { %>
+                                                                    <span class="badge rounded-pill alert-info "><%= Order.order_status %></span>
+                                                                <% } else { %>
+                                                                    <span class="badge rounded-pill alert-success text-success"><%= Order.order_status %></span>
+                                                                <% } %>
+                                                            </td>
                                                             <!-- Update the line to display quantity for each order -->
                                                             <td><%= Order.actualTotalAmount %> for <%= Order.quantity %> item</td>
                                                             <td><a href="/orderDetails/<%= Order._id %>" class="btn-small d-block">View Details</a></td>
