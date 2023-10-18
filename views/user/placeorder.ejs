@@ -29,40 +29,53 @@
 
         <!-- Cart Totals Box -->
         <div class="col-lg-6">
-            <div class="border p-md-4 p-30 border-radius cart-totals">
-                <div class="heading_s1 mb-3">
-                    <h4>Cart Totals</h4>
+                <% if (total==0) { %>
+                    <div class="table-responsive">
+                        <div class="padding_eight_all bg-white">
+                                <div class="alert alert-danger text-center" role="alert">
+                                    <p>Something went wrong...</p>
+                                </div>
+                        </div>
+                        <div class="text-center mt-50 ">
+                            <h5>Go back to home, <a href="/home"><i ></i>Home...</a> </h5>
+                        </div>
+                    </div>
+                <% }else{%>
+                    <div class="border p-md-4 p-30 border-radius cart-totals">
+                    <div class="heading_s1 mb-3">
+                        <h4>Cart Totals</h4>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td class="cart_total_label">Cart Subtotal</td>
+                                    <td class="cart_total_amount">
+                                        <span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs.<%= total %></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cart_total_label">Shipping</td>
+                                    <td class="cart_total_amount">
+                                        <i class="ti-gift mr-5"></i> Free Shipping
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cart_total_label">Total</td>
+                                    <td class="cart_total_amount">
+                                        <strong>
+                                            <span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs.<%= total %> </span>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="/checkout" class="btn">
+                        <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut
+                    </a>
                 </div>
-                <div class="table-responsive">
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td class="cart_total_label">Cart Subtotal</td>
-                                <td class="cart_total_amount">
-                                    <span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs.<%= total %></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cart_total_label">Shipping</td>
-                                <td class="cart_total_amount">
-                                    <i class="ti-gift mr-5"></i> Free Shipping
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cart_total_label">Total</td>
-                                <td class="cart_total_amount">
-                                    <strong>
-                                        <span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs.<%= total %> </span>
-                                    </strong>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <a href="/checkout" class="btn">
-                    <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut
-                </a>
-            </div>
+                <% } %>
         </div>
     </div>
 </div>

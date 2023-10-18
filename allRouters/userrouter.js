@@ -5,7 +5,7 @@ const controller=require("../controller/userController")
 const middleware=require("../middleware/userAuth")
 
 
-router.get("/",controller.home)
+router.get("/",middleware.iflogin,controller.home)
 router.get("/home",middleware.islogin,controller.loadHomeAfterLogin)
 router.get("/login",controller.login)
 router.post("/login",controller.dologin)
@@ -73,5 +73,7 @@ router.post("/returnOrder/:id",controller.returnOrder)
 router.post("/quantityIncrease/:id",middleware.cartAuth,controller.quantityIncrease)
 
 router.post("/profileEdit",controller.profileEdit)
+router.get("/changePassword",middleware.cartAuth,controller.changePassword)
+router.post("/validatePassword",controller.validatePassword)
 
 module.exports=router

@@ -7,12 +7,17 @@ const islogin=async(req,res,next)=>{
     }
     
 }
-
+const iflogin=async(req,res,next)=>{
+    if(req.session.user){
+        res.redirect("/home")
+    }else{
+        next()
+    }
+}
 
 const islogout=async(req,res,next)=>{
     console.log("logout middleware")
     req.session.user=null;
-    // console.log( req.sesion.user)
     next()
 }
 
@@ -24,4 +29,4 @@ const cartAuth=async(req,res,next)=>{
     }
 }
 
-module.exports={islogout,islogin,cartAuth}
+module.exports={islogout,islogin,cartAuth,iflogin}

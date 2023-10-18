@@ -1,6 +1,5 @@
 const bcrypt=require("bcrypt")
 const nodemailer=require("nodemailer")
-// const otpgenerator=require("otp-generator")
 const randomstring = require('randomstring');
 const collection = require("../model/mongodb");
 const Products=require("../model/productmodel")
@@ -13,7 +12,6 @@ const home=async(req,res)=>{
     const isAuthenticated=false
     const categories=await CategoryCollection.find({blocked:false})
     const products=await Products.find({blocked:false})
-    console.log(products);
     res.render("user/home",{isAuthenticated,products,categories})
 }
 
@@ -55,13 +53,12 @@ const login = async (req, res) => {
 }
 
 const logout=async(req,res)=>{
-    
     res.redirect("/home")
 }
 
-// var loginwithoutotp=''
 var globalEmail=" "
 var otps
+
 const dologin= async(req,res)=>{
     const emails=req.body.email
     const password=req.body.password
@@ -183,10 +180,10 @@ const dosignup = async (req, res) => {
                 res.status(500).send("error in hashing password")
             }else{
                 data.password=hashedpassword
-                const newUser = new collection(data); // Create a new instance of the model
+                const newUser = new collection(data);
 
         try {
-          await newUser.save(); // Save the new user to the database
+          await newUser.save(); 
           res.redirect('otp');
         } catch (err) {
           console.error('Error while saving user:', err);
@@ -196,7 +193,6 @@ const dosignup = async (req, res) => {
             }
         })
     }
-
     console.log("Reached signup");
 }
 
@@ -273,7 +269,6 @@ const sendOtp = async (req, res) => {
 
 const validateotp=async(req,res)=>{
 console.log("reached validateotp");
-console.log("reached......=>")
     if(generatedOTP===req.body.enterotp){
         // Save OTP to MongoDB
         const email=globalEmail
@@ -471,7 +466,7 @@ const ethinicpage=async(req,res)=>{
         const type = "Ethinic"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
         const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
-        console.log(products)        
+              
         res.render("user/ethinic",{isAuthenticated,products,categories})   
     }    
 }
@@ -509,7 +504,7 @@ const westernpage=async(req,res)=>{
         const type = "Western"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
         const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
-        console.log(products)        
+            
         res.render("user/western",{isAuthenticated,products,categories,name:''})   
     }    
 }
@@ -587,7 +582,7 @@ const sportspage=async(req,res)=>{
         const type = "Sports"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
         const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
-        console.log(products)        
+               
         res.render("user/sports",{isAuthenticated,products,categories})   
     }    
 }
@@ -618,14 +613,14 @@ const productview=async(req,res)=>{
         const isAuthenticated=true
         const categories=await CategoryCollection.find({blocked:false})
         const product = await Products.findOne({_id:id});
-        console.log(product);
+        
         res.render("user/productview",{isAuthenticated,product,categories})
     }else{
         const isAuthenticated=false
         const id=req.params.id  
         const categories=await CategoryCollection.find({blocked:false})
         const product = await Products.findOne({_id:id});
-        console.log(product);
+        
         res.render("user/productview",{isAuthenticated,product,categories})  
     }
 
@@ -642,15 +637,13 @@ const wishlist=async(req,res)=>{
 
 
 const doCart = async (req, res) => {
-    // Extract the product ID from the route parameter
     const productId = req.params.id;
     const product = await Products.findById(productId);
-    console.log(product);
+    
     const userId = req.session.user._id;
     const user = await collection.findOne({ _id: userId });
     const existingCartItem = user.cart.find(item => item.product.toString() === productId);
 
-    // Update the cart based on whether the product exists or not
     if (existingCartItem) {
         if(product.stock > existingCartItem.quantity){
             existingCartItem.quantity++;
@@ -672,7 +665,7 @@ const doCart = async (req, res) => {
     }
     await user.save();
     const userdata=await collection.findById(userId).populate('cart.product')
-    // res.redirect("/home")
+    
 };
 
 
@@ -687,7 +680,7 @@ const productQuantityUpdate = async (req, res) => {
         const CartItem = user.cart.find(item => item.product.toString() === cartItem);
         
         if (CartItem) {
-            CartItem.quantity++  // Make sure quantity is defined somewhere.
+            CartItem.quantity++ 
             console.log(CartItem);
             await user.save();
             const msg = "Product updated successfully";
@@ -697,7 +690,6 @@ const productQuantityUpdate = async (req, res) => {
             return res.json({ msg });
         }
     } else {
-        // If the user is not authenticated, you should redirect to the login page.
         return res.redirect("/login");
     }
 }
@@ -731,7 +723,6 @@ const cartUpdate = async (req, res) => {
       const user = await collection.findOne({ _id: userId });
       const CartItem = user.cart.find(item => item.product.toString() === productid);
       CartItem.quantity = quantity;
-      console.log(CartItem);
       let cartSubtotal = 0;
     user.cart.forEach(cartItem => {
         cartSubtotal += cartItem.product.sellingprice * cartItem.quantity;
@@ -765,13 +756,12 @@ const cart = async (req, res) => {
     const user = await collection.findById(userId).populate('cart.product');
     const categories = await CategoryCollection.find({ blocked: false });
 
-    // Calculate the cart subtotal using the defined function
+    // Calculate the cart subtotal using calculateCartSubtotal function
     const cartSubtotal = calculateCartSubtotal(user);
-    console.log(cartSubtotal);
     res.render("user/cart", {isAuthenticated: true,
         categories,
         userdata: user,
-        cartSubtotal: cartSubtotal, // Pass the cart subtotal to the template
+        cartSubtotal: cartSubtotal,
     });
 };
 
@@ -828,7 +818,6 @@ const addAddress=async(req,res)=>{
 
 const newAddress=async(req,res)=>{
     console.log("reached newAddress");
-    // console.log(userId);
     const msg=req.query.org
     const name= req.body.username
     const address= req.body.address
@@ -927,9 +916,9 @@ const placedOrder = async (req, res) => {
     console.log("reached placedOrder");
     const addressId = req.params.id;
     const categories = await CategoryCollection.find({ blocked: false });
-    console.log(addressId);
+    
     const address = await Address.findById(addressId);
-    console.log(address);
+    
     res.render("user/orderPlacedSuccessfully", {isAuthenticated: true,categories,errmessage: "",message: "Order Placed Successfully..!"});
     const userId = req.session.user._id;
     const user=await collection.findById(userId).populate('cart.product')
@@ -941,6 +930,13 @@ const placedOrder = async (req, res) => {
 const OrderSubmit = async (req, res) => {
     console.log("reached OrderSubmit");
     console.log(req.body.addressId);
+    console.log(req.body.cartSubtotal);
+    if(req.body.cartSubtotal==0){
+        const response = {
+        message: "Something went wrong, go to checkoutpage",
+        redirectUrl: `/checkout`
+    };
+    }
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate('cart.product');
     const cartSubtotal = calculateCartSubtotal(user);
@@ -1034,7 +1030,6 @@ const quantityIncrease=async(req,res)=>{
     console.log("reached quantityIncrease when adding to cart");
     const productId=req.params.id
     const product = await Products.findById(productId);
-    console.log(product);
     const userId = req.session.user._id;
     const user = await collection.findOne({ _id: userId });
     const existingCartItem = user.cart.find(item => item.product.toString() === productId);
@@ -1072,10 +1067,34 @@ const profileEdit=async(req,res)=>{
     res.redirect("/myaccount")
 }
 
+const changePassword=async(req,res)=>{
+    console.log("reached changePassword");
+    const categories=await CategoryCollection.find({blocked:false})
+    res.render("user/currentPassword",{isAuthenticated: true,categories,errmessage:'',message:''})
+}
+
+const validatePassword=async(req,res)=>{
+    console.log("reached validatePassword");
+    const { password, newpassword, confirmpassword } = req.body;
+    const userId=req.session.user._id
+    const user=await collection.findById(userId)
+    const isMatch = await bcrypt.compare(password, user.password);
+    const categories=await CategoryCollection.find({blocked:false})
+    if(isMatch){
+        const hashedPassword = await bcrypt.hash(newpassword, 10); // You can adjust the salt rounds as needed
+        user.password = hashedPassword;
+        await user.save();
+        res.redirect("/myaccount");
+    }else{
+        res.render("user/currentPassword",{isAuthenticated: true,categories,errmessage:'Current password is not matching',message:''})
+    }
+}
+
 module.exports={
     home,login,signup,logout,dosignup,sendOtp,dologin,validateotp,resendotp,Toemail,checkemail,otpchecks,otpcheckpage,
     allpage,showbycategory,ethinicpage,ethinicshowbycategory,westernpage,westernshowbycategory,sportspage,Sportsshowbycategory,
     productview,wishlist,cart,resendOTP_for_forgrtpassword,confirmpassword,confirm_password_check,loadHomeAfterLogin,productQuantityUpdate,
     cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,
-    deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,sortByPrice,profileEdit
+    deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,sortByPrice,profileEdit,changePassword,
+    validatePassword
 }

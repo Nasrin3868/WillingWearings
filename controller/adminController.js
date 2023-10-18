@@ -30,11 +30,6 @@ const dashboard=async(req,res)=>{
  
 }
 
-// const productlist=async(req,res)=>{
-//     console.log("reached productlist");
-//     res.render("admin/product_list.ejs")
-// }
-
 const addproductpage=async(req,res)=>{
     console.log("reached addproduct");
     const categories= await CategoryCollection.find() 
@@ -43,47 +38,42 @@ const addproductpage=async(req,res)=>{
 
 const addproduct = async (req, res) => {
     console.log("reached")
-   
-      
-        const name=req.body.name
-        const description=req.body.description
-        const price=req.body.price
-        const sellingprice=req.body.sellingprice
-        const category=req.body.category
-        const size=req.body.size
-        const brand=req.body.brand
-        const stock=req.body.stock
-        const status=req.body.status
-        const colour=req.body.colour
-        const type=req.body.type
-        const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
-        console.log('image urls is =>',imageUrls)
-        const product = new Product({
-          name,
-          description,
-          price,
-          sellingprice,
-          category,
-          size,
-          brand,
-          status,
-          colour,
-          type,
-          stock,
-          images: imageUrls
-        });
-        console.log("category id is =>"+category);
+    const name=req.body.name
+    const description=req.body.description
+    const price=req.body.price
+    const sellingprice=req.body.sellingprice
+    const category=req.body.category
+    const size=req.body.size
+    const brand=req.body.brand
+    const stock=req.body.stock
+    const status=req.body.status
+    const colour=req.body.colour
+    const type=req.body.type
+    const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
+    console.log('image urls is =>',imageUrls)
+    const product = new Product({
+        name,
+        description,
+        price,
+        sellingprice,
+        category,
+        size,
+        brand,
+        status,
+        colour,
+        type,
+        stock,
+        images: imageUrls
+    });
+    console.log("category id is =>"+category);
+    console.log(product.name,product.images)
 
-        console.log(product.name,product.images)
-    
-        await product.save();
-        console.log("product added")
-        const products=await Product.find()
-        console.log("products variable added")
-
-        res.redirect("/admin/productredirection")
-      
-    }
+    await product.save();
+    console.log("product added")
+    const products=await Product.find()
+    console.log("products variable added")
+    res.redirect("/admin/productredirection")
+}
 
 const productredirection=async(req,res)=>{
     const products=await Product.find()
@@ -128,9 +118,10 @@ const editproductpage=async(req,res)=>{
     const productId=req.params.id
    
 
-    const foundproduct = await Product.findById(productId);
+    const categories= await CategoryCollection.find() 
+    const product = await Product.findById(productId);
 
-    res.render('admin/editproduct.ejs', { foundproduct });
+    res.render('admin/editproduct.ejs', { product,categories });
     // res.render('admin/editproduct')
     // res.redirect("editproduct/id=${productId}")
 }
@@ -139,7 +130,6 @@ const editproductpage=async(req,res)=>{
 const editproduct=async(req,res)=>{
     console.log("reached editproduct");
     const productId=req.params.id
-    // const name=req.body.name
     const { name, description, price, sellingprice, category, size, brand, stock,colour,type } = req.body;
     const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
     await Product.findOneAndUpdate({ _id: productId }, { name: name,description:description,price:price,sellingprice:sellingprice,category:category,size:size,brand:brand,stock:stock,colour:colour,type:type});
@@ -164,7 +154,6 @@ const user_block=async(req,res)=>{
     }
     await user.save()
     res.redirect('/admin/user_list')
-    // await collection.updateOne()
 }
 
 const toaddcategory=async(req,res)=>{
@@ -200,7 +189,6 @@ const category_block=async(req,res)=>{
 
 const editcategorypage=async(req,res)=>{
     console.log("reached editcategory");
-    // const categories=await CategoryCollection.find()
     const name=req.body.name
     const id=req.body.editCategoryId
     const categoryType=req.body.editcategory
@@ -257,9 +245,39 @@ const changestatus = async (req, res) => {
 };
 
 
+const removeImage = async (req, res) => {
+    const { productId, imageFile, dataindex } = req.body;
+  
+    // Make sure to validate input and handle errors properly here
+  
+    try {
+      // Remove the image URL from the product's images array
+      await Product.updateOne(
+        { _id: productId },
+        { $pull: { images: imageFile } }
+      );
+  
+      // Delete the image file from the file system
+      // Assuming you store images in a directory named 'public/uploads'
+      const imagePath = path.join("public/uploads", path.basename(imageFile));
+  
+      // Code to delete the image file (implement error handling as needed)
+      // fs.unlinkSync(imagePath);
+  
+      return res.json({ message: "Image removed successfully" });
+    } catch (error) {
+      console.error("Error occurred during image removal:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+  
+  
+  
+
+
 module.exports={
     dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block,
     toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout,orderManagement,orderDetails,
-    changestatus
+    changestatus,removeImage
     
 }

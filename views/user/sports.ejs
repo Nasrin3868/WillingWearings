@@ -79,7 +79,11 @@
                                                 <span class="old-price"><%= product.price %></span>
                                             </div>
                                             <div class="product-action-1 show">
-                                                <a aria-label="Add To Cart" class="action-btn hover-up" onclick="itemsToCart('<%= product._id%>')"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                <% if (product.stock==0) { %>
+                                                    <p style="color: red;">Out of Stock</p>
+                                                <% }else{%>
+                                                    <a aria-label="Add To Cart" class="action-btn hover-up" onclick="itemsToCart('<%= product._id%>')"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                <% } %>
                                             </div>
                                         </div>
                                     </div>
