@@ -931,14 +931,14 @@ const OrderSubmit = async (req, res) => {
     console.log("reached OrderSubmit");
     console.log(req.body.addressId);
     console.log(req.body.cartSubtotal);
-    if(req.body.cartSubtotal==0){
+    const userId = req.session.user._id;
+    const user = await collection.findById(userId).populate('cart.product');
+    if(user.cart==[]){
         const response = {
         message: "Something went wrong, go to checkoutpage",
         redirectUrl: `/checkout`
     };
     }
-    const userId = req.session.user._id;
-    const user = await collection.findById(userId).populate('cart.product');
     const cartSubtotal = calculateCartSubtotal(user);
     const cartTotal = calculateCartTotal(user);
     // Create an array of items from the user's cart

@@ -40,7 +40,7 @@ $(document).ready(function () {
                                     <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>My Profile</a>
+                                    <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Edit Profile</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
@@ -77,18 +77,18 @@ $(document).ready(function () {
                                                 <thead>
                                                     <tr class="text-center">
                                                         <th style="width: 20%;">Order Id</th>
-                                                        <th style="width: 20%;">Date</th>
-                                                        <th>Status</th>
+                                                        <th style="width: 15%;">Date</th>
+                                                        <th style="width: 15%;">Status</th>
                                                         <th style="width: 20%;">Total</th>
-                                                        <th style="width: 20%;">Actions</th>
+                                                        <th style="width: 15%;">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <% order.forEach(Order => { %>
                                                         <tr>
                                                             <td style="width: 20%;"><%= Order._id %></td>
-                                                            <td style="width: 20%;"><%= Order.created_on %></td>
-                                                            <td>
+                                                            <td style="width: 15%;"><%= Order.created_on %></td>
+                                                            <td style="width: 15%;">
                                                                 <% if (Order.order_status == 'cancelled'||Order.order_status == 'returned') { %>
                                                                     <span class="badge rounded-pill alert-warning"><%= Order.order_status %></span>
                                                                 <% }else if (Order.order_status != 'delivered') { %>
@@ -99,7 +99,7 @@ $(document).ready(function () {
                                                             </td>
                                                             <!-- Update the line to display quantity for each order -->
                                                             <td style="width: 20%;"><%= Order.actualTotalAmount %> for <%= Order.quantity %> item</td>
-                                                            <td style="width: 20%;"><a href="/orderDetails/<%= Order._id %>" class="btn-small d-block">View Details</a></td>
+                                                            <td style="width: 15%;"><a href="/orderDetails/<%= Order._id %>" class="btn-small d-block">View Details</a></td>
                                                         </tr>
                                                     <%}) %>
                                                 </tbody>
