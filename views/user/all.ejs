@@ -13,22 +13,13 @@
                     </ul>
                 </div>
                 <div class="widget-category mb-30">
-                    <h5 class="section-title style-1 mb-30 wow fadeIn animated">Sort by</h5>
-                    <ul class="categories">
-                        <li><a href="shop-grid-right.html">Popularity</a></li>
-                        <li><a href="shop-grid-right.html">Average rating</a></li>
-                        <li><a href="shop-grid-right.html">Price: Low to High</a></li>
-                        <li><a href="shop-grid-right.html">Price: High to Low</a></li>
-                    </ul>
-                </div>
-                <div class="widget-category mb-30">
                     <h5 class="section-title style-1 mb-30 wow fadeIn animated">Price Range</h5>
                     <ul class="categories">
-                        <li><a href="shop-grid-right.html">$0-$200</a></li>
-                        <li><a href="shop-grid-right.html">$200-$400</a></li>
-                        <li><a href="shop-grid-right.html">$400-$600</a></li>
-                        <li><a href="shop-grid-right.html">$600-$800</a></li>
-                        <li><a href="shop-grid-right.html">800$+</a></li>
+                        <li><a href="shop-grid-right.html">0- Rs.1500</a></li>
+                        <li><a href="shop-grid-right.html">Rs.1500-Rs.3000</a></li>
+                        <li><a href="shop-grid-right.html">Rs.3000-Rs.4500</a></li>
+                        <li><a href="shop-grid-right.html">Rs.4500-Rs.6000</a></li>
+                        <li><a href="shop-grid-right.html">Rs.6000+</a></li>
                     </ul>
                 </div>
                 <div class="banner-img wow fadeIn mb-45mb-lg-0 animated d-lg-block d-none">
@@ -106,27 +97,15 @@
                 <!-- End tab-content -->
 
                 <!-- Pagination -->
-                <div class="pagination-container">
+                <div class="pagination-container text-center">
                     <ul class="pagination">
                         <% const totalPages = Math.ceil(products.length / 9); %>
-                        <!-- Previous button -->
-                        <li class="page-item" id="prev-page">
-                            <a class="page-link" href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
                         <!-- Page links -->
                         <% for (let i = 1; i <= totalPages; i++) { %>
                             <li class="page-item">
                                 <a class="page-link" href="#" data-page="<%= i %>"><%= i %></a>
                             </li>
                         <% } %>
-                        <!-- Next button -->
-                        <li class="page-item" id="next-page">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -155,22 +134,6 @@
             // Show the clicked page
             showPage(targetPage);
         });
-
-        // Handle Previous and Next buttons
-        $('#prev-page').on('click', function(e) {
-            e.preventDefault();
-            if (currentPage > 1) {
-                showPage(currentPage - 1);
-            }
-        });
-
-        $('#next-page').on('click', function(e) {
-            e.preventDefault();
-            if (currentPage < totalPages) {
-                showPage(currentPage + 1);
-            }
-        });
-
         function showPage(page) {
             // Calculate the range of products to display for the given page
             const startIndex = (page - 1) * itemsPerPage;
@@ -182,10 +145,6 @@
 
             // Update the current page
             currentPage = page;
-
-            // Disable/enable Prev and Next buttons
-            $('#prev-page').toggleClass('disabled', currentPage === 1);
-            $('#next-page').toggleClass('disabled', currentPage === totalPages);
         }
     });
 

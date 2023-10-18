@@ -1,3 +1,13 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function () {
+    new DataTable('#example');
+            
+})
+</script>
+
 <%-include("../partials/adminheader")-%>
 
 <section class="content-main">
@@ -9,11 +19,10 @@
         
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover" id="example">
                     <thead>
                         <tr>
                             <th>Username</th>
-                            <!-- <th>Last name</th> -->
                             <th>Email</th>                            
                             <th>Phone no.</th>
                             <th>Status</th>
@@ -50,9 +59,9 @@
                             <td>
                                 <div class="info pl-3">
                                     <% if (user.blocked==true) { %>
-                                        <a class="btn btn-primary btn-sm rounded" style="background-color: red;" href="/admin/userblock/<%= user._id %>">Unblock</a>
+                                        <a class="btn btn-primary btn-sm rounded" style="background-color: rgb(198, 51, 51);" href="/admin/userblock/<%= user._id %>">Unblock</a>
                                     <% } else { %>
-                                        <a class="btn btn-primary btn-sm rounded" style="background-color: green;" href="/admin/userblock/<%= user._id %>">Block</a>                                       
+                                        <a class="btn btn-primary btn-sm rounded" style="background-color: rgb(51, 134, 51);" href="/admin/userblock/<%= user._id %>">Block</a>                                       
                                     <% } %>                                      
                                 </div>
                             </td>
@@ -65,18 +74,6 @@
             </div>
         </div> <!-- card-body end// -->
     </div> <!-- card end// -->
-    <div class="pagination-area mt-15 mb-50">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-start">
-                <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                <li class="page-item"><a class="page-link" href="#">02</a></li>
-                <li class="page-item"><a class="page-link" href="#">03</a></li>
-                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                <li class="page-item"><a class="page-link" href="#">16</a></li>
-                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-            </ul>
-        </nav>
-    </div>
 </section> <!-- content-main end// -->
 
 <%-include("../partials/adminfooter")-%>

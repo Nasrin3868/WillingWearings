@@ -78,12 +78,17 @@
                                     
                                     <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                     <div class="detail-extralink">
+                                        <% if (product.stock === 0) { %>
+                                            <a  style="color: red;">Out of Stock</a>
+                                        <% } else { %>
+                                            <a onclick="itemsToCart('<%= product._id%>')" class="btn btn-fill-out btn-block hover-up">Add to cart</a>
+                                        <% } %>
                                         <div class="product-extra-link2">
-                                            <a onclick="itemsToCart('<%= product._id%>')" class="button button-add-to-cart">Add to cart</a>
                                             <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
                                             <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
                                         </div>
                                     </div>
+                                    
                                     <ul class="product-meta font-xs color-grey mt-50">
                                         <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
                                         <li class="mb-5">Tags: <a href="#" rel="tag">Cloth</a>, <a href="#" rel="tag">Women</a>, <a href="#" rel="tag">Dress</a> </li>

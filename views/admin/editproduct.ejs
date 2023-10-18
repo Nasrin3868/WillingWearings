@@ -5,9 +5,6 @@
                 <div class="col-9">
                     <div class="content-header">
                         <h2 class="content-title">Product Management</h2>
-                        <div>
-                            <!-- <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button> -->
-                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -16,28 +13,30 @@
                             <h4>Basic</h4>
                         </div>
                         <div class="card-body">
-                            <form action="/admin/editproduct/<%= foundproduct._id %>" method="post" enctype="multipart/form-data">
+                            <form action="/admin/editproduct/<%= foundproduct._id %>" onsubmit="return validateform()" method="post" enctype="multipart/form-data">
                                 <div class="mb-4">
                                     <label for="product_name" class="form-label">Product Name</label>
-                                    <input type="text"placeholder="Type here" class="form-control" id="product_name" name="name" value="<%= foundproduct.name %>">
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_name" name="name" value="<%= foundproduct.name %>">
+                                    <span id="name-error" style="color: red;"></span>
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
-                                    <textarea placeholder="Type here" class="form-control" rows="4" name="description" ><%= foundproduct.description %></textarea>
+                                    <textarea placeholder="Type here" class="form-control" rows="4" id="product_description" name="description" value="<%= foundproduct.description %>"></textarea>
+                                    <span id="description-error" style="color: red;"></span>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="mb-4">
-                                            <label class="form-label"> price</label>
-                                            <div class="row gx-2">
-                                                <input placeholder="Rs." type="text" class="form-control" name="price" value="<%= foundproduct.price %>">
-                                            </div>
+                                            <label class="form-label">Price</label>
+                                            <input placeholder="Rs." type="text" class="form-control" id="product_price" name="price" value="<%= foundproduct.price %>">
+                                            <span id="price-error" style="color: red;"></span>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label class="form-label">Selling price</label>
-                                            <input placeholder="Rs." type="text" class="form-control" name="sellingprice" value="<%= foundproduct.sellingprice %>">
+                                            <input placeholder="Rs." type="text" class="form-control" id="product_sellingprice" name="sellingprice" value="<%= foundproduct.sellingprice %>">
+                                            <span id="sellingprice-error" style="color: red;"></span>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
@@ -70,13 +69,15 @@
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label class="form-label">Stock</label>
-                                            <input placeholder="Type here" type="text" class="form-control" name="stock" value="<%= foundproduct.stock %>">
+                                            <input placeholder="Type here" type="text" class="form-control" id="product_stock" name="stock" value="<%= foundproduct.stock %>">
+                                            <span id="stock-error" style="color: red;"></span>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label class="form-label">Colour</label>
-                                            <input placeholder="Type here" type="text" class="form-control" name="colour" value="<%= foundproduct.colour %>">
+                                            <input placeholder="Type here" type="text" class="form-control" id="product_colour" name="colour" value="<%= foundproduct.colour %>">
+                                            <span id="colour-error" style="color: red;"></span>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
@@ -108,6 +109,7 @@
                                                             </div>
                                                         <% }); %>
                                                     <% } %>
+                                                    <span id="image-upload-error" style="color: red;"></span>
                                                 </div>
                                 
                                                 <!-- Container for newly added images -->
@@ -124,8 +126,8 @@
                                                 />
 
                                                 <!-- Add Image button -->
-                                                <button id="addImage">Choose Image</button>
-                                                <button id="deleteImages" type="button">Delete All Images</button>
+                                                <button class="btn btn-md rounded font-sm hover-up" id="addImage">Choose Image</button>
+                                                <button class="btn btn-md rounded font-sm hover-up" id="deleteImages" type="button">Delete All Images</button>
                                             </div>
                                         </div>
                                     </div>

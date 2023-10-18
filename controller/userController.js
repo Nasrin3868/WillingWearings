@@ -503,14 +503,14 @@ const westernpage=async(req,res)=>{
         const type = "Western"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
         const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
-        res.render("user/western",{isAuthenticated,products,categories})
+        res.render("user/western",{isAuthenticated,products,categories,name:''})
     }else{
         const isAuthenticated=false
         const type = "Western"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
         const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
         console.log(products)        
-        res.render("user/western",{isAuthenticated,products,categories})   
+        res.render("user/western",{isAuthenticated,products,categories,name:''})   
     }    
 }
 
@@ -522,16 +522,56 @@ const westernshowbycategory=async(req,res)=>{
         const type = "Western";
         const categories = await CategoryCollection.find({ blocked: false, type });
         const products = await Products.find({ blocked: false,category:name, type });
-        res.render("user/western",{isAuthenticated,products,categories})
+        res.render("user/western",{isAuthenticated,products,categories,name})
     }else{
         const isAuthenticated=false
         const name=req.params.name
         const type = "Western";
         const categories = await CategoryCollection.find({ blocked: false, type });
         const products = await Products.find({ blocked: false,category:name, type });        
+        res.render("user/western",{isAuthenticated,products,categories,name})   
+    }
+}
+
+const sortByPrice=async(req,res)=>{
+    console.log("reached sortByPrice");
+    const category=req.params.category
+    const price=req.params.price
+    if(req.session.user){
+        const name=req.params.name  
+        const isAuthenticated=true
+        const type = "Western";
+        const categories = await CategoryCollection.find({ blocked: false, type });
+        const products = await Products.find({ blocked: false,category:{name:category}, type ,price: { $gte: price - 1500, $lte: price }});
+        res.render("user/western",{isAuthenticated,products,categories})
+    }else{
+        const isAuthenticated=false
+        const name=req.params.name
+        const type = "Western";
+        const categories = await CategoryCollection.find({ blocked: false, type });      
+        const products = await Products.find({ blocked: false,category:{name:category}, type ,price: { $gte: price - 1500, $lte: price }});
         res.render("user/western",{isAuthenticated,products,categories})   
     }
 }
+
+// const westernShowByPrice=async(req,res)=>{
+//     console.log("reache westernShowByPrice");
+//     if(req.session.user){
+//         const name=req.params.name  
+//         const isAuthenticated=true
+//         const type = "Western";
+//         const categories = await CategoryCollection.find({ blocked: false, type });
+//         const products = await Products.find({ blocked: false,category:name, type });
+//         res.render("user/western",{isAuthenticated,products,categories})
+//     }else{
+//         const isAuthenticated=false
+//         const name=req.params.name
+//         const type = "Western";
+//         const categories = await CategoryCollection.find({ blocked: false, type });
+//         const products = await Products.find({ blocked: false,category:name, type });        
+//         res.render("user/western",{isAuthenticated,products,categories})   
+//     }
+// }
 
 const sportspage=async(req,res)=>{
     console.log("reached sports wears");
@@ -886,44 +926,41 @@ const myaccount = async (req, res) => {
 const placedOrder = async (req, res) => {
     console.log("reached placedOrder");
     const addressId = req.params.id;
-    if (!addressId) {
-        const errmessage = "Please select an address";
-        // Pass the errorMessage as a local variable to the template
-        return res.render("user/checkout", { errmessage });
-    }
     const categories = await CategoryCollection.find({ blocked: false });
     console.log(addressId);
     const address = await Address.findById(addressId);
     console.log(address);
-    res.render("user/orderPlacedSuccessfully", {
-        isAuthenticated: true,
-        categories,
-        errmessage: "",
-        message: "Order Placed Successfully..!"
-    });
+    res.render("user/orderPlacedSuccessfully", {isAuthenticated: true,categories,errmessage: "",message: "Order Placed Successfully..!"});
     const userId = req.session.user._id;
+    const user=await collection.findById(userId).populate('cart.product')
+    
     await collection.findByIdAndUpdate(userId, { $set: { cart: [] } });
     console.log("cart cleared");
 }
 
 const OrderSubmit = async (req, res) => {
     console.log("reached OrderSubmit");
-    
     console.log(req.body.addressId);
-    // console.log(req.session.user._id);
-    // ... rest of the code
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate('cart.product');
     const cartSubtotal = calculateCartSubtotal(user);
     const cartTotal = calculateCartTotal(user);
-
     // Create an array of items from the user's cart
     const items = user.cart.map(cartItem => ({
         product_id: cartItem.product._id,
         quantity: cartItem.quantity,
         sales_price: cartItem.quantity * cartItem.product.sellingprice
     }));
-
+    for (const cartItem of user.cart) {
+        const product = cartItem.product;
+        const orderedQuantity = cartItem.quantity;
+        const newStock = product.stock - orderedQuantity;
+        if (newStock < 0) {
+            return res.redirect('/checkout?err=true&msg=Insufficient stock for ' + product.name);
+        }
+        product.stock = newStock;
+        await product.save();
+    }
     const newOrder = new Orders({
         user_id: userId,
         address: req.body.addressId,
@@ -932,100 +969,14 @@ const OrderSubmit = async (req, res) => {
         totalAmount: cartTotal,
     });
     await newOrder.save();
+    user.cart = [];
+    await user.save();
     const response = {
         message: "Order created successfully",
         redirectUrl: `/placedOrder/${req.body.addressId}`
     };
     return res.status(200).json(response);
 }
-
-
-// const placedOrder=async(req,res)=>{
-//     console.log("reached placedOrder");
-//     const addressId=req.params.id
-//     if(!addressId){
-//         return res.redirect('/checkout?err=true&msg=please select an address')
-//     }
-//     const categories = await CategoryCollection.find({ blocked: false });
-//     console.log(addressId);
-//     const address=await Address.findById(addressId)
-//     console.log(address);
-//     res.render("user/orderPlacedSuccessfully",{isAuthenticated:true,categories,errmessage:"",message:"Order Placed Successfully..!"})
-//     const userId=req.session.user._id
-//     await collection.findByIdAndUpdate(userId,{ $set: { cart: [] } });
-//     console.log("cart cleared");
-// }
-
-// const OrderSubmit = async (req, res) => {
-//     console.log("reached OrderSubmit");
-//     if (!req.body.addressId) {
-//         req.session.errorMessage = "Please select an address";
-//         return res.redirect('/checkout');
-//     }
-//     console.log(req.body.addressId);
-//     console.log(req.session.user._id);
-//     // ... rest of the code
-//     const userId=req.session.user._id
-//     const user = await collection.findById(userId).populate('cart.product');
-//     const cartSubtotal = calculateCartSubtotal(user);
-//     const cartTotal= calculateCartTotal(user)
-
-//     // Create an array of items from the user's cart
-//     const items = user.cart.map(cartItem => ({
-//         product_id: cartItem.product._id,
-//         quantity: cartItem.quantity,
-//         sales_price: cartItem.quantity*cartItem.product.sellingprice
-// //     }));
-
-//     const newOrder= new Orders({
-//         user_id: userId,
-//         address: req.body.addressId,
-//         items,
-//         actualTotalAmount: cartSubtotal,
-//         totalAmount: cartTotal,
-//     })
-//     await newOrder.save();
-//     const response={
-//         message: "Order created successfully",
-//         redirectUrl: `/placedOrder/${req.body.addressId}`
-//     }
-//     return res.status(200).json(response)
-// }
-
-
-// const OrderSubmit=async(req,res)=>{
-//     console.log("reached OrderSubmit");
-//     if(!req.body.addressId){
-//         return res.redirect('/checkout?err=true&msg=please select an address')
-//     }
-//     console.log(req.body.addressId);
-//     console.log(req.session.user._id);
-//     const userId=req.session.user._id
-//     const user = await collection.findById(userId).populate('cart.product');
-//     const cartSubtotal = calculateCartSubtotal(user);
-//     const cartTotal= calculateCartTotal(user)
-
-//     // Create an array of items from the user's cart
-//     const items = user.cart.map(cartItem => ({
-//         product_id: cartItem.product._id,
-//         quantity: cartItem.quantity,
-//         sales_price: cartItem.quantity*cartItem.product.sellingprice
-//     }));
-
-//     const newOrder= new Orders({
-//         user_id: userId,
-//         address: req.body.addressId,
-//         items,
-//         actualTotalAmount: cartSubtotal,
-//         totalAmount: cartTotal,
-//     })
-//     await newOrder.save();
-//     const response={
-//         message: "Order created successfully",
-//         redirectUrl: `/placedOrder/${req.body.addressId}`
-//     }
-//     return res.status(200).json(response)
-// }
 
 const orderDetails=async(req,res)=>{
     console.log("reached orderDetails");
@@ -1039,6 +990,21 @@ const cancelOrder=async(req,res)=>{
     console.log("reached cancelOrder");
     const orderId=req.params.id
     await Orders.findByIdAndUpdate(orderId, { order_status: "cancelled" });
+    const userId = req.session.user._id;
+    const order = await Orders.findById(orderId).populate({
+        path: 'items.product_id',
+        model: 'productCollection',
+    });
+    for (const cartItem of order.items) {
+        const product = cartItem.product_id;
+        const orderedQuantity = cartItem.quantity;
+        const newStock = product.stock + orderedQuantity;
+        if (newStock < 0) {
+            return res.redirect('/checkout?err=true&msg=Insufficient stock for ' + product.name);
+        }
+        product.stock = newStock;
+        await product.save();
+    }
     res.redirect(`/orderDetails/${orderId}`);
 }
 
@@ -1046,6 +1012,21 @@ const returnOrder=async(req,res)=>{
     console.log("reached returnOrder");
     const orderId=req.params.id
     await Orders.findByIdAndUpdate(orderId, { order_status: "returned" });
+    const userId = req.session.user._id;
+    const order = await Orders.findById(orderId).populate({
+        path: 'items.product_id',
+        model: 'productCollection',
+    });
+    for (const cartItem of order.items) {
+        const product = cartItem.product_id;
+        const orderedQuantity = cartItem.quantity;
+        const newStock = product.stock + orderedQuantity;
+        if (newStock < 0) {
+            return res.redirect('/checkout?err=true&msg=Insufficient stock for ' + product.name);
+        }
+        product.stock = newStock;
+        await product.save();
+    }
     res.redirect(`/orderDetails/${orderId}`);
 }
 
@@ -1081,10 +1062,20 @@ const quantityIncrease=async(req,res)=>{
     await user.save();
 }
 
+const profileEdit=async(req,res)=>{
+    console.log("reached profileEdit");
+    const username=req.body.name
+    const email=req.body.email
+    const mobile=req.body.mobile
+    const userId=req.session.user._id
+    const user=await collection.findByIdAndUpdate(userId,{username:username,email:email,mobile:mobile})
+    res.redirect("/myaccount")
+}
+
 module.exports={
     home,login,signup,logout,dosignup,sendOtp,dologin,validateotp,resendotp,Toemail,checkemail,otpchecks,otpcheckpage,
     allpage,showbycategory,ethinicpage,ethinicshowbycategory,westernpage,westernshowbycategory,sportspage,Sportsshowbycategory,
     productview,wishlist,cart,resendOTP_for_forgrtpassword,confirmpassword,confirm_password_check,loadHomeAfterLogin,productQuantityUpdate,
     cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,
-    deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease
+    deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,sortByPrice,profileEdit
 }

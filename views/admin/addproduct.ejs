@@ -1,149 +1,137 @@
 <%-include("../partials/adminheader")-%>
 
-        <section class="content-main">
-            <div class="row">
-                <div class="col-9">
-                    <div class="content-header">
-                        <h2 class="content-title">Add New Product</h2>
-                        
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h4>Basic</h4>
-                        </div>
-                        <div class="card-body">
-                            <form action="/admin/addproduct" onsubmit="return validateform()" method="post" enctype="multipart/form-data">
-                                <div class="mb-4">
-                                    <label for="product_name" class="form-label">Product Name</label>
-                                    <input type="text"placeholder="Type here" class="form-control" id="product_name" name="name">
-                                    <span id="username-error" style="color: red;"></span>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Description</label>
-                                    <textarea placeholder="Type here" class="form-control" rows="4" id="product_description" name="description"></textarea>
-                                    <span id="description-error" style="color: red;"></span>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label"> price</label>
-                                            <div class="row gx-2">
-                                                <input placeholder="Rs." type="text" class="form-control" id="product_price" name="price">
-                                                <span id="price-error" style="color: red;"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Selling price</label>
-                                            <input placeholder="Rs." type="text" class="form-control" id="product_sellingprice" name="sellingprice">
-                                            <span id="sellingprice-error" style="color: red;"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Size</label>
-                                            <select class="form-select" id="product_size" name="size">
-                                                <option> S </option>
-                                                <option> M </option>
-                                                <option> L </option>
-                                                <option> X </option>
-                                                <option> XL </option>
-                                                <option> XXL </option>
-                                                <option> Free Size </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Brand</label>
-                                            <select class="form-select" id="product_brand" name="brand">
-                                                <option> fwd </option>
-                                                <option> soch </option>
-                                                <option> aurelia </option>
-                                                <option> forever 21 </option>
-                                                <option> nike </option>
-                                                <option> puma </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Stock</label>
-                                            <input placeholder="Type here" type="text" class="form-control" id="product_stock" name="stock">
-                                            <span id="stock-error" style="color: red;"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Colour</label>
-                                            <input placeholder="Type here" type="text" class="form-control" id="product_colour" name="colour">
-                                            <span id="colour-error" style="color: red;"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="mb-4">
-                                            <label class="form-label">Type</label>
-                                            <select class="form-select" id="product_type" name="type">
-                                                <option> Ethinic </option>
-                                                <option> Western </option>
-                                                <option> Sports </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- for images -->
-                                <div class="col-lg-6">
-                                    <div class="card mb-4">
-                                        <div class="card-header">
-                                            <h4>Media</h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="input-upload">
-                                                <img src="/admin-assets/imgs/theme/upload.svg" alt="">
-                                                <input
-                                                    type="file"
-                                                    id="productImage"
-                                                    name="images"
-                                                    accept="image/*"
-                                                    multiple
-                                                    required
-                                                />
-                                            </div>
-                                            <span id="image-upload-error" style="color: red;"></span> 
-                                        </div>
-                                    </div> 
-                                    <div class="card mb-4">
-                                        <div class="card-header">
-                                            <h4>Organization</h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row gx-2">
-                                                <div class="col-sm-6 mb-3">
-                                                    <label class="form-label">Category</label>
-                                                    <select class="form-select" id="product_category" name="category">
-                                                        <% categories.forEach(function(category) { %>
-                                                            <option> <%= category.name %> </option>
-                                                        <% }); %>
-                                                    </select>
-                                                </div>
-                                                
-                                            </div> <!-- row.// -->
-                                        </div>
-                                    </div> <!-- card end// -->
-                                </div>
-                            <button type="submit" class="btn btn-md rounded font-sm hover-up">Publish</button>
-                            </form>
-                        </div>
-                    </div> <!-- card end// -->
-                </div>
-                
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Add New Product</h2>
             </div>
-        </section> <!-- content-main end// -->
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Basic</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/addproduct" onsubmit="return validateform()" method="post" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label">Product Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="product_name" name="name">
+                            <span id="name-error" style="color: red;"></span> <!-- Fixed ID name -->
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Description</label>
+                            <textarea placeholder="Type here" class="form-control" rows="4" id="product_description" name="description"></textarea>
+                            <span id="description-error" style="color: red;"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Price</label>
+                                    <input placeholder="Rs." type="text" class="form-control" id="product_price" name="price">
+                                    <span id="price-error" style="color: red;"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Selling price</label>
+                                    <input placeholder="Rs." type="text" class="form-control" id="product_sellingprice" name="sellingprice">
+                                    <span id="sellingprice-error" style="color: red;"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Size</label>
+                                    <select class="form-select" id="product_size" name="size">
+                                        <option> S </option>
+                                        <option> M </option>
+                                        <option> L </option>
+                                        <option> X </option>
+                                        <option> XL </option>
+                                        <option> XXL </option>
+                                        <option> Free Size </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Brand</label>
+                                    <select class="form-select" id="product_brand" name="brand">
+                                        <option> fwd </option>
+                                        <option> soch </option>
+                                        <option> aurelia </option>
+                                        <option> forever 21 </option>
+                                        <option> nike </option>
+                                        <option> puma </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Stock</label>
+                                    <input placeholder="Type here" type="text" class="form-control" id="product_stock" name="stock">
+                                    <span id="stock-error" style="color: red;"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Colour</label>
+                                    <input placeholder="Type here" type="text" class="form-control" id="product_colour" name="colour">
+                                    <span id="colour-error" style="color: red;"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Type</label>
+                                    <select class="form-select" id="product_type" name="type">
+                                        <option> Ethinic </option>
+                                        <option> Western </option>
+                                        <option> Sports </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4>Media</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="input-upload">
+                                        <img src="/admin-assets/imgs/theme/upload.svg" alt="">
+                                        <input type="file" id="productImage" name="images" accept="image/*" multiple required>
+                                    </div>
+                                    <span id="image-upload-error" style="color: red;"></span>
+                                </div>
+                            </div>
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4>Organization</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row gx-2">
+                                        <div class="col-sm-6 mb-3">
+                                            <label class="form-label">Category</label>
+                                            <select class="form-select" id="product_category" name="category">
+                                                <% categories.forEach(function(category) { %>
+                                                    <option> <%= category.name %> </option>
+                                                <% }); %>
+                                            </select>
+                                        </div>
+                                    </div> <!-- row.// -->
+                                </div>
+                            </div> <!-- card end// -->
+                        </div>
+                        <button type="submit" class="btn btn-md rounded font-sm hover-up">Publish</button>
+                    </form>
+                </div>
+            </div> <!-- card end// -->
+        </div>
+    </div>
+</section> <!-- content-main end// -->
 
 <%-include("../partials/adminfooter")-%>
+
 <script>
     function validateform() {
         console.log("validateform function called");
@@ -201,7 +189,7 @@
             return false;
         }
 
-        const stockRegex = /^[0-9]\d{0,6}$/;
+        var stockRegex = /^[0-9]\d{0,6}$/;
         if (stock === '' || stock.trim() === '') {
             document.getElementById('stock-error').innerHTML = 'Stock is required.';
             return false;
@@ -231,5 +219,3 @@
         return true;
     }
 </script>
-
-

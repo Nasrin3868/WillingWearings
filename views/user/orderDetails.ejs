@@ -24,7 +24,7 @@
                             <% }else if (orders.order_status == 'returned') { %>
                                 <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order returned</a>
                             <% }else if (orders.order_status != 'delivered') { %>
-                                <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="saveStatus('<%= orders._id %>')">Cancel Order</a>
+                                <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="cancelOrder('<%= orders._id %>')">Cancel Order</a>
                             <% } else { %>
                                 <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="returnorder('<%= orders._id %>')">Return Order</a>
                             <% } %>
@@ -174,7 +174,7 @@
 <%-include("../partials/userfooter")-%>
 
 <script>
-    function saveStatus(orderID) {
+    function cancelOrder(orderID) {
             fetch(`/cancelOrder/${orderID}`, {
                 method: 'POST'
             })

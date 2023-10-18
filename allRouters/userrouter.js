@@ -35,6 +35,8 @@ router.get("/ethinicshowbycategory/:name",controller.ethinicshowbycategory)
 
 router.get("/western",controller.westernpage)
 router.get("/westernshowbycategory/:name",controller.westernshowbycategory)
+// router.get("/westernShowByPrice",controller.westernShowByPrice)
+router.get("/sortByPrice/:category/:price",controller.sortByPrice)
 
 router.get("/sports",controller.sportspage)
 router.get("/Sportsshowbycategory/:name",controller.Sportsshowbycategory)
@@ -69,5 +71,7 @@ router.post("/returnOrder/:id",controller.returnOrder)
 
 // router.post("/cartUpdate",controller.calculateCartSubtotal)
 router.post("/quantityIncrease/:id",middleware.cartAuth,controller.quantityIncrease)
+
+router.post("/profileEdit",controller.profileEdit)
 
 module.exports=router
