@@ -20,9 +20,6 @@ const productschema = new mongoose.Schema({
       type: Date, default: Date.now()
     },
     category: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref:"CategoryCollection",
-    // //   required:true
     type: String,
 
     },

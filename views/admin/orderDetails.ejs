@@ -20,11 +20,14 @@
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                             <select id="statusSelect" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
-                                <option>Change status</option>
+                                <option class="mb-15 mw-200">Change status</option>
                                 <option value="awaiting_payment">Awaiting payment</option>
                                 <option value="confirmed">Confirmed</option>
                                 <option value="shipped">Shipped</option>
                                 <option value="delivered">Delivered</option>
+                                <option value="cancel(seller)_defect">Cancel:Defect</option>
+                                <option value="cancel(seller)_incorrect address">Cancel:Incorrect address</option>
+
                             </select>
                             <a class="btn btn-primary" href="#" onclick="saveStatus('<%= orders._id %>')">Save</a>
                             <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
@@ -96,8 +99,8 @@
                                                     <a class="itemside" href="#">
                                                         <div class="left">
                                                             <!-- Check if orders.product_id has images before accessing -->
-                                                            <% if (order.product_id.images && order.product_id.images.length > 0) { %>
-                                                                <img src="<%= order.product_id.images[0] %>" width="40" height="40" class="img-xs" alt="Item">
+                                                            <% if (order.images && order.images.length > 0) { %>
+                                                                <img src="<%= order.images[0] %>" width="40" height="40" class="img-xs" alt="Item">
                                                             <% } else { %>
                                                                 <!-- Handle case when images are missing -->
                                                                 <img src="/path-to-default-image" width="40" height="40" class="img-xs" alt="Item">
@@ -106,7 +109,7 @@
                                                         <div class="info"> <%= order.product_id.name %> </div>
                                                     </a>
                                                 </td>
-                                                <td> RS.<%= order.product_id.sellingprice %> </td>
+                                                <td> RS.<%= order.sellingprice %> </td>
                                                 <td> <%= order.quantity %> </td>
                                                 <td class="text-end"> Rs.<%= order.sales_price %> </td>
                                             </tr>
@@ -131,6 +134,12 @@
                                                         <dd>
                                                             <% if (orders.order_status == 'cancelled'||orders.order_status == 'returned') { %>
                                                                 <span class="badge rounded-pill alert-warning"><%= orders.order_status %></span>
+                                                            <% }else if (orders.order_status == 'cancel(seller)_defect') { %>
+                                                                <span class="badge rounded-pill alert-warning">Cancelled by seller</span><br>
+                                                                <span class="badge rounded-pill alert-warning">Due to defect in product</span>
+                                                            <% }else if (orders.order_status == 'cancel(seller)_incorrect address') { %>
+                                                                <span class="badge rounded-pill alert-warning">Cancelled by seller</span><br>
+                                                                <span class="badge rounded-pill alert-warning">Delivery boy couldn't find you</span>
                                                             <% }else if (orders.order_status != 'delivered') { %>
                                                                 <span class="badge rounded-pill alert-info "><%= orders.order_status %></span>
                                                             <% } else { %>
@@ -177,7 +186,13 @@
         const selectedOption = statusSelect.value;
         
         if (selectedOption === "Change status") {
-            alert("Please select a status before saving.");
+            Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please select a status before saving.',
+        });
+        return;
+           
         } else {
             fetch(`/admin/changestatus/${orderID}/${selectedOption}`, {
                 method: 'POST'
@@ -193,3 +208,5 @@
         }
     }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

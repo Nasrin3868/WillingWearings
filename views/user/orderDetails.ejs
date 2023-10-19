@@ -1,3 +1,11 @@
+<style>
+    .order-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+
 <%-include("../partials/userheader")-%>
 
 <div class="container ">
@@ -19,14 +27,24 @@
                             <small class="text-muted">Order ID: <%= orders._id %></small>
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <% if (orders.order_status == 'cancelled') { %>
+                            <% if (orders.order_status == 'cancelled'||orders.order_status == 'cancel(seller)_incorrect address'||orders.order_status =='cancel(seller)_defect' ) { %>
                                 <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order Cancelled</a>
                             <% }else if (orders.order_status == 'returned') { %>
                                 <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order returned</a>
                             <% }else if (orders.order_status != 'delivered') { %>
                                 <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="cancelOrder('<%= orders._id %>')">Cancel Order</a>
                             <% } else { %>
-                                <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="returnorder('<%= orders._id %>')">Return Order</a>
+                                <div class="col-lg-6 col-md-6 ms-auto text-md-end order-actions" >
+                                <select id="statusSelect" class="form-select d-inline-block mb-lg-0 mb-15 mw-100">
+                                    <option >Return Order</option>
+                                    <option value="Quality as not expected">Quality as not expected</option>
+                                    <option value="Colour is not as expected">Colour is not as expected</option>
+                                    <option value="Product damaged">Product damaged</option>
+                                    <option value="Different size">Different size</option>
+                                    <option value="Different product">Different product</option>
+                                </select>
+                                <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="returnorder('<%= orders._id %>')">Return</a>
+                                </div>
                             <% } %>
                         </div>
                         
@@ -97,8 +115,8 @@
                                                     <a class="itemside" href="#">
                                                         <div class="left">
                                                             <!-- Check if orders.product_id has images before accessing -->
-                                                            <% if (order.product_id.images && order.product_id.images.length > 0) { %>
-                                                                <img src="<%= order.product_id.images[0] %>" width="40" height="40" class="img-xs" alt="Item">
+                                                            <% if (order.images && order.images.length > 0) { %>
+                                                                <img src="<%= order.images[0] %>" width="40" height="40" class="img-xs" alt="Item">
                                                             <% } else { %>
                                                                 <!-- Handle case when images are missing -->
                                                                 <img src="/path-to-default-image" width="40" height="40" class="img-xs" alt="Item">
@@ -107,7 +125,7 @@
                                                         <div class="info"> <%= order.product_id.name %> </div>
                                                     </a>
                                                 </td>
-                                                <td> RS.<%= order.product_id.sellingprice %> </td>
+                                                <td> RS.<%= order.sellingprice %> </td>
                                                 <td> <%= order.quantity %> </td>
                                                 <td class="text-end"> Rs.<%= order.sales_price %> </td>
                                             </tr>
@@ -131,7 +149,16 @@
                                                         <dt class="text-muted">Status:</dt>
                                                         <dd>
                                                             <% if (orders.order_status == 'cancelled'||orders.order_status == 'returned') { %>
-                                                                <span class="badge rounded-pill alert-warning"><%= orders.order_status %></span>
+                                                                <span class="badge rounded-pill alert-warning"><%= orders.order_status %></span><br>
+                                                                <% if(orders.return_Reason){%>
+                                                                <small>Reason: <span class="badge rounded-pill alert-warning"><%= orders.return_Reason %></span></small>
+                                                                <% }%>
+                                                            <% }else if (orders.order_status == 'cancel(seller)_defect') { %>
+                                                                <span class="badge rounded-pill alert-warning">Cancelled by seller</span><br>
+                                                                <span class="badge rounded-pill alert-warning">Due to defect in product</span>
+                                                            <% }else if (orders.order_status == 'cancel(seller)_incorrect address') { %>
+                                                                <span class="badge rounded-pill alert-warning">Cancelled by seller</span><br>
+                                                                <span class="badge rounded-pill alert-warning">Delivery boy couldn't find you</span>
                                                             <% }else if (orders.order_status != 'delivered') { %>
                                                                 <span class="badge rounded-pill alert-info "><%= orders.order_status %></span>
                                                             <% } else { %>
@@ -175,21 +202,7 @@
 
 <script>
     function cancelOrder(orderID) {
-            fetch(`/cancelOrder/${orderID}`, {
-                method: 'POST'
-            })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-
-        function returnorder(orderID) {   
-        fetch(`/returnOrder/${orderID}`, {
+        fetch(`/cancelOrder/${orderID}`, {
             method: 'POST'
         })
         .then(response => {
@@ -201,4 +214,32 @@
             console.error('Error:', error);
         });
     }
+
+    function returnorder(orderID) {   
+        const statusSelect = document.getElementById('statusSelect');
+        const selectedOption = statusSelect.value;
+        if (selectedOption === "Return Order") {
+            Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please select a reason to change.',
+        });
+        return;
+           
+        } else {
+        fetch(`/returnOrder/${orderID}/${selectedOption}`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

@@ -116,12 +116,13 @@
                                                     name="selectedShippingAddress"
                                                     value="<%= userAddress._id %>"
                                                     id="<%= userAddress._id %>"
-                                                    onclick="submitForm(`${id}`)">
+                                                    onclick="submitForm('<%= userAddress.name %>','<%= userAddress.address %>','<%= userAddress.state %>','<%= userAddress.district %>','<%= userAddress.city %>','<%= userAddress.pincode %>','<%= userAddress.mobile %>')">
                                                 <label for="<%= userAddress._id %>">
                                                     <%= userAddress.name %><br>
                                                     <%= userAddress.address %><br>
                                                     <%= userAddress.state %>,
                                                     <%= userAddress.district %>,
+                                                    <%= userAddress.city %>,
                                                     <%= userAddress.pincode %><br>
                                                     Mobile: <%=userAddress.mobile%> <br> <br>
                                                     <a class="mt-30" href="/editAddress/<%= userAddress._id %>?org=checkout">Edit address</a>
@@ -216,16 +217,24 @@
 
 <script>
 
-let addressId=''
+let address='',name='',state='',district='',city='',pincode='',mobileno=''
 
-function submitForm(Id) {
-    addressId = Id; // Set the global variable addressId
-    console.log(addressId);
+
+function submitForm(username,useraddress,userstate,userdistrict,usercity,userpincode,usermobileno) {
+    name=username
+    address = useraddress; // Set the global variable addressId
+    state=userstate
+    district=userdistrict
+    city=usercity
+    pincode=userpincode
+    mobileno=usermobileno
+    console.log(name,address,state);
 }
 
 function submitPlaceOrder(cartSubtotal) {
     const apiUrl = '/OrderSubmit';
-    if (!addressId) {
+    if (address==='') {
+        console.log("name=" ,address);
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
@@ -241,7 +250,7 @@ function submitPlaceOrder(cartSubtotal) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ addressId,cartSubtotal }) // Wrap addressId in an object
+        body: JSON.stringify({ cartSubtotal,address,name,state,district,city,pincode,mobileno }) // Wrap addressId in an object
     })
     .then(response => {
         if (!response.ok) {

@@ -12,7 +12,7 @@ const home=async(req,res)=>{
     const isAuthenticated=false
     const categories=await CategoryCollection.find({blocked:false})
     const products=await Products.find({blocked:false})
-    res.render("user/home",{isAuthenticated,products,categories})
+    res.render("user/home",{isAuthenticated,products,categories,user:''})
 }
 
 const loadHomeAfterLogin= async(req,res)=>{
@@ -22,7 +22,9 @@ const loadHomeAfterLogin= async(req,res)=>{
         const isAuthenticated = true;
         const categories = await CategoryCollection.find({ blocked: false });
         const products = await Products.find({ blocked: false });
-        res.render("user/home", { isAuthenticated, products, categories});
+        const user=await collection.findById(userId).populate('cart.product')
+        res.render("user/home", { isAuthenticated, products, categories,user});
+        
     } else {
         res.redirect("/");
     }
@@ -277,7 +279,7 @@ console.log("reached validateotp");
         const categories=await CategoryCollection.find({blocked:false})
         const products=await Products.find({blocked:false})
         await collection.updateOne({email},{$set:{otp:save_otp}})
-        res.redirect('/home');
+        res.redirect('login');
     }else{
         const isAuthenticated=false
         res.render("user/otp", { errordata: "Invalid OTP", message: "" ,isAuthenticated,categories})
@@ -914,10 +916,7 @@ const myaccount = async (req, res) => {
 
 const placedOrder = async (req, res) => {
     console.log("reached placedOrder");
-    const addressId = req.params.id;
     const categories = await CategoryCollection.find({ blocked: false });
-    
-    const address = await Address.findById(addressId);
     
     res.render("user/orderPlacedSuccessfully", {isAuthenticated: true,categories,errmessage: "",message: "Order Placed Successfully..!"});
     const userId = req.session.user._id;
@@ -929,24 +928,32 @@ const placedOrder = async (req, res) => {
 
 const OrderSubmit = async (req, res) => {
     console.log("reached OrderSubmit");
-    console.log(req.body.addressId);
     console.log(req.body.cartSubtotal);
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate('cart.product');
-    if(user.cart==[]){
-        const response = {
-        message: "Something went wrong, go to checkoutpage",
-        redirectUrl: `/checkout`
-    };
-    }
     const cartSubtotal = calculateCartSubtotal(user);
+    console.log(cartSubtotal);
+    
+    
     const cartTotal = calculateCartTotal(user);
     // Create an array of items from the user's cart
     const items = user.cart.map(cartItem => ({
         product_id: cartItem.product._id,
+        images:cartItem.product.images,
+        sellingprice:cartItem.product.sellingprice,
         quantity: cartItem.quantity,
         sales_price: cartItem.quantity * cartItem.product.sellingprice
     }));
+    const address={
+        name:req.body.name,
+        address:req.body.address,
+        state:req.body.state,
+        district:req.body.district,
+        city:req.body.city,
+        pincode:req.body.pincode,
+        mobileno:req.body.mobileno
+    } 
+
     for (const cartItem of user.cart) {
         const product = cartItem.product;
         const orderedQuantity = cartItem.quantity;
@@ -959,19 +966,29 @@ const OrderSubmit = async (req, res) => {
     }
     const newOrder = new Orders({
         user_id: userId,
-        address: req.body.addressId,
+        address,
         items,
         actualTotalAmount: cartSubtotal,
         totalAmount: cartTotal,
     });
-    await newOrder.save();
+    if(newOrder.actualTotalAmount==0){
+        const response = {
+        message: "Something went wrong, go to checkoutpage",
+        redirectUrl: `/checkout`
+    };
+    return res.status(200).json(response);
+    }else{
+        await newOrder.save();
     user.cart = [];
     await user.save();
     const response = {
         message: "Order created successfully",
-        redirectUrl: `/placedOrder/${req.body.addressId}`
+        redirectUrl: `/placedOrder`
     };
     return res.status(200).json(response);
+    }
+    
+    
 }
 
 const orderDetails=async(req,res)=>{
@@ -1007,7 +1024,8 @@ const cancelOrder=async(req,res)=>{
 const returnOrder=async(req,res)=>{
     console.log("reached returnOrder");
     const orderId=req.params.id
-    await Orders.findByIdAndUpdate(orderId, { order_status: "returned" });
+    const returnReason=req.params.reason
+    await Orders.findByIdAndUpdate(orderId, { order_status: "returned",return_Reason:returnReason });
     const userId = req.session.user._id;
     const order = await Orders.findById(orderId).populate({
         path: 'items.product_id',

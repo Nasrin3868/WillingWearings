@@ -8,6 +8,15 @@ const mongoose = require('mongoose');
             ref: 'productCollection', // Reference to the Product model
             required: true,
           },
+          images: [
+            {
+              type: String  // Assuming you store image URLs as strings
+            }
+          ],
+          sellingprice:{
+            type: Number,
+            required: true,
+          },
           quantity: {
             type: Number,
             required: true,
@@ -79,9 +88,34 @@ const mongoose = require('mongoose');
       required: true,
     },
     address: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'addresscollection', 
-      required: true
+        name:{
+          type: String,
+          required:true
+        },
+        address:{
+          type: String,
+          required:true
+        },
+        district:{
+          type: String,
+          required:true
+        },
+        state:{
+          type: String,
+          required:true
+        },
+        city:{
+          type: String,
+          required:true
+        },
+        pincode:{
+          type: Number,
+          required:true
+        },
+        mobileno:{
+          type: Number,
+          required:true
+        }
       },
   });
 
