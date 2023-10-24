@@ -4,7 +4,6 @@ const router=express.Router()
 const controller=require("../controller/userController")
 const middleware=require("../middleware/userAuth")
 
-
 router.get("/",middleware.iflogin,controller.home)
 router.get("/home",middleware.islogin,controller.loadHomeAfterLogin)
 router.get("/login",middleware.iflogin,controller.login)
@@ -67,7 +66,11 @@ router.get("/orderDetails/:id",middleware.cartAuth,controller.orderDetails)
 router.post("/cancelOrder/:id",controller.cancelOrder)
 router.post("/returnOrder/:id/:reason",controller.returnOrder)
 
-// router.post("/cartTotalUpdate",controller.cartTotalUpdate)
+
+  router.post("/verify-payment",middleware.cartAuth,controller.verifyOnlinePayment);
+  router.post("/paymentFailureHandler",controller.paymentFailureHandler)
+  router.get("/paymentFailure",middleware.cartAuth,controller.paymentFailure)
+// router.post("/cartTotalUpdate",controller.cartTotalUpdate)   
 
 // router.post("/cartUpdate",controller.calculateCartSubtotal)
 router.post("/quantityIncrease/:id",middleware.cartAuth,controller.quantityIncrease)

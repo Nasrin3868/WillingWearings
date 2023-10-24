@@ -50,11 +50,18 @@ router.get("/orderManagement",controller.orderManagement)
 router.get("/orderDetails/:id",controller.orderDetails)
 router.post("/changestatus/:id/:status", controller.changestatus);
 
+router.get("/sales_report",controller.salesReport)
+router.get("/dailyOrder",controller.dailyOrder)
+router.get("/weeklyOrder",controller.weeklyOrder)
+// router.get("/monthlyOrder",controller.monthlyOrder)
+router.get("/yearlyOrder",controller.yearlyOrder)
 
 
 router.post("/remove-image", controller.removeImage);
 router.post("/addproduct", upload.array('images', 4), controller.addproduct);
 router.post("/editproduct/:id", upload.array('images', 4), controller.editproduct);
+
+
 
 
 module.exports=router

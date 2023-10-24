@@ -135,6 +135,16 @@
                                                             <a aria-label="Add To Cart" class="action-btn hover-up" onclick="itemsToCart('<%= product._id%>')"><i class="fi-rs-shopping-bag-add"></i></a>
                                                         <% } %>
                                                     </div>
+                                                    <% if(user!=''){%>
+                                                        <div>
+                                                            <% user.cart.forEach(cartProduct => { %>
+                                                                <% if (cartProduct.product._id.toString() === product._id.toString()) { %>
+                                                                    <small>Already in cart</small>
+                                                                <% } %>
+                                                            <% }); %>
+                                                        </div>
+                                                    <%} %>
+                                                    
                                                 </div>
                                             </div>
                                         </div>

@@ -194,15 +194,15 @@
                             <div class="mb-25">
                                 <h5>Payment</h5>
                             </div>
-                            <div class="payment_option">
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="">
-                                    <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">Cash on Delivery</label>
-                                    <div class="form-group collapse in" id="bankTranfer">
-                                        <p class="text-muted mt-5">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration. </p>
-                                    </div>
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="" value="onlinePayment">
+                                    <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">Online Payment</label>
                                 </div>
-                            </div>
+                            
+                                <div class="custome-radio">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5" value="COD">
+                                    <label class="form-check-label" for="exampleRadios5" id="cashondelivery" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Cash On Delivery</label>
+                                </div>
                         </div>
                         <button onclick="submitPlaceOrder('<%= cartSubtotal %>')" class="btn btn-fill-out btn-block mt-30">Place Order</button>
                     </div>
@@ -215,12 +215,14 @@
 
 <%-include("../partials/userfooter")-%>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
 
 let address='',name='',state='',district='',city='',pincode='',mobileno=''
-
+let paymentType
 
 function submitForm(username,useraddress,userstate,userdistrict,usercity,userpincode,usermobileno) {
+    paymentType = document.querySelector('input[name="payment_option"]:checked').value;
     name=username
     address = useraddress; // Set the global variable addressId
     state=userstate
@@ -250,25 +252,116 @@ function submitPlaceOrder(cartSubtotal) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ cartSubtotal,address,name,state,district,city,pincode,mobileno }) // Wrap addressId in an object
+        body: JSON.stringify({ cartSubtotal,address,name,state,district,city,pincode,mobileno,paymentType}) // Wrap addressId in an object
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-        }
-        return response.json();
-    })
+   
+    .then(response => response.json())
     .then(data => {
-        console.log('Cart item updated successfully:', data);
-        if (data.redirectUrl) {
+    console.log(data)
+    if(data.status=="COD"){
             window.location.href = data.redirectUrl;
+    }else if(data.status=="RAZORPAY"){
+       
+        razorpayPayment(data.response);
+    }
+function razorpayPayment(order) {
+
+
+var options = {
+"key": "rzp_test_badyxeiy422xF7", // Enter the Key ID generated from the Dashboard
+"amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+"currency": "INR",
+"name": "Runners_Rave", //your business name
+"description": "Test Transaction",
+"order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+"handler": function (response) {
+
+verifyPayment(response, order)
+
+},
+"prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
+"name": "Gaurav Kumar", //your customer's name
+"email": "gaurav.kumar@example.com",
+"contact": "9000090000" //Provide the customer's phone number for better conversion rates 
+},
+"notes": {
+"address": "Razorpay Corporate Office"
+},
+
+};
+console.log('options are',options);
+var razorpay = new Razorpay(options);
+razorpay.on('payment.failed', function (response) {
+    alert("Payment failed");
+    console.log("response data for failed paymentis ===> ",response);
+   
+    // Your fetch call to handle payment failure
+    fetch('/paymentFailureHandler', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            errorDescription: response.error.description,
+            errorSource: response.error.source,
+            errorStep: response.error.step,
+            errorReason: response.error.reason,
+            orderId: response.error.metadata.order_id,
+            paymentId: response.error.metadata.payment_id
+        })
+    })
+    .then(response => response.json())
+    .then(data => { 
+       window.location.href=data.redirectUrl
+    })
+    .catch(error => {
+        console.error('Error handling payment failure:', error);
+       
+    });
+});
+
+razorpay.open();
+ }
+ async function verifyPayment(payment, order) {
+  
+    console.log("verifyPayment function get called")
+            const response = await fetch('/verify-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ payment, order }),
+            })
+            // .then((data)=>{
+            //   alert(data.redirectUrl,data.message)
+            //     window.location.href=data.redirectUrl
+            // })
+
+            
+            const result = await response.json();
+
+            if (result.status === 'paymentSuccess') {
+                window.location.href="/placedOrder"
+                
+                console.log("payment success")
+            } else if (result.status === 'paymentFailed') {
+                window.location.href="/paymentFailure"
+                console.log("payment failede")
+            } else {
+                
+                console.log("payment error")
+            }
         }
+
     })
     .catch(error => {
         console.error('Error updating cart item:', error);
     });
-}
+        }
+        
 
+       
+   
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 

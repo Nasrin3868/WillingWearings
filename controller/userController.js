@@ -7,6 +7,7 @@ const CategoryCollection=require("../model/categorymodel")
 const Address= require("../model/addressmodel");
 const { Collection } = require("mongoose");
 const Orders=require("../model/ordermodel")
+const userHelper = require('../helper/razorPay');
 
 const home=async(req,res)=>{
     const isAuthenticated=false
@@ -22,7 +23,8 @@ const loadHomeAfterLogin= async(req,res)=>{
         const isAuthenticated = true;
         const categories = await CategoryCollection.find({ blocked: false });
         const products = await Products.find({ blocked: false });
-        const user=await collection.findById(userId).populate('cart.product')
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        console.log("user:",user)
         res.render("user/home", { isAuthenticated, products, categories,user});
         
     } else {
@@ -829,6 +831,7 @@ const newAddress=async(req,res)=>{
     const pincode= req.body.pincode
     const mobile= req.body.mobileno
     const userId=req.session.user._id
+    
     const data = new Address({
         name,
         address,
@@ -926,6 +929,7 @@ const placedOrder = async (req, res) => {
     console.log("cart cleared");
 }
 
+let orderId = "";
 const OrderSubmit = async (req, res) => {
     console.log("reached OrderSubmit");
     console.log(req.body.cartSubtotal);
@@ -953,17 +957,8 @@ const OrderSubmit = async (req, res) => {
         pincode:req.body.pincode,
         mobileno:req.body.mobileno
     } 
-
-    for (const cartItem of user.cart) {
-        const product = cartItem.product;
-        const orderedQuantity = cartItem.quantity;
-        const newStock = product.stock - orderedQuantity;
-        if (newStock < 0) {
-            return res.redirect('/checkout?err=true&msg=Insufficient stock for ' + product.name);
-        }
-        product.stock = newStock;
-        await product.save();
-    }
+    console.log("paymentType=",req.body.paymentType);
+    
     const newOrder = new Orders({
         user_id: userId,
         address,
@@ -978,18 +973,110 @@ const OrderSubmit = async (req, res) => {
     };
     return res.status(200).json(response);
     }else{
-        await newOrder.save();
-    user.cart = [];
-    await user.save();
-    const response = {
-        message: "Order created successfully",
-        redirectUrl: `/placedOrder`
-    };
-    return res.status(200).json(response);
+        const cod='COD'
+        console.log(cod);
+        if(cod==req.body.paymentType){
+            console.log(true);
+        }else{
+            console.log("cod: ",cod);
+            console.log("cod: ",req.body.paymentType);
+        }
+        const onlinepayment='onlinePayment'
+        if(req.body.paymentType==cod) {
+            for (const cartItem of user.cart) {
+                const product = cartItem.product;
+                const orderedQuantity = cartItem.quantity;
+                const newStock = product.stock - orderedQuantity;
+                if (newStock < 0) {
+                    return res.redirect('/checkout?err=true&msg=Insufficient stock for ' + product.name);
+                }
+                product.stock = newStock;
+                await product.save();
+            }
+            await newOrder.save();
+            orderId=newOrder._id
+            console.log("newOrder._id:",newOrder._id);
+            user.cart = [];
+            await user.save();
+            return res.json({
+                status: "COD",
+                redirectUrl: "/placedOrder",
+              });
+            // const response = {
+            //     message: "Order created successfully",
+            //     redirectUrl: `/placedOrder`
+            // };
+            // return res.json({ status: "COD", response: response  });
+            // return res.status(200).json(response);
+        }else {
+            await newOrder.save();
+            orderId=newOrder._id
+                userHelper
+                  .generateRazorPay(newOrder._id, newOrder.actualTotalAmount)
+                  .then((response) => {
+                    console.log("razorpay response is===>", response);
+                    return res.json({ status: "RAZORPAY", response: response });
+                  });
+                // if (cartDetails) {
+                //   cartDetails.products = [];
+                //   await cartDetails.save();
+                // }
+              }
+        }
+        
     }
     
-    
-}
+    const verifyOnlinePayment = async (req, res) => {
+        let data = req.body;
+        console.log(data);
+        const userId = req.session.user._id;
+        const user = await collection.findById(userId).populate('cart.product');
+        user.cart = [];
+        await user.save();
+        let receiptId = data.order.receipt;
+        userHelper
+          .verifyOnlinePayment(data)
+          .then(() => {
+            console.log("this is a payment success block");
+      
+            let paymentSuccess = true;
+            userHelper.updatePaymentStatus(receiptId, paymentSuccess).then(() => {
+              res.json({ status: "paymentSuccess", placedOrderId: receiptId });
+            });
+          })
+          .catch((err) => {
+            console.log("this is a payment failure block");
+            console.log("Rejected");
+            if (err) {
+              console.log(err.message);
+      
+              let paymentSuccess = false;
+              userHelper.updatePaymentStatus(receiptId, paymentSuccess);
+            }
+          });
+      };
+
+      const paymentFailureHandler = async (req, res) => {
+        // let data=await Order.findOne({_id:orderId});
+        console.log("order details are==>", orderId);
+        
+        let data = await Orders.findOneAndUpdate(
+          { _id: orderId }, // Query to find the document
+          { $set: { order_status: "payment Failed" } },
+          { new: true }
+        );
+      
+        return res.status(200).json({
+          redirectUrl: `/paymentFailure`, // Specify the desired redirect URL here
+        });
+      };
+      const paymentFailure = async (req, res) => {
+        console.log("reached paymentFailure");
+    const categories = await CategoryCollection.find({ blocked: false });
+    res.render("user/paymentFailure", {isAuthenticated: true,categories,errmessage: "Payment Failed...",message: ""});
+      };
+
+
 
 const orderDetails=async(req,res)=>{
     console.log("reached orderDetails");
@@ -1114,5 +1201,5 @@ module.exports={
     productview,wishlist,cart,resendOTP_for_forgrtpassword,confirmpassword,confirm_password_check,loadHomeAfterLogin,productQuantityUpdate,
     cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,
     deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,sortByPrice,profileEdit,changePassword,
-    validatePassword
+    validatePassword,paymentFailure,paymentFailureHandler,verifyOnlinePayment,
 }

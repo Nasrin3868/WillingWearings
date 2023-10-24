@@ -244,6 +244,88 @@ const changestatus = async (req, res) => {
     }
 };
 
+const salesReport=async(req,res)=>{
+  console.log("reached salesReport");
+  const orders = await Orders.find().populate('address').populate('items.product_id').populate('user_id');
+  res.render('admin/salesReport.ejs',{orders})
+}
+
+const dailyOrder=async(req,res)=>{
+    console.log("reached dailyOrder");
+    const now = new Date();
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const year = now.getFullYear().toString();
+    const currentDate = `${day}-${month}-${year}`;
+    const orders = await Orders.find({ created_on: currentDate }).populate('address').populate('items.product_id').populate('user_id');
+    res.render('admin/salesReport.ejs',{orders})
+}
+
+const weeklyOrder=async(req,res)=>{
+    console.log("reached weeklyOrder");
+    const now = new Date();
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const year = now.getFullYear().toString();
+    const currentDate = `${day}-${month}-${year}`;
+
+    const days = now.getDate() -7;
+    const months = (now.getMonth() + 1).toString().padStart(2, '0');
+    const years = now.getFullYear().toString();
+    const sevenDaysBefore = `${days}-${months}-${years}`;
+    const orders = await Orders.find({ created_on: {$gt: sevenDaysBefore, $lte: currentDate } }).populate('address').populate('items.product_id').populate('user_id');
+    res.render('admin/salesReport.ejs',{orders})
+}
+
+
+
+// const yearlyOrder = async (req, res) => {
+//     console.log("reached monthlyOrder");
+//     const now = new Date();
+//     const day = now.getDate().toString().padStart(2, '0');
+//     const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+    
+//     const currentYear = now.getFullYear().toString();
+//     const lastYear = now.getFullYear()-1
+//     console.log(currentYear);
+//     const currentDate = `${day}-${currentMonth}-${currentYear}`;
+//     console.log(currentDate);
+//     const Dates = `${day}-${currentMonth}-${lastYear}`;
+//     console.log(Dates);
+//     const orders = await Orders.find({ created_on: {$gte: Dates, $lte: currentDate } }).populate('address').populate('items.product_id').populate('user_id');
+//     res.render('admin/salesReport.ejs',{orders})
+
+// }
+
+const yearlyOrder = async (req, res) => {
+    console.log("reached yearlyOrder");
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const lastYear = currentYear - 1;
+
+    // Calculate the start and end dates for the full year
+    const startDate = '23-10-2022' // October is represented as 9 (0-based index)
+    const endDate = '24-10-2023'
+    console.log(`startdate:${startDate}, enddate: ${endDate}`);
+
+    try {
+        // Find orders from 24-10-2022 to 23-10-2023 (full year)
+        const orders = await Orders.find({
+            created_on: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        }).populate('address').populate('items.product_id').populate('user_id');
+        res.render('admin/salesReport.ejs', { orders });
+    } catch (error) {
+        // Handle any potential errors
+        console.error(error);
+        res.status(500).send("An error occurred");
+    }
+}
+
+
+
 
 const removeImage = async (req, res) => {
     const { productId, imageFile, dataindex } = req.body;
@@ -272,12 +354,11 @@ const removeImage = async (req, res) => {
   };
   
   
-  
 
 
 module.exports={
     dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block,
     toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout,orderManagement,orderDetails,
-    changestatus,removeImage
+    changestatus,removeImage,salesReport,dailyOrder,weeklyOrder,yearlyOrder
     
 }
