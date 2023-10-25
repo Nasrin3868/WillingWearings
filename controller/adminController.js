@@ -26,7 +26,73 @@ const upload = multer({ storage: storage });
 
 const dashboard=async(req,res)=>{
     console.log("reached admin dashboard");
-    res.render("admin/dashboard.ejs")
+    const productCount=await Product.countDocuments();
+    const orders = await Orders.find().populate('address').populate('items.product_id').populate('user_id');
+    const paidOrders = await Orders.aggregate([
+        {
+            $match: {payment_status: { $in: ['paid', 'Pending'] }}
+        },
+        {
+            $group: { _id: null,totalAmount: { $sum: '$actualTotalAmount' }}
+        }
+    ]);
+    console.log(paidOrders);
+    // Calculate the total no. of orders in the collection
+    const totalOrdersCount = await Orders.countDocuments();
+
+    // Calculate the sum of actualTotalAmount for orders in the current month
+    const now = new Date();
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const days= 1
+    const year = now.getFullYear().toString();
+    const currentDate = `${day}-${month}-${year}`;
+    const firstDayOfMonth = `${days}-${month}-${year}`;
+
+    const monthlyOrders = await Orders.aggregate([
+        {
+            $match: {created_on: {$gte: firstDayOfMonth,$lte: currentDate},payment_status: { $in: ['paid', 'Pending'] }}
+        },
+        {
+            $group: {_id: null,totalAmount: { $sum: '$actualTotalAmount' }}
+        }
+    ]);
+    const monthlyOrderStats = await Orders.aggregate([
+        {
+            $match: {
+                created_on: {
+                    $gte: `01-01-${year}`, // Start of the current year
+                    $lte: `31-12-${year}`  // End of the current year
+                }
+            }
+        },
+        {
+            $group: {
+                _id: { $substr: ["$created_on", 3, 2] }, // Extract month from the date
+                count: { $sum: 1 } // Count orders for each month
+            }
+        },
+        {
+            $sort: {
+                "_id": 1 // Sort by month
+            }
+        }
+    ]);
+    
+
+    // Extract the calculated values from the aggregation results
+    const paidOrdersTotal = paidOrders.length > 0 ? paidOrders[0].totalAmount : 0;
+    const monthlyOrdersTotal = monthlyOrders.length > 0 ? monthlyOrders[0].totalAmount : 0;
+
+    // Render the dashboard view with the calculated values
+    res.render("admin/dashboard.ejs", {
+        paidOrdersTotal,
+        productCount,
+        totalOrdersCount,
+        monthlyOrdersTotal,
+        monthlyOrderStats
+    });
+    // res.render("admin/dashboard.ejs")
  
 }
 
@@ -237,7 +303,29 @@ const changestatus = async (req, res) => {
     try {
         const status = req.params.status;
         const orderId = req.params.id;
-        await Orders.findByIdAndUpdate(orderId, { order_status: status });
+        if(status=='delivered'){
+            const order=await Orders.findByIdAndUpdate(orderId, { order_status: status , payment_status: 'paid'});
+        }else if(status=='cancel(seller)_defect'||status=="cancel(seller)_incorrect address"){
+            const orders = await Orders.findById(orderId).populate({
+                path: 'items.product_id',
+                model: 'productCollection',
+            });
+            if(orders.payment_method=='Cash On Delivery'){
+                await Orders.findByIdAndUpdate(orderId, { order_status: status , payment_status:"cancelled"});
+            }else{
+                await Orders.findByIdAndUpdate(orderId, { order_status: status , payment_status:"refunded"});
+            }
+            for (const cartItem of orders.items) {
+                const product = cartItem.product_id;
+                const orderedQuantity = cartItem.quantity;
+                const newStock = product.stock + orderedQuantity;
+                if (newStock < 0) {
+                    return res.redirect('/checkout?err=true&msg=Insufficient stock for ' + product.name);
+                }
+                product.stock = newStock;
+                await product.save();
+            }
+        }
         res.redirect(`/admin/orderDetails/${orderId}`);
     } catch (error) {
         console.error(error);
@@ -258,6 +346,7 @@ const dailyOrder=async(req,res)=>{
     const year = now.getFullYear().toString();
     const currentDate = `${day}-${month}-${year}`;
     const orders = await Orders.find({ created_on: currentDate }).populate('address').populate('items.product_id').populate('user_id');
+    console.log(orders);
     res.render('admin/salesReport.ejs',{orders})
 }
 
@@ -277,51 +366,12 @@ const weeklyOrder=async(req,res)=>{
     res.render('admin/salesReport.ejs',{orders})
 }
 
-
-
-// const yearlyOrder = async (req, res) => {
-//     console.log("reached monthlyOrder");
-//     const now = new Date();
-//     const day = now.getDate().toString().padStart(2, '0');
-//     const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
-    
-//     const currentYear = now.getFullYear().toString();
-//     const lastYear = now.getFullYear()-1
-//     console.log(currentYear);
-//     const currentDate = `${day}-${currentMonth}-${currentYear}`;
-//     console.log(currentDate);
-//     const Dates = `${day}-${currentMonth}-${lastYear}`;
-//     console.log(Dates);
-//     const orders = await Orders.find({ created_on: {$gte: Dates, $lte: currentDate } }).populate('address').populate('items.product_id').populate('user_id');
-//     res.render('admin/salesReport.ejs',{orders})
-
-// }
-
 const yearlyOrder = async (req, res) => {
     console.log("reached yearlyOrder");
     const now = new Date();
-    const currentYear = now.getFullYear();
-    const lastYear = currentYear - 1;
-
-    // Calculate the start and end dates for the full year
-    const startDate = '23-10-2022' // October is represented as 9 (0-based index)
-    const endDate = '24-10-2023'
-    console.log(`startdate:${startDate}, enddate: ${endDate}`);
-
-    try {
-        // Find orders from 24-10-2022 to 23-10-2023 (full year)
-        const orders = await Orders.find({
-            created_on: {
-                $gte: startDate,
-                $lte: endDate
-            }
-        }).populate('address').populate('items.product_id').populate('user_id');
-        res.render('admin/salesReport.ejs', { orders });
-    } catch (error) {
-        // Handle any potential errors
-        console.error(error);
-        res.status(500).send("An error occurred");
-    }
+    const year = now.getFullYear().toString();
+    const orders = await Orders.find({ created_on: { $regex: year } }).populate('address').populate('items.product_id').populate('user_id');
+    res.render('admin/salesReport.ejs', { orders });
 }
 
 

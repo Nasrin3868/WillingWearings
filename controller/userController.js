@@ -1031,6 +1031,16 @@ const OrderSubmit = async (req, res) => {
         console.log(data);
         const userId = req.session.user._id;
         const user = await collection.findById(userId).populate('cart.product');
+    for (const cartItem of user.cart) {
+        const product = cartItem.product;
+        const orderedQuantity = cartItem.quantity;
+        const newStock = product.stock - orderedQuantity;
+        if (newStock < 0) {
+            return res.redirect('/checkout?err=true&msg=Insufficient stock for ' + product.name);
+        }
+        product.stock = newStock;
+        await product.save();
+    }
         user.cart = [];
         await user.save();
         let receiptId = data.order.receipt;
@@ -1073,6 +1083,7 @@ const OrderSubmit = async (req, res) => {
       const paymentFailure = async (req, res) => {
         console.log("reached paymentFailure");
     const categories = await CategoryCollection.find({ blocked: false });
+    const orderUpdate = await Orders.findByIdAndUpdate({_id:orderId},{$set:{order_status:'Failed',payment_method:'online payment',payment_status:'failed'}})
     res.render("user/paymentFailure", {isAuthenticated: true,categories,errmessage: "Payment Failed...",message: ""});
       };
 
@@ -1089,7 +1100,12 @@ const orderDetails=async(req,res)=>{
 const cancelOrder=async(req,res)=>{
     console.log("reached cancelOrder");
     const orderId=req.params.id
-    await Orders.findByIdAndUpdate(orderId, { order_status: "cancelled" });
+    const orders=await Orders.findById(orderId)
+    if(orders.payment_method=='Cash On Delivery'){
+        await Orders.findByIdAndUpdate(orderId, { order_status: "cancelled" , payment_status:"cancelled"});
+    }else{
+        await Orders.findByIdAndUpdate(orderId, { order_status: "cancelled" , payment_status:"refunded"});
+    }
     const userId = req.session.user._id;
     const order = await Orders.findById(orderId).populate({
         path: 'items.product_id',
@@ -1112,7 +1128,7 @@ const returnOrder=async(req,res)=>{
     console.log("reached returnOrder");
     const orderId=req.params.id
     const returnReason=req.params.reason
-    await Orders.findByIdAndUpdate(orderId, { order_status: "returned",return_Reason:returnReason });
+    await Orders.findByIdAndUpdate(orderId, { order_status: "returned",return_Reason:returnReason , payment_status:"refunded"});
     const userId = req.session.user._id;
     const order = await Orders.findById(orderId).populate({
         path: 'items.product_id',

@@ -46,15 +46,16 @@ const verifyOnlinePayment = async(details)=>{
 }
 
 const updatePaymentStatus = (orderId,paymentStatus)=>{
+    console.log(paymentStatus);
    return new Promise(async(resolve,reject)=>{
       try {
          if(paymentStatus){
-            const orderUpdate = await Orders.findByIdAndUpdate({_id:orderId},{$set:{order_status:'Placed',payment_status:'paid'}})
+            const orderUpdate = await Orders.findByIdAndUpdate({_id:orderId},{$set:{order_status:'Placed',payment_status:'paid',payment_method:'online payment'}})
             .then(()=>{
                resolve();
             });
          }else{
-            const orderUpdate = await Orders.findByIdAndUpdate({_id:orderId},{$set:{order_status:'Failed'}})
+            const orderUpdate = await Orders.findByIdAndUpdate({_id:orderId},{$set:{order_status:'Failed',payment_status:'failed',payment_method:'online payment'}})
             .then(()=>{
                resolve()
             });
