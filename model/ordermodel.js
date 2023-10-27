@@ -54,15 +54,10 @@ const mongoose = require('mongoose');
       required: true,
       default:'Placed'
     },
-    created_on: {
-      type: String,
-      default: function () {
-        const now = new Date();
-        const day = now.getDate().toString().padStart(2, '0');
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const year = now.getFullYear().toString();
-        return `${day}-${month}-${year}`;
-      },
+    created_on:{
+      type: Date,
+      default:Date.now,
+      required:true
     },
     expected_delivery_on: {
       type: String,

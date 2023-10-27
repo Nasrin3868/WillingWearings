@@ -10,7 +10,6 @@ const Orders=require("../model/ordermodel")
 const userHelper = require('../helper/razorPay');
 
 const home=async(req,res)=>{
-    
     const isAuthenticated=false
     const categories=await CategoryCollection.find({blocked:false})
     const products=await Products.find({blocked:false})
@@ -987,6 +986,7 @@ const OrderSubmit = async (req, res) => {
         actualTotalAmount: cartSubtotal,
         totalAmount: cartTotal,
     });
+    console.log("newOrder",newOrder);
     if(newOrder.actualTotalAmount==0){
         const response = {
         message: "Something went wrong, go to checkoutpage",
@@ -999,7 +999,6 @@ const OrderSubmit = async (req, res) => {
         if(cod==req.body.paymentType){
             console.log(true);
         }else{
-            console.log("cod: ",cod);
             console.log("cod: ",req.body.paymentType);
         }
         const onlinepayment='onlinePayment'
@@ -1031,6 +1030,7 @@ const OrderSubmit = async (req, res) => {
             // return res.status(200).json(response);
         }else {
             await newOrder.save();
+            console.log("newOrder.actualTotalAmount:",newOrder.actualTotalAmount);
             orderId=newOrder._id
                 userHelper
                   .generateRazorPay(newOrder._id, newOrder.actualTotalAmount)

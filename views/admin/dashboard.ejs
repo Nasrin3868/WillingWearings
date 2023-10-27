@@ -1,4 +1,4 @@
-<%-include("../partials/adminheader")-%>
+<%- include("../partials/adminheader") -%>
 
 <section class="content-main">
     <div class="content-header">
@@ -72,16 +72,18 @@
     </div>
 </section> <!-- content-main end// -->
 
-<%-include("../partials/adminfooter")-%>
+<%- include("../partials/adminfooter") -%>
 
 <script>
     const monthlyOrderStats = <%- JSON.stringify(monthlyOrderStats) %>; // Parse the data from EJS
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+    // Initialize an array to hold order counts for each month
     const orderCounts = new Array(12).fill(0);
 
+    // Process the monthly order statistics data
     monthlyOrderStats.forEach(item => {
-        const monthIndex = new Date(item._id).getMonth();
+        const monthIndex = item._id.month - 1; // Month is 0-indexed
         orderCounts[monthIndex] = item.count;
     });
 

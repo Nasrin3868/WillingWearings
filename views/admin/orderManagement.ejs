@@ -75,7 +75,14 @@ $(document).ready(function () {
                                 <% } %>
                             </td>
                             <td><%= order.payment_method %></td>
-                            <td><%= order.created_on %></td>
+                            <td>
+                                <script>
+                                    var dateString = '<%= order.created_on %>'; 
+                                    var date = new Date(dateString);
+                                    var formattedDate = date.toLocaleDateString(); 
+                                    document.write(formattedDate);
+                                </script>
+                            </td>
                             <td class="text-end">
                                 <a href="/admin/orderDetails/<%= order._id %>" class="btn btn-md rounded font-sm">View Detail</a>
                             </td>

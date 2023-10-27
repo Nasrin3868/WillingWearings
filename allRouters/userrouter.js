@@ -26,6 +26,7 @@ router.get("/confirmpassword",controller.confirmpassword)
 router.post("/confirm_password_check",controller.confirm_password_check)
 // router.post("/signup")
 
+
 router.get("/all",controller.allpage)
 router.get("/showbycategory/:name",controller.showbycategory)
 

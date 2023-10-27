@@ -55,7 +55,12 @@ $(document).ready(function () {
                             <td><a href="#" class="fw-bold"><%= order._id %></a> </td>
                             <td><%= order.user_id.username %></td>
                             <td>
-                                <%= order.created_on %>
+                                <script>
+                                    var dateString = '<%= order.created_on %>'; 
+                                    var date = new Date(dateString);
+                                    var formattedDate = date.toLocaleDateString(); 
+                                    document.write(formattedDate);
+                                </script>
                             </td>
                             <td>
                                 Rs.<%= order.actualTotalAmount %>

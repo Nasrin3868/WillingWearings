@@ -14,6 +14,7 @@ const generateRazorPay = async(orderId,total)=>{
          currency:"INR",
          receipt:orderId,
       };
+      
       instance.orders.create(options,function(err,order){
          console.log("New order from razorpay :",order);
          resolve(order)

@@ -42,19 +42,18 @@ const dashboard=async(req,res)=>{
     // Calculate the total no. of orders in the collection
     const totalOrdersCount = await Orders.countDocuments();
 
-    // Calculate the sum of actualTotalAmount for orders in the current month
     const now = new Date();
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const days= 1
-    const year = now.getFullYear().toString();
-    const currentDate = `${day}-${month}-${year}`;
-    const firstDayOfMonth = `${days}-${month}-${year}`;
-    console.log("firstdayof month: ", firstDayOfMonth);
-    console.log("currentdayof month: ", currentDate);
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // Month is 0-indexed (0 = January, 1 = February, ...)
+    const startOfMonth = new Date(currentYear, currentMonth, 1, 0, 0, 0, 1); // Set to the beginning of the current month (midnight on the 1st)
+    const endOfMonth = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999); 
+    
+    const startOfYear = new Date(currentYear, 0, 1, 0, 0, 0, 1);
+    const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+
     const monthlyOrders = await Orders.aggregate([
         {
-            $match: {created_on: {$gte: firstDayOfMonth,$lte: currentDate},payment_status: { $in: ['paid', 'Pending'] }}
+            $match: {created_on: {$gte: startOfMonth, $lte: endOfMonth},payment_status: { $in: ['paid', 'Pending'] }}
         },
         {
             $group: {_id: null,totalAmount: { $sum: '$actualTotalAmount' }}
@@ -64,34 +63,32 @@ const dashboard=async(req,res)=>{
         {
             $match: {
                 created_on: {
-                    $gte: `01-01-${year}`, // Start of the current year
-                    $lte: `31-12-${year}`  // End of the current year
+                    $gte: startOfYear, // Start of the current year
+                    $lte: endOfYear  // End of the current year
                 }
             }
         },
         {
             $group: {
-                _id: { $substr: ["$created_on", 3, 2] }, // Extract month from the date
+                _id: {
+                    year: { $year: "$created_on" },  // Extract the year from the date
+                    month: { $month: "$created_on" } // Extract the month from the date
+                },
                 count: { $sum: 1 } // Count orders for each month
             }
         },
         {
             $sort: {
-                "_id": 1 // Sort by month
+                "_id.year": 1, // Sort by year
+                "_id.month": 1 // Sort by month
             }
         }
     ]);
+    
 
-    // Extract the calculated values from the aggregation results
+//     // Extract the calculated values from the aggregation results
     const monthlyOrdersTotal = monthlyOrders.length > 0 ? monthlyOrders.reduce((total, order) => total + order.totalAmount, 0) : 0;
 const paidOrdersTotal = paidOrders.length > 0 ? paidOrders[0].totalAmount : 0;
-
-
-    console.log("monthlyOrders: ", monthlyOrders);
-console.log("paidOrders: ", paidOrders);
-    console.log("monthlyOrdersTotal: ", monthlyOrdersTotal);
-console.log("paidOrdersTotal: ", paidOrdersTotal);
-
 
     // Render the dashboard view with the calculated values
     res.render("admin/dashboard.ejs", {
@@ -101,7 +98,6 @@ console.log("paidOrdersTotal: ", paidOrdersTotal);
         monthlyOrdersTotal,
         monthlyOrderStats
     });
-    // res.render("admin/dashboard.ejs")
  
 }
 
@@ -477,44 +473,39 @@ const salesReport=async(req,res)=>{
   res.render('admin/salesReport.ejs',{orders})
 }
 
-const dailyOrder=async(req,res)=>{
-    console.log("reached dailyOrder");
+const dailyOrder = async (req, res) => {
     const now = new Date();
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const year = now.getFullYear().toString();
-    const currentDate = `${day}-${month}-${year}`;
-    const orders = await Orders.find({ created_on: currentDate }).populate('address').populate('items.product_id').populate('user_id');
-    console.log(orders);
-    res.render('admin/salesReport.ejs',{orders})
-}
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 1);
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999); 
+    const orders = await Orders.find({created_on: { $gte: startOfDay, $lte: endOfDay }}).populate('address').populate('items.product_id').populate('user_id');
+    res.render('admin/salesReport.ejs', { orders });
+};
 
-const weeklyOrder=async(req,res)=>{
-    console.log("reached weeklyOrder");
+const weeklyOrder = async (req, res) => {
     const now = new Date();
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const year = now.getFullYear().toString();
-    const currentDate = `${day}-${month}-${year}`;
-
-    const days = now.getDate() -7;
-    const months = (now.getMonth() + 1).toString().padStart(2, '0');
-    const years = now.getFullYear().toString();
-    const sevenDaysBefore = `${days}-${months}-${years}`;
-    console.log("sevenDaysBefore:",sevenDaysBefore);
-    console.log("currentDate:",currentDate);
-    const orders = await Orders.find({ created_on: {$gt: sevenDaysBefore, $lte: currentDate } }).populate('address').populate('items.product_id').populate('user_id');
-    console.log(orders);
-    res.render('admin/salesReport.ejs',{orders})
-}
+    const currentDayOfWeek = now.getDay();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1));
+    startOfWeek.setHours(0, 0, 0, 1);
+    const endOfWeek = new Date(now);
+    // Set the end of the week to Sunday (end of the day)
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    const orders = await Orders.find({created_on: { $gte: startOfWeek, $lte: endOfWeek }}).populate('address').populate('items.product_id').populate('user_id');
+    res.render('admin/salesReport.ejs', { orders });
+};
 
 const yearlyOrder = async (req, res) => {
-    console.log("reached yearlyOrder");
     const now = new Date();
-    const year = now.getFullYear().toString();
-    const orders = await Orders.find({ created_on: { $regex: year } }).populate('address').populate('items.product_id').populate('user_id');
+    const currentYear = now.getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1, 0, 0, 0, 1);
+    const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+    const orders = await Orders.find({created_on: { $gte: startOfYear, $lte: endOfYear }}).populate('address').populate('items.product_id').populate('user_id');
     res.render('admin/salesReport.ejs', { orders });
-}
+};
+
 
 
 
