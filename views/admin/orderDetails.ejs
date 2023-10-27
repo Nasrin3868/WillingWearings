@@ -25,6 +25,8 @@
                             <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order returned</a>
                         <% }else if (orders.order_status == 'delivered') { %>
                             <a class="badge rounded-pill alert-success" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order delivered</a>
+                        <% }else if (orders.order_status == 'Failed') { %>
+                            <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order Failed</a>
                         <% } else { %>
                             <select id="statusSelect" class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
                                 <option class="mb-15 mw-200">Change status</option>

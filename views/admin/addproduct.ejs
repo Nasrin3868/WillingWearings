@@ -80,16 +80,6 @@
                                     <span id="colour-error" style="color: red;"></span>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="mb-4">
-                                    <label class="form-label">Type</label>
-                                    <select class="form-select" id="product_type" name="type">
-                                        <option> Ethinic </option>
-                                        <option> Western </option>
-                                        <option> Sports </option>
-                                    </select>
-                                </div>
-                            </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="card mb-4">
@@ -97,6 +87,7 @@
                                     <h4>Media</h4>
                                 </div>
                                 <div class="card-body">
+
                                     <div class="input-upload">
                                         <img src="/admin-assets/imgs/theme/upload.svg" alt="">
                                         <input type="file" id="productImage" name="images" accept="image/*" multiple required>
@@ -213,6 +204,9 @@
         const fileInput = document.getElementById('productImage');
         if (fileInput.files.length === 0) {
             document.getElementById('image-upload-error').textContent = 'Please select one or more images.';
+            return false;
+        }else if(fileInput.files.length >4){
+            document.getElementById('image-upload-error').textContent = 'cannot upload more than 4 images ';
             return false;
         }
 

@@ -31,6 +31,8 @@
                                 <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order Cancelled</a>
                             <% }else if (orders.order_status == 'returned') { %>
                                 <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order returned</a>
+                            <% }else if (orders.order_status == 'Failed') { %>
+                                <a class="badge rounded-pill alert-warning" href="#" style="font-size: 18px; padding: 8px 12px; pointer-events: none;">Order failed</a>
                             <% }else if (orders.order_status != 'delivered') { %>
                                 <a class="btn btn-fill-out btn-block hover-up" href="#" onclick="cancelOrder('<%= orders._id %>')">Cancel Order</a>
                             <% } else { %>

@@ -20,18 +20,15 @@ const productschema = new mongoose.Schema({
       type: Date, default: Date.now()
     },
     category: {
-    type: String,
-
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'CategoryCollection', 
+      required: true,
     },
     size: {
       type: String,
       required: true,
     },
     colour: {
-        type: String,
-        required: true,
-    },
-    type: {
         type: String,
         required: true,
     },

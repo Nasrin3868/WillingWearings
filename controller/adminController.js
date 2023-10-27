@@ -1,14 +1,17 @@
 
 const multer=require("multer")
+const easyimg = require('easyimage');
+const fs = require('fs');
 const Product=require("../model/productmodel")
 const collection=require("../model/mongodb")
 const Address= require("../model/addressmodel");
 const Orders=require("../model/ordermodel")
-
+const sharp = require('sharp');
 
 const admincollection=require("../model/admincollection")
 const CategoryCollection=require("../model/categorymodel")
-const path=require("path")
+const path=require("path");
+const { log } = require("sharp/lib/libvips");
 
 
 const storage = multer.diskStorage({
@@ -21,7 +24,6 @@ const storage = multer.diskStorage({
 });
   
 const upload = multer({ storage: storage });
-
 
 
 const dashboard=async(req,res)=>{
@@ -48,7 +50,8 @@ const dashboard=async(req,res)=>{
     const year = now.getFullYear().toString();
     const currentDate = `${day}-${month}-${year}`;
     const firstDayOfMonth = `${days}-${month}-${year}`;
-
+    console.log("firstdayof month: ", firstDayOfMonth);
+    console.log("currentdayof month: ", currentDate);
     const monthlyOrders = await Orders.aggregate([
         {
             $match: {created_on: {$gte: firstDayOfMonth,$lte: currentDate},payment_status: { $in: ['paid', 'Pending'] }}
@@ -78,11 +81,17 @@ const dashboard=async(req,res)=>{
             }
         }
     ]);
-    
 
     // Extract the calculated values from the aggregation results
-    const paidOrdersTotal = paidOrders.length > 0 ? paidOrders[0].totalAmount : 0;
-    const monthlyOrdersTotal = monthlyOrders.length > 0 ? monthlyOrders[0].totalAmount : 0;
+    const monthlyOrdersTotal = monthlyOrders.length > 0 ? monthlyOrders.reduce((total, order) => total + order.totalAmount, 0) : 0;
+const paidOrdersTotal = paidOrders.length > 0 ? paidOrders[0].totalAmount : 0;
+
+
+    console.log("monthlyOrders: ", monthlyOrders);
+console.log("paidOrders: ", paidOrders);
+    console.log("monthlyOrdersTotal: ", monthlyOrdersTotal);
+console.log("paidOrdersTotal: ", paidOrdersTotal);
+
 
     // Render the dashboard view with the calculated values
     res.render("admin/dashboard.ejs", {
@@ -102,21 +111,59 @@ const addproductpage=async(req,res)=>{
     res.render("admin/addproduct.ejs",{categories})
 }
 
+
+
 const addproduct = async (req, res) => {
-    console.log("reached")
-    const name=req.body.name
-    const description=req.body.description
-    const price=req.body.price
-    const sellingprice=req.body.sellingprice
-    const category=req.body.category
-    const size=req.body.size
-    const brand=req.body.brand
-    const stock=req.body.stock
-    const status=req.body.status
-    const colour=req.body.colour
-    const type=req.body.type
-    const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
-    console.log('image urls is =>',imageUrls)
+    console.log("reached");
+    console.log(req.body);
+    const name = req.body.name;
+    const description = req.body.description;
+    const price = req.body.price;
+    const sellingprice = req.body.sellingprice;
+    const categoryname = req.body.category;
+    const categories = await CategoryCollection.find({ name: categoryname });
+    console.log("category name: ", categoryname);
+    console.log("category: ", categories);
+
+    const category = categories[0]._id;
+
+    const size = req.body.size;
+    const brand = req.body.brand;
+    const stock = req.body.stock;
+    const status = req.body.status;
+    const colour = req.body.colour;
+
+    let imageUrls = [];
+    
+    // Define the desired crop dimensions (width, height)
+    const width = 700;
+    const height = 600;
+
+    // Handle each file individually
+    for (const file of req.files) {
+        const filePath = path.join('uploads', file.filename);
+
+        // Check if the file exists before processing
+        if (fs.existsSync(filePath)) {
+            // Use Sharp to resize and crop the image
+            const croppedBuffer = await sharp(filePath)
+                .resize(width, height)
+                .toBuffer();
+
+            // Save the cropped image
+            const croppedFilename = 'cropped-' + file.filename;
+            const croppedFilePath = path.join('uploads', croppedFilename);
+            fs.writeFileSync(croppedFilePath, croppedBuffer);
+
+            imageUrls.push(`/uploads/${croppedFilename}`);
+        } else {
+            console.log(`File not found: ${filePath}`);
+            imageUrls = req.files.map(file => `/uploads/${file.filename}`);
+        }
+    }
+
+    console.log('image urls are =>', imageUrls);
+
     const product = new Product({
         name,
         description,
@@ -127,19 +174,20 @@ const addproduct = async (req, res) => {
         brand,
         status,
         colour,
-        type,
         stock,
-        images: imageUrls
+        images: imageUrls,
     });
-    console.log("category id is =>"+category);
-    console.log(product.name,product.images)
+
+    console.log("category id is =>" + category);
+    console.log(product.name, product.images);
 
     await product.save();
-    console.log("product added")
-    const products=await Product.find()
-    console.log("products variable added")
-    res.redirect("/admin/productredirection")
-}
+    console.log("product added");
+    const products = await Product.find();
+    console.log("products variable added");
+    res.redirect("/admin/productredirection");
+};
+
 
 const productredirection=async(req,res)=>{
     const products=await Product.find()
@@ -180,28 +228,103 @@ const dosignin=async(req,res)=>{
 
 const editproductpage=async(req,res)=>{
     console.log("reached toedit");
-
     const productId=req.params.id
-   
-
     const categories= await CategoryCollection.find() 
-    const product = await Product.findById(productId);
-
+    const product = await Product.findById(productId).populate('category');
     res.render('admin/editproduct.ejs', { product,categories });
     // res.render('admin/editproduct')
     // res.redirect("editproduct/id=${productId}")
 }
 
 
-const editproduct=async(req,res)=>{
+const editproduct = async (req, res) => {
     console.log("reached editproduct");
-    const productId=req.params.id
-    const { name, description, price, sellingprice, category, size, brand, stock,colour,type } = req.body;
-    const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
-    await Product.findOneAndUpdate({ _id: productId }, { name: name,description:description,price:price,sellingprice:sellingprice,category:category,size:size,brand:brand,stock:stock,colour:colour,type:type});
-    res.redirect("/productredirection")
+    const productId = req.body.id;
+    const name=req.body.name
+    const description=req.body.description
+    const price=req.body.price
+    const sellingprice=req.body.sellingprice
+    const categoryname=req.body.category
+    const categories= await CategoryCollection.find({name:categoryname}) 
+    console.log("category name: ",categoryname);
+    console.log("name: ",name);
+    console.log("category : ",categories);
 
+    const category=categories[0]._id
+    
+    const size=req.body.size
+    const brand=req.body.brand
+    const stock=req.body.stock
+    const colour=req.body.colour
+
+    const product = await Product.findById(productId);
+    console.log(product);
+    console.log(name,description);
+    // const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
+    let imageUrls = product.images;
+    if (req.files && req.files.length > 0) {
+        let imageUrls = [];
+    
+    // Define the desired crop dimensions (width, height)
+    const width = 700;
+    const height = 600;
+
+    // Handle each file individually
+    for (const file of req.files) {
+        const filePath = path.join('uploads', file.filename);
+
+        // Check if the file exists before processing
+        if (fs.existsSync(filePath)) {
+            // Use Sharp to resize and crop the image
+            const croppedBuffer = await sharp(filePath)
+                .resize(width, height)
+                .toBuffer();
+
+            // Save the cropped image
+            const croppedFilename = 'cropped-' + file.filename;
+            const croppedFilePath = path.join('uploads', croppedFilename);
+            fs.writeFileSync(croppedFilePath, croppedBuffer);
+
+            imageUrls.push(`/uploads/${croppedFilename}`);
+        } else {
+            console.log(`File not found: ${filePath}`);
+            imageUrls = req.files.map(file => `/uploads/${file.filename}`);
+        }
+    }
+    }
+    console.log('image urls is =>',imageUrls)
+    if (product) {
+        await Product.findOneAndUpdate(
+            { _id: productId },
+            {
+                name,
+                description,
+                price,
+                sellingprice,
+                category,
+                size,
+                brand,
+                stock,
+                colour,
+                images: imageUrls, // Update the image URLs
+            }
+        );
+
+        res.redirect("/admin/productredirection");
+    } else {
+        // Handle product not found error
+        res.status(404).send("Product not found.");
+    }
+};
+
+
+const deleteImage=async(req,res)=>{
+    console.log("reached deleteImage");
+    const productId=req.params.id
+    await Product.findByIdAndUpdate(productId,{$set:{images: []}})
+    res.redirect(`/admin/edit-product/${productId}`);
 }
+
 
 const userlist=async(req,res)=>{
     console.log("reached usermanagement");
@@ -222,17 +345,24 @@ const user_block=async(req,res)=>{
     res.redirect('/admin/user_list')
 }
 
+
+
 const toaddcategory=async(req,res)=>{
     const category=req.body.name
     const categorytype=req.body.category
     const data=await CategoryCollection.findOne({name:category})
-    if(data){
-        res.render('admin/categorylist',{errmessage:"category already exists"})
-    }else{
-        const newCategory = new CategoryCollection({ name: category,type: categorytype }); 
+    if (data) {
+        const categories=await CategoryCollection.find()
+        const create=true
+        res.render('admin/categorylist', { categories,errmessage: "Category already exists",create });
+    } else {
+        const newCategory = new CategoryCollection({ name: category, type: categorytype });
         await newCategory.save();
+        const categories = await CategoryCollection.find();
+        const create = true;
+        res.redirect('/admin/categoryredirection')
     }
-    res.redirect('/admin/categoryredirection')
+    // res.redirect('/admin/categoryredirection')
 }
 
 const categoryredirection=async(req,res)=>{
@@ -260,8 +390,15 @@ const editcategorypage=async(req,res)=>{
     const categoryType=req.body.editcategory
     console.log(name);
     console.log(id);
-    await CategoryCollection.findOneAndUpdate({ _id: id }, { name: name,type: categoryType });
-    res.redirect('/admin/categorylist')
+    const data=await CategoryCollection.findOne({name:name})
+    if (data) {
+        const categories=await CategoryCollection.find()
+        const create=true
+        res.render('admin/categorylist', { categories,errmessage: "Category already exists",create });
+    } else {
+        await CategoryCollection.findOneAndUpdate({ _id: id }, { name: name,type: categoryType });
+        res.redirect('/admin/categorylist')
+    }
     
 }
 
@@ -325,6 +462,8 @@ const changestatus = async (req, res) => {
                 product.stock = newStock;
                 await product.save();
             }
+        }else{
+            const order=await Orders.findByIdAndUpdate(orderId, { order_status: status });
         }
         res.redirect(`/admin/orderDetails/${orderId}`);
     } catch (error) {
@@ -362,7 +501,10 @@ const weeklyOrder=async(req,res)=>{
     const months = (now.getMonth() + 1).toString().padStart(2, '0');
     const years = now.getFullYear().toString();
     const sevenDaysBefore = `${days}-${months}-${years}`;
+    console.log("sevenDaysBefore:",sevenDaysBefore);
+    console.log("currentDate:",currentDate);
     const orders = await Orders.find({ created_on: {$gt: sevenDaysBefore, $lte: currentDate } }).populate('address').populate('items.product_id').populate('user_id');
+    console.log(orders);
     res.render('admin/salesReport.ejs',{orders})
 }
 
@@ -409,6 +551,6 @@ const removeImage = async (req, res) => {
 module.exports={
     dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block,
     toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout,orderManagement,orderDetails,
-    changestatus,removeImage,salesReport,dailyOrder,weeklyOrder,yearlyOrder
+    changestatus,removeImage,salesReport,dailyOrder,weeklyOrder,yearlyOrder,deleteImage
     
 }

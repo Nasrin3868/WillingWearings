@@ -30,9 +30,11 @@ $(document).ready(function () {
             <div class="table-responsive">
                 <table class="table" id="example">
                     <thead>
-                        <tr>
+                        <tr class="text-center">
                             <th>Product details</th>
-                            <th style="width: 15%;">Price</th>
+                            <th style="width: 10%;">Stock</th>
+                            <th style="width: 10%;">Actual_price</th>
+                            <th style="width: 10%;">Selling_price</th>
                             <th style="width: 15%;">Status</th>
                             <th style="width: 15%;">Actions</th>
                         </tr>
@@ -40,7 +42,7 @@ $(document).ready(function () {
                     <tbody>
                         <!-- Iterate through products -->
                         <% products.forEach(function(product) { %>
-                            <tr>
+                            <tr class="text-center">
                                 <td>
                                     <a class="itemside" href="#">
                                         <div class="left">
@@ -56,7 +58,9 @@ $(document).ready(function () {
                                         </div>
                                     </a>
                                 </td>
-                                <td style="width: 15%;"><%= product.price %>/-</td>
+                                <td style="width: 10%;"><%= product.stock %></td>
+                                <td style="width: 10%;"><%= product.price %>/-</td>
+                                <td style="width: 10%;"><%= product.sellingprice %>/-</td>
                                 <td style="width: 15%;">
                                     <% if (product.blocked == true) { %>
                                         <span class="badge rounded-pill alert-danger">Blocked</span>

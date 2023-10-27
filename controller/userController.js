@@ -10,6 +10,7 @@ const Orders=require("../model/ordermodel")
 const userHelper = require('../helper/razorPay');
 
 const home=async(req,res)=>{
+    
     const isAuthenticated=false
     const categories=await CategoryCollection.find({blocked:false})
     const products=await Products.find({blocked:false})
@@ -442,16 +443,20 @@ const allpage=async(req,res)=>{
 const showbycategory=async(req,res)=>{
     console.log("reached showbycategory")
     if(req.session.user){
-        const name=req.params.name   
+        const categoryname=req.params.name   
         const isAuthenticated=true
-        const categories=await CategoryCollection.find({blocked:false})
-        const products=await Products.find({blocked:false,category:name})
+        const category = await CategoryCollection.findOne({ name: categoryname, blocked: false });
+        const categoryId = category._id;
+        const products = await Products.find({ blocked: false, category: categoryId});
+        const categories = await CategoryCollection.find({ blocked: false});
         res.render("user/all",{isAuthenticated,products,categories})
     }else{
         const isAuthenticated=false
-        const name=req.params.name
-        const categories=await CategoryCollection.find({blocked:false})
-        const products=await Products.find({blocked:false,category:name})        
+        const categoryname=req.params.name
+        const category = await CategoryCollection.findOne({ name: categoryname,blocked: false });
+        const categoryId = category._id;
+        const products = await Products.find({ blocked: false, category: categoryId});
+        const categories = await CategoryCollection.find({ blocked: false});       
         res.render("user/all",{isAuthenticated,products,categories})   
     }
 }
@@ -463,14 +468,15 @@ const ethinicpage=async(req,res)=>{
         const isAuthenticated=true
         const type = "Ethinic"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
-        res.render("user/ethinic",{isAuthenticated,products,categories})
+        const categoryIds = categories.map(category => category._id);
+        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
+        res.render("user/ethinic", { isAuthenticated, products, categories });
     }else{
         const isAuthenticated=false
         const type = "Ethinic"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
-              
+        const categoryIds = categories.map(category => category._id);
+        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
         res.render("user/ethinic",{isAuthenticated,products,categories})   
     }    
 }
@@ -478,18 +484,22 @@ const ethinicpage=async(req,res)=>{
 const ethinicshowbycategory=async(req,res)=>{
     console.log("reached ethinicshowbycategory")
     if(req.session.user){
-        const name=req.params.name  
+        const categoryname=req.params.name  
         const isAuthenticated=true
         const type = "Ethinic";
+        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+        const categoryId = category._id;
+        const products = await Products.find({ blocked: false, category: categoryId, type });
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false,category:name, type });
         res.render("user/ethinic",{isAuthenticated,products,categories})
     }else{
         const isAuthenticated=false
-        const name=req.params.name
+        const categoryname=req.params.name
         const type = "Ethinic";
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false,category:name, type });        
+        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+        const categoryId = category._id;
+        const products = await Products.find({ blocked: false, category: categoryId, type });
+        const categories = await CategoryCollection.find({ blocked: false, type });       
         res.render("user/ethinic",{isAuthenticated,products,categories})   
     }
 }
@@ -501,34 +511,40 @@ const westernpage=async(req,res)=>{
         const isAuthenticated=true
         const type = "Western"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
-        res.render("user/western",{isAuthenticated,products,categories,name:''})
+        const categoryIds = categories.map(category => category._id);
+        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
+        res.render("user/western", { isAuthenticated, products, categories });
     }else{
         const isAuthenticated=false
         const type = "Western"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
+        const categoryIds = categories.map(category => category._id);
+        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
             
-        res.render("user/western",{isAuthenticated,products,categories,name:''})   
+        res.render("user/western",{isAuthenticated,products,categories})   
     }    
 }
 
 const westernshowbycategory=async(req,res)=>{
     console.log("reached westernshowbycategory")
     if(req.session.user){
-        const name=req.params.name  
+        const categoryname=req.params.name  
         const isAuthenticated=true
         const type = "Western";
+        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+        const categoryId = category._id;
+        const products = await Products.find({ blocked: false, category: categoryId, type });
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false,category:name, type });
-        res.render("user/western",{isAuthenticated,products,categories,name})
+        res.render("user/western",{isAuthenticated,products,categories})
     }else{
         const isAuthenticated=false
-        const name=req.params.name
+        const categoryname=req.params.name
         const type = "Western";
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false,category:name, type });        
-        res.render("user/western",{isAuthenticated,products,categories,name})   
+        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+        const categoryId = category._id;
+        const products = await Products.find({ blocked: false, category: categoryId, type });
+        const categories = await CategoryCollection.find({ blocked: false, type });        
+        res.render("user/western",{isAuthenticated,products,categories})   
     }
 }
 
@@ -579,14 +595,15 @@ const sportspage=async(req,res)=>{
         const isAuthenticated=true
         const type = "Sports"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
+        const categoryIds = categories.map(category => category._id);
+        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
         res.render("user/sports",{isAuthenticated,products,categories})
     }else{
         const isAuthenticated=false
         const type = "Sports"; // Change 'dress' to 'type'
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false, type }); // Change 'category' to 'type'
-               
+        const categoryIds = categories.map(category => category._id);
+        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
         res.render("user/sports",{isAuthenticated,products,categories})   
     }    
 }
@@ -594,18 +611,22 @@ const sportspage=async(req,res)=>{
 const Sportsshowbycategory=async(req,res)=>{
     console.log("reached Sportsshowbycategory")
     if(req.session.user){
-        const name=req.params.name  
+        const categoryname=req.params.name  
         const isAuthenticated=true
         const type = "Sports";
+        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+        const categoryId = category._id;
+        const products = await Products.find({ blocked: false, category: categoryId, type });
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false,category:name, type });
         res.render("user/sports",{isAuthenticated,products,categories})
     }else{
         const isAuthenticated=false
-        const name=req.params.name
+        const categoryname=req.params.name
         const type = "Sports";
+        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+        const categoryId = category._id;
+        const products = await Products.find({ blocked: false, category: categoryId, type });
         const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false,category:name, type });        
         res.render("user/sports",{isAuthenticated,products,categories})   
     }
 }

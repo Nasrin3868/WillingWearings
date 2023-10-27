@@ -7,6 +7,7 @@ const controller=require("../controller/adminController")
 const path=require("path")
 const middleware=require("../middleware/adminAuth")
 
+router.use(express.urlencoded({ extended: true }));
 
 // const middleware=require("../middleware/userAuth")
 const multer=require("multer")
@@ -32,34 +33,36 @@ router.get("/adminsignin",middleware.islogout,controller.signin)
 router.post("/adminsignin",middleware.islogout,controller.dosignin)
 router.get("/edit-product/:id",middleware.islogin,controller.editproductpage)
 router.post("/editproduct/:id",controller.editproduct)
+
+router.post("/deleteImage/:id",controller.deleteImage)
 // router.post("/editproduct",controller.doedit)
 // router.post("/edit-product/:id",controller.editonaddproduct)
 router.get("/adminlogout",middleware.islogin,controller.logout)
 
-router.get("/user_list",controller.userlist)
-router.get("/userblock/:id",controller.user_block)
+router.get("/user_list",middleware.islogin,controller.userlist)
+router.get("/userblock/:id",middleware.islogin,controller.user_block)
 
-router.get("/categorylist",controller.categoryredirection)
+router.get("/categorylist",middleware.islogin,controller.categoryredirection)
 router.post("/addcategory",controller.toaddcategory)
-router.get("/categoryredirection",controller.categoryredirection)
-router.get("/categoryblock/:id",controller.category_block)
+router.get("/categoryredirection",middleware.islogin,controller.categoryredirection)
+router.get("/categoryblock/:id",middleware.islogin,controller.category_block)
 router.post("/editcategory",controller.editcategorypage)
 
-router.get("/productblock/:id",controller.product_block)
-router.get("/orderManagement",controller.orderManagement)
-router.get("/orderDetails/:id",controller.orderDetails)
+router.get("/productblock/:id",middleware.islogin,controller.product_block)
+router.get("/orderManagement",middleware.islogin,controller.orderManagement)
+router.get("/orderDetails/:id",middleware.islogin,controller.orderDetails)
 router.post("/changestatus/:id/:status", controller.changestatus);
 
-router.get("/sales_report",controller.salesReport)
-router.get("/dailyOrder",controller.dailyOrder)
-router.get("/weeklyOrder",controller.weeklyOrder)
+router.get("/sales_report",middleware.islogin,controller.salesReport)
+router.get("/dailyOrder",middleware.islogin,controller.dailyOrder)
+router.get("/weeklyOrder",middleware.islogin,controller.weeklyOrder)
 // router.get("/monthlyOrder",controller.monthlyOrder)
-router.get("/yearlyOrder",controller.yearlyOrder)
+router.get("/yearlyOrder",middleware.islogin,controller.yearlyOrder)
 
 
 router.post("/remove-image", controller.removeImage);
 router.post("/addproduct", upload.array('images', 4), controller.addproduct);
-router.post("/editproduct/:id", upload.array('images', 4), controller.editproduct);
+router.post("/editproduct", upload.array('images', 4), controller.editproduct);
 
 
 
