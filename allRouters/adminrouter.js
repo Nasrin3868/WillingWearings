@@ -48,6 +48,10 @@ router.get("/categoryredirection",middleware.islogin,controller.categoryredirect
 router.get("/categoryblock/:id",middleware.islogin,controller.category_block)
 router.post("/editcategory",controller.editcategorypage)
 
+router.get("/couponlist",middleware.islogin,controller.couponlistredirection)
+router.post("/addcoupon",controller.addcoupon)
+router.post("/updateCoupon",controller.updateCoupon)
+
 router.get("/productblock/:id",middleware.islogin,controller.product_block)
 router.get("/orderManagement",middleware.islogin,controller.orderManagement)
 router.get("/orderDetails/:id",middleware.islogin,controller.orderDetails)

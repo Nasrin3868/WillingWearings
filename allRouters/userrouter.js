@@ -44,9 +44,15 @@ router.get("/Sportsshowbycategory/:name",controller.Sportsshowbycategory)
 router.get("/productview/:id",controller.productview)
 
 router.get("/wishlist",middleware.cartAuth,controller.wishlist)
+router.post("/updateWishlist/:id",controller.updateWishlist)
+router.post("/wishlistToCart/:id",controller.wishlistToCart)
+router.get("/wishlistProductDelete/:id",middleware.cartAuth,controller.wishlistProductDelete)
+
 router.post("/productQuantityUpdate",controller.productQuantityUpdate)
 router.get("/doCart/:id",middleware.cartAuth,controller.doCart)
 router.get("/cart",middleware.cartAuth,controller.cart)
+router.post("/quantityIncrease/:id",controller.quantityIncrease)
+
 router.post("/cartUpdate",controller.cartUpdate)
 router.get("/cart",middleware.cartAuth,controller.calculateCartSubtotal)
 router.get("/placeorder/:total",middleware.cartAuth,controller.placeorder)
@@ -74,7 +80,6 @@ router.post("/returnOrder/:id/:reason",controller.returnOrder)
 // router.post("/cartTotalUpdate",controller.cartTotalUpdate)   
 
 // router.post("/cartUpdate",controller.calculateCartSubtotal)
-router.post("/quantityIncrease/:id",middleware.cartAuth,controller.quantityIncrease)
 
 router.post("/profileEdit",controller.profileEdit)
 router.get("/changePassword",middleware.cartAuth,controller.changePassword)

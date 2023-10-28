@@ -10,6 +10,7 @@ const sharp = require('sharp');
 
 const admincollection=require("../model/admincollection")
 const CategoryCollection=require("../model/categorymodel")
+const CouponCollection=require("../model/couponmodel")
 const path=require("path");
 const { log } = require("sharp/lib/libvips");
 
@@ -398,6 +399,57 @@ const editcategorypage=async(req,res)=>{
     
 }
 
+const couponlistredirection=async(req,res)=>{
+    console.log("reached couponlistredirection");
+    const Coupon=await CouponCollection.find()
+    const create=true
+    res.render("admin/couponlist.ejs",{Coupon,errmessage:"",create})
+}
+
+const addcoupon=async(req,res)=>{
+    console.log("reached addcoupon");
+    const coupon_code=req.body.coupon_code
+    const coupon_description=req.body.coupon_description
+    const discount_percentage=req.body.coupon_percentage
+    const min_order=req.body.min_order
+    const max_discount=req.body.max_discount
+    const valid_from=req.body.valid_from
+    const valid_to=req.body.valid_to
+    const data=await CouponCollection.findOne({coupon_code:coupon_code})
+    if (data) {
+        const Coupon=await CouponCollection.find()
+        const create=true
+        res.render('admin/couponlist', { Coupon,errmessage: "Coupon already exists",create });
+    } else {
+        const newCoupon = new CouponCollection({ coupon_code,coupon_description,discount_percentage,min_order,max_discount,valid_from,valid_to });
+        await newCoupon.save();
+        res.redirect('/admin/couponlist')
+    }
+}
+
+const updateCoupon=async(req,res)=>{
+    console.log("reached updateCoupon");
+    
+    const couponId=req.body.editCouponId
+    const coupon_code=req.body.editcoupon_code
+    const coupon_description=req.body.editcoupon_description
+    const discount_percentage=req.body.editcoupon_percentage
+    const min_order=req.body.editmin_order
+    const max_discount=req.body.editmax_discount
+    const valid_from=req.body.editvalid_from
+    const valid_to=req.body.editvalid_to
+    const data=await CouponCollection.findOne({coupon_code:coupon_code})
+    // if (data) {
+    //     const Coupon=await CouponCollection.find()
+    //     const create=true
+    //     res.render('admin/couponlist', { Coupon,errmessage: "Coupon already exists",create });
+    // } else 
+    {
+        await CouponCollection.findByIdAndUpdate(couponId,{coupon_code,coupon_description,discount_percentage,min_order,max_discount,valid_from,valid_to})
+        res.redirect('/admin/couponlist')
+    }
+}
+
 const  product_block=async(req,res)=>{
     const productId=req.params.id
     console.log(productId)
@@ -542,6 +594,6 @@ const removeImage = async (req, res) => {
 module.exports={
     dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block,
     toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout,orderManagement,orderDetails,
-    changestatus,removeImage,salesReport,dailyOrder,weeklyOrder,yearlyOrder,deleteImage
+    changestatus,removeImage,salesReport,dailyOrder,weeklyOrder,yearlyOrder,deleteImage,couponlistredirection,addcoupon,updateCoupon
     
 }

@@ -652,13 +652,75 @@ const productview=async(req,res)=>{
 
 const wishlist=async(req,res)=>{
     console.log("Reached wishlist");
-        const isAuthenticated=true
-        const categories=await CategoryCollection.find({blocked:false})
-        res.render("user/wishlist",{isAuthenticated,categories})
+    const isAuthenticated=true
+    const categories=await CategoryCollection.find({blocked:false})
+    const user=await collection.findById(req.session.user._id).populate('wishlist').populate('cart.product')
+    res.render("user/wishlist",{isAuthenticated,categories,userdata:user})
     
 }
 
+const updateWishlist = async (req, res) => {
+    console.log("reached updateWishlist");
+    const productId = req.params.id;
+    const user = await collection.findById(req.session.user._id).populate('wishlist');
+    const index = user.wishlist.findIndex((item) => item._id.equals(productId)); // Check if the product is in the wishlist
+    if (index === -1) {
+        user.wishlist.push(productId);
+    } else {
+        user.wishlist.splice(index, 1);
+    }
+    await user.save();
+    return res.json({ status: true });
+}
 
+const wishlistToCart=async(req,res)=>{
+    console.log("reached wishlistToCart");
+    const productId=req.params.id
+    const product = await Products.findById(productId);
+    const userId = req.session.user._id;
+    const user = await collection.findOne({ _id: userId });
+    const existingCartItem = user.cart.find(item => item.product.toString() === productId);
+
+    // Update the cart based on whether the product exists or not
+    if (existingCartItem) {
+        if(product.stock > existingCartItem.quantity){
+            existingCartItem.quantity++;
+            const index=user.wishlist.findIndex((item) => item._id.equals(productId))
+            user.wishlist.splice(index, 1);
+        }else{
+            existingCartItem.quantity=existingCartItem.quantity;
+            const index=user.wishlist.findIndex((item) => item._id.equals(productId))
+            user.wishlist.splice(index, 1);
+        }
+    } else {
+        if(product.stock===0){
+            user.cart.push({
+                product: productId,
+                quantity: 0
+            });
+        }else{
+            user.cart.push({
+                product: productId,
+                quantity: 1
+            });
+            const index=user.wishlist.findIndex((item) => item._id.equals(productId))
+            user.wishlist.splice(index, 1);
+        }
+    }
+    await user.save();
+    res.json({ status: true });
+}
+
+const wishlistProductDelete=async(req,res)=>{
+    console.log("Reached wishlistProductDelete");
+    const productId=req.params.id
+    const userId = req.session.user._id;
+    const user = await collection.findOne({ _id: userId }).populate('wishlist');
+    const productIndex = user.wishlist.findIndex((item) => item.toString() === productId)
+    user.wishlist.splice(productIndex, 1);
+    await user.save();
+    res.redirect("/wishlist")
+}
 
 const doCart = async (req, res) => {
     const productId = req.params.id;
@@ -800,6 +862,7 @@ const cartproductdelete=async(req,res)=>{
     res.redirect("/cart")
 
 }
+
 
 const placeorder = async (req, res) => {
     const userId = req.session.user._id;
@@ -1238,5 +1301,5 @@ module.exports={
     productview,wishlist,cart,resendOTP_for_forgrtpassword,confirmpassword,confirm_password_check,loadHomeAfterLogin,productQuantityUpdate,
     cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,
     deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,sortByPrice,profileEdit,changePassword,
-    validatePassword,paymentFailure,paymentFailureHandler,verifyOnlinePayment,
+    validatePassword,paymentFailure,paymentFailureHandler,verifyOnlinePayment,updateWishlist,wishlistToCart,wishlistProductDelete
 }

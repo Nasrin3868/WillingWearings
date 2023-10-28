@@ -111,7 +111,15 @@
                                                         </a>
                                                     </div>
                                                     <div class="product-action-1">
-                                                        <a aria-label="Add To Wishlist" class="action-btn hover-up" href="/wishlist"><i class="fi-rs-heart"></i></a>
+                                                        <% if (!user) { %>
+                                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="/wishlist"><i class="fi-rs-heart"></i></a>
+                                                        <% }else{%>
+                                                                <% if (user.wishlist&& user.wishlist.includes(product._id)) { %>
+                                                                    <a aria-label="Remove from Wishlist" class="action-btn hover-up" onclick="itemsToWishlist('<%= product._id%>')" id="wishlist-link-<%= product._id%>" ><i class="fi-rs-heart"></i></a>
+                                                                <% }else{%>
+                                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="itemsToWishlist('<%= product._id%>')" id="wishlist-link-<%= product._id%>"><i class="fi-rs-heart"></i></a>
+                                                                <%} %>
+                                                        <% } %>
                                                     </div>
                                                 </div>
                                                 <div class="product-content-wrap">
@@ -139,7 +147,7 @@
                                                         <div>
                                                             <% user.cart.forEach(cartProduct => { %>
                                                                 <% if (cartProduct.product._id.toString() === product._id.toString()) { %>
-                                                                    <small>Already in cart</small>
+                                                                    <small>Added to cart</small>
                                                                 <% } %>
                                                             <% }); %>
                                                         </div>
@@ -251,7 +259,11 @@
         }
     });
         function itemsToCart(productId){
-            
+            Swal.fire({
+            icon: 'success',
+            title: 'Added..',
+            text: 'Item added into cart.',
+        });
             fetch(`/quantityIncrease/${productId}`, {
                 method: 'POST'
             })
@@ -264,6 +276,30 @@
                 console.error('Error:', error);
             });
         }
+
+        async function itemsToWishlist(productId){
+            console.log("reached itemsToWishlist");
+            const response=await fetch(`/updateWishlist/${productId}`,{
+                method:'POST',
+            })
+            const result =await response.json();
+            if(result.status){
+                const wishlistBtn = $(`#wishlist-link-${productId}`);
+                wishlistBtn.find('i').toggleClass('in-wishlist');
+                
+                if (wishlistBtn.attr('aria-label') === 'Add To Wishlist') {
+                    wishlistBtn.attr('aria-label', 'Remove from Wishlist');
+                    wishlistBtn.css('background-color', '#088178');
+
+                } else {
+                    wishlistBtn.attr('aria-label', 'Add To Wishlist');
+                    wishlistBtn.css('background-color', '');
+
+                }
+            }
+        }
     </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     
     
