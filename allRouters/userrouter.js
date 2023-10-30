@@ -11,6 +11,7 @@ router.post("/login",controller.dologin)
 router.get("/logout",middleware.islogout,controller.logout)
 // router.post("/logout",controller.dologout)
 router.post("/login",controller.home)
+
 router.get("/signup",controller.signup)
 router.post("/dosignup",controller.dosignup)
 router.get("/otp",controller.sendOtp)
@@ -55,7 +56,10 @@ router.post("/quantityIncrease/:id",controller.quantityIncrease)
 
 router.post("/cartUpdate",controller.cartUpdate)
 router.get("/cart",middleware.cartAuth,controller.calculateCartSubtotal)
-router.get("/placeorder/:total",middleware.cartAuth,controller.placeorder)
+router.get("/placeorder",middleware.cartAuth,controller.placeorder)
+
+router.get("/coupon",middleware.cartAuth,controller.coupon)
+router.post("/applyCoupon",controller.applyCoupon)
 
 router.get("/checkout",middleware.cartAuth,controller.checkout)
 router.get("/cartproductdelete/:id",middleware.cartAuth,controller.cartproductdelete)
@@ -74,9 +78,9 @@ router.post("/cancelOrder/:id",controller.cancelOrder)
 router.post("/returnOrder/:id/:reason",controller.returnOrder)
 
 
-  router.post("/verify-payment",middleware.cartAuth,controller.verifyOnlinePayment);
-  router.post("/paymentFailureHandler",controller.paymentFailureHandler)
-  router.get("/paymentFailure",middleware.cartAuth,controller.paymentFailure)
+router.post("/verify-payment",middleware.cartAuth,controller.verifyOnlinePayment);
+router.post("/paymentFailureHandler",controller.paymentFailureHandler)
+router.get("/paymentFailure",middleware.cartAuth,controller.paymentFailure)
 // router.post("/cartTotalUpdate",controller.cartTotalUpdate)   
 
 // router.post("/cartUpdate",controller.calculateCartSubtotal)

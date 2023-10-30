@@ -1,0 +1,206 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function () {
+    new DataTable('#example');
+            
+})
+</script>
+
+<%-include("../partials/adminheader")-%>
+
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Referral Management </h2>
+                <p>Edit referral amount</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <form onsubmit="return referralAmountValidation()"  method="post" action="/admin/addcategory" id="createCategoryForm">
+                            <% if (errmessage) { %>
+                                <div class="alert alert-danger text-center" role="alert">
+                                    <%= errmessage %>
+                                </div>
+                            <% }%>
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="name" name="name"/>
+                                <span id="nameError" style="color: red;"></span><br>
+                                <select class="form-select" name="category">
+                                    <% const uniqueCategoryTypes = Array.from(new Set(categories.map(category => category.type))) %>
+                                    <% uniqueCategoryTypes.forEach(function(categoryType) { %>
+                                        <option> <%= categoryType %> </option>
+                                    <% }); %>
+                                </select>
+                            </div>                            
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit">Create category</button>
+                            </div>
+                        </form>
+                        <form onsubmit="return editnameValidation()"  method="post" action="/admin/editcategory" style="display: none;" id="editCategoryForm">
+                            <% if (errmessage) { %>
+                                <div class="alert alert-danger text-center" role="alert">
+                                    <%= errmessage %>
+                                </div>
+                            <% }%>
+                            <input type="hidden" id="editCategoryId" name="editCategoryId">
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="editCategoryName" name="name">
+                                <span id="editnameError" style="color: red;"></span><br>
+                                <select class="form-select" name="editcategory" id="editcategoryType">
+                                    <% const uniqueCategoryTypesForEdit = Array.from(new Set(categories.map(category => category.type))) %>
+                                    <% uniqueCategoryTypesForEdit.forEach(function(categoryType) { %>
+                                        <option> <%= categoryType %> </option>
+                                    <% }); %>
+                                </select>
+                            </div>                            
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit"  >Edit category</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="example">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" width="20%">Name</th>
+                                        <th class="text-center" width="20%">Type</th>
+                                        <th class="text-center" width="30%">Edit</th>
+                                        <th class="text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% categories.forEach(function(category){ %>
+                                    <tr>
+                                        <td class="text-center" width="20%"><b><%= category.name %></b></td>
+                                        <td class="text-center" width="20%"><b><%= category.type %></b></td>
+                                        <td class="text-center">
+                                            <a onclick="showEditCategoryForm( '<%= category._id %>', '<%= category.name %>','<%= category.type %>') " class="btn btn-primary btn-sm rounded" >Edit</a>
+                                        </td>
+                                        <td>
+                                            <div width="20%" class="info pl-3 text-center">
+                                                <% if (category.blocked==true) { %>
+                                                    <a class="btn btn-primary btn-sm rounded" style="background-color: red;" href="/admin/categoryblock/<%= category._id %>">Block</a>
+                                                <% } else { %>
+                                                    <a class="btn btn-primary btn-sm rounded" style="background-color: green;" href="/admin/categoryblock/<%= category._id %>">Unblock</a>                                       
+                                                <% } %>                                      
+                                            </div>
+                                        </td>
+                                        
+                                        
+                                    </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div> <!-- .col// -->
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+
+    <script>
+
+    function showEditCategoryForm(categoryId, categoryName, categoryType){
+        document.getElementById('createCategoryForm').style.display = 'none';
+        document.getElementById('editCategoryForm').style.display = 'block';
+        document.getElementById('editCategoryName').value = categoryName;
+        document.getElementById('editCategoryId').value = categoryId;
+        document.getElementById('editcategoryType').value = categoryType;
+
+
+        
+    }
+    function categorynameValidation() {
+      // Input fields
+      const name = document.getElementById('name');
+    
+      // Error fields
+      const nameError = document.getElementById('nameError');
+    
+      // Regex
+      const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
+    
+      let isValid = true; // A flag to track overall validation
+    
+      // Function to clear error message with a delay
+      function clearErrorWithDelay(errorField) {
+         setTimeout(() => {
+            errorField.innerHTML = '';
+         }, 8000); // 5000 milliseconds = 5 seconds
+      }
+    
+      // Function to validate email
+      function validatename() {
+         if (name.value.trim() === '') {
+            nameError.innerHTML = 'Enter category';
+            clearErrorWithDelay(nameError);
+            isValid = false;
+         } else if (!nameRegex.test(name.value)) {
+            nameError.innerHTML = 'Please enter a valid name with only letters and start with a capital letter.';
+            clearErrorWithDelay(nameError);
+            isValid = false;
+         } else {
+            nameError.innerHTML = ''; // Clear error message
+         }
+      }
+    
+      
+      // Validate fields one by one
+      validatename();
+      if (isValid) validatename();
+      return isValid;
+    }
+
+    function editnameValidation() {
+      // Input fields
+      const name = document.getElementById('editCategoryName');
+    
+      // Error fields
+      const nameError = document.getElementById('editnameError');
+    
+      // Regex
+      const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
+    
+      let isValid = true; // A flag to track overall validation
+    
+      // Function to clear error message with a delay
+      function clearErrorWithDelay(errorField) {
+         setTimeout(() => {
+            errorField.innerHTML = '';
+         }, 8000); // 5000 milliseconds = 5 seconds
+      }
+    
+      // Function to validate email
+      function validatename() {
+         if (name.value.trim() === '') {
+            nameError.innerHTML = 'Enter category';
+            clearErrorWithDelay(nameError);
+            isValid = false;
+         } else if (!nameRegex.test(name.value)) {
+            nameError.innerHTML = 'Please enter a valid name with only letters and start with a capital letter.';
+            clearErrorWithDelay(nameError);
+            isValid = false;
+         } else {
+            nameError.innerHTML = ''; // Clear error message
+         }
+      }
+    
+      
+      // Validate fields one by one
+      validatename();
+      if (isValid) validatename();
+      return isValid;
+    }
+
+    </script>
+
+<%-include("../partials/adminfooter")-%>

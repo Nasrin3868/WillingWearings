@@ -44,6 +44,14 @@ const mongoose = require('mongoose');
        type: Number,
        required:true
     },
+    discount:{
+       type: Number,
+       required:true
+    },
+    finalAmount:{
+      type: Number,
+      required:true
+   },
     payment_status: {
       type: String,
       required: true,
@@ -60,14 +68,12 @@ const mongoose = require('mongoose');
       required:true
     },
     expected_delivery_on: {
-      type: String,
-      default: function () {
+      type: Date,
+      default: () => {
         const now = new Date();
-        const day = now.getDate() + 5;
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const year = now.getFullYear().toString();
-        return `${day}-${month}-${year}`;
-      },
+        now.setDate(now.getDate() + 5);
+        return now;
+      }
     },
     delivered_on: {
       type: Date,

@@ -413,8 +413,10 @@ const addcoupon=async(req,res)=>{
     const discount_percentage=req.body.coupon_percentage
     const min_order=req.body.min_order
     const max_discount=req.body.max_discount
-    const valid_from=req.body.valid_from
-    const valid_to=req.body.valid_to
+    const valid_from = new Date(req.body.editvalid_from);
+    valid_from.setHours(0, 0, 0, 1); 
+    const valid_to = new Date(req.body.editvalid_to);
+    valid_to.setHours(23, 59, 59, 999); 
     const data=await CouponCollection.findOne({coupon_code:coupon_code})
     if (data) {
         const Coupon=await CouponCollection.find()
@@ -436,8 +438,10 @@ const updateCoupon=async(req,res)=>{
     const discount_percentage=req.body.editcoupon_percentage
     const min_order=req.body.editmin_order
     const max_discount=req.body.editmax_discount
-    const valid_from=req.body.editvalid_from
-    const valid_to=req.body.editvalid_to
+    const valid_from = new Date(req.body.editvalid_from);
+    valid_from.setHours(0, 0, 0, 1);
+    const valid_to = new Date(req.body.editvalid_to);
+    valid_to.setHours(23, 59, 59, 999); 
     const data=await CouponCollection.findOne({coupon_code:coupon_code})
     // if (data) {
     //     const Coupon=await CouponCollection.find()
@@ -448,6 +452,17 @@ const updateCoupon=async(req,res)=>{
         await CouponCollection.findByIdAndUpdate(couponId,{coupon_code,coupon_description,discount_percentage,min_order,max_discount,valid_from,valid_to})
         res.redirect('/admin/couponlist')
     }
+}
+
+const couponblock=async(req,res)=>{
+    console.log("reached couponblock");
+    const coupon=await CouponCollection.findById(req.params.id)
+    if(coupon.blocked==false){
+        await CouponCollection.findByIdAndUpdate(req.params.id,{blocked:true})
+    }else{
+        await CouponCollection.findByIdAndUpdate(req.params.id,{blocked:false})
+    }
+    res.redirect('/admin/couponlist')
 }
 
 const  product_block=async(req,res)=>{
@@ -519,6 +534,16 @@ const changestatus = async (req, res) => {
     }
 };
 
+const UpdateOrderByDateForm=async(req,res)=>{
+    console.log("reached UpdateOrderByDateForm");
+    const startOfDay=req.body.orderFrom
+    startOfDay.setHours(0, 0, 0, 1);
+    const endOfDay=req.body.orderTo
+    endOfDay.setHours(23, 59, 59, 999); 
+    const orders = await Orders.find({created_on: { $gte: startOfDay, $lte: endOfDay }}).populate('address').populate('items.product_id').populate('user_id');
+    res.render('admin/salesReport.ejs', { orders });
+}
+
 const salesReport=async(req,res)=>{
   console.log("reached salesReport");
   const orders = await Orders.find().populate('address').populate('items.product_id').populate('user_id');
@@ -553,7 +578,7 @@ const yearlyOrder = async (req, res) => {
     const now = new Date();
     const currentYear = now.getFullYear();
     const startOfYear = new Date(currentYear, 0, 1, 0, 0, 0, 1);
-    const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+    const endOfYear = new Date(currentYear, 12, 31, 23, 59, 59, 999);
     const orders = await Orders.find({created_on: { $gte: startOfYear, $lte: endOfYear }}).populate('address').populate('items.product_id').populate('user_id');
     res.render('admin/salesReport.ejs', { orders });
 };
@@ -594,6 +619,7 @@ const removeImage = async (req, res) => {
 module.exports={
     dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block,
     toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout,orderManagement,orderDetails,
-    changestatus,removeImage,salesReport,dailyOrder,weeklyOrder,yearlyOrder,deleteImage,couponlistredirection,addcoupon,updateCoupon
+    changestatus,removeImage,salesReport,dailyOrder,weeklyOrder,yearlyOrder,deleteImage,couponlistredirection,addcoupon,updateCoupon,couponblock,
+    UpdateOrderByDateForm
     
 }

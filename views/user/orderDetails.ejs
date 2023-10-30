@@ -17,6 +17,11 @@
                     <p>Details for Order ID: <%= orders._id %></p>
                 </div>
             </div>
+            <div class="pb-20">
+            <% if (orders.payment_status== 'refunded') { %>
+                    <a class="badge rounded-pill alert-success" href="#" style="font-size: 13px; padding: 8px 12px; pointer-events: none;">Your payment is refunded into your wallet.</a>
+            <% }%>
+            </div>
             <div class="card">
                 <header class="card-header">
                     <div class="row align-items-center">
@@ -220,6 +225,7 @@
         .catch(error => {
             console.error('Error:', error);
         });
+        
     }
 
     function returnorder(orderID) {   
@@ -234,6 +240,7 @@
         return;
            
         } else {
+
         fetch(`/returnOrder/${orderID}/${selectedOption}`, {
             method: 'POST'
         })

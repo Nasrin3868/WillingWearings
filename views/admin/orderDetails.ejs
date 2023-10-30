@@ -3,11 +3,16 @@
 <div class="container ">
     <div class="row justify-content-center align-items-center pt-50 pb-50">
         <section class="content-main">
-            <div class="content-header pb-20" >
+            <div class="content-header" >
                 <div>
                     <h2 class="content-title card-title">Order detail</h2>
                     <p>Details for Order ID: <%= orders._id %></p>
                 </div>
+            </div>
+            <div class="pb-20">
+                <% if (orders.payment_status== 'refunded') { %>
+                    <a class="badge rounded-pill alert-success" href="#" style="font-size: 13px; padding: 8px 12px; pointer-events: none;">Your payment is refunded into your wallet.</a>
+            <% }%>
             </div>
             <div class="card">
                 <header class="card-header">

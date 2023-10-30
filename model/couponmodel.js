@@ -40,10 +40,12 @@ const couponschema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    redeemed_users: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "logincollection",
-    },
+    redeemed_users: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "logincollection",
+        }
+    ],
     blocked: {
         type: Boolean,
         default: false,

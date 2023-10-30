@@ -182,8 +182,13 @@
                                         <td colspan="2"><em>Free Shipping</em></td>
                                     </tr>
                                     <tr>
+                                        <th>Coupon Discount</th>
+                                        <td class="product-subtotal" colspan="2">Rs.<%= coupondiscount %></td>
+                                    </tr>
+                                    
+                                    <tr>
                                         <th>Total</th>
-                                        <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900">Rs.<%= cartSubtotal %></span></td>
+                                        <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900">Rs.<%= cartSubtotal-coupondiscount %></span></td>
                                     </tr>
 
                                 </tbody>
@@ -204,7 +209,7 @@
                                     <label class="form-check-label" for="exampleRadios5" id="cashondelivery" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Cash On Delivery</label>
                                 </div>
                         </div>
-                        <button onclick="submitPlaceOrder('<%= cartSubtotal %>')" class="btn btn-fill-out btn-block mt-30">Place Order</button>
+                        <button onclick="submitPlaceOrder('<%= cartSubtotal-coupondiscount %>')" class="btn btn-fill-out btn-block mt-30">Place Order</button>
                     </div>
                 <% } %>
             </div>
@@ -271,7 +276,7 @@ var options = {
 "key": "rzp_test_badyxeiy422xF7", // Enter the Key ID generated from the Dashboard
 "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
 "currency": "INR",
-"name": "Runners_Rave", //your business name
+"name": "Willing_Wearings", //your business name
 "description": "Test Transaction",
 "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
 "handler": function (response) {

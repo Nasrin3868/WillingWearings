@@ -51,12 +51,14 @@ router.post("/editcategory",controller.editcategorypage)
 router.get("/couponlist",middleware.islogin,controller.couponlistredirection)
 router.post("/addcoupon",controller.addcoupon)
 router.post("/updateCoupon",controller.updateCoupon)
+router.get("/couponblock/:id",middleware.islogin,controller.couponblock)
 
 router.get("/productblock/:id",middleware.islogin,controller.product_block)
 router.get("/orderManagement",middleware.islogin,controller.orderManagement)
 router.get("/orderDetails/:id",middleware.islogin,controller.orderDetails)
 router.post("/changestatus/:id/:status", controller.changestatus);
 
+router.post("/UpdateOrderByDateForm",controller.UpdateOrderByDateForm)
 router.get("/sales_report",middleware.islogin,controller.salesReport)
 router.get("/dailyOrder",middleware.islogin,controller.dailyOrder)
 router.get("/weeklyOrder",middleware.islogin,controller.weeklyOrder)

@@ -81,7 +81,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status) {
-                    // Redirect to the wishlist page after a successful update
                     window.location.href = '/wishlist';
                 }
             })

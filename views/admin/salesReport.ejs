@@ -16,9 +16,22 @@ $(document).ready(function () {
     <header class="card-header">
         <h4 class="card-title">Latest orders</h4>
         <div class="row align-items-center">
-            
-            <div class="col-md-2 col-6 p-md-4">
-                <input type="date" value="02.05.2021" class="form-control">
+            <div class="col-md-2 col-6">
+                <form method="post" action="/admin/UpdateOrderByDateForm" id="OrderByDateForm">
+                    <div class="row align-items-center">
+                        <div class="col-md-10 col-6">
+                            <label for="from" class="form-label">From:</label>
+                            <input type="date" class="form-control" id="from" name="orderFrom">
+                        </div>
+                        <div class="col-md-10 col-6">
+                            <label for="to" class="form-label">To:</label>
+                            <input type="date" class="form-control" id="to" name="orderTo">
+                        </div>
+                        <div class="col-md-6 col-6" style="padding-top: 4%;">
+                            <button class="btn btn-primary" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="col-md-2 col-6">
                 <a href="/admin/dailyOrder" class="btn btn-primary btn-sm rounded">Daily</a>
@@ -83,6 +96,34 @@ $(document).ready(function () {
     </div>
 </div>
 </section>
+
+<!-- 
+<script>
+
+    function daily(){
+        const now = new Date();
+        const startOfDay = new Date(now);
+        startOfDay.setHours(0, 0, 0, 1);
+        const endOfDay = new Date(now);
+        endOfDay.setHours(23, 59, 59, 999);
+        UpdateOrder(startOfDay,endofDay)
+    }
+
+    function UpdateOrder(startOfDay,endofDay){
+        fetch(`/UpdateOrder/${startOfDay}/${endofDay}`, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    window.location.href = '/admin/salesReport.ejs';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script> -->
 
 
 <script>

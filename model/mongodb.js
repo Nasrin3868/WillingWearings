@@ -9,6 +9,17 @@ mongoose
         console.log(err)
     });
 
+function generateRandomCouponCode() {
+    const length = 10;
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let couponCode = "";
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        couponCode += charset.charAt(randomIndex);
+    }
+    return couponCode;
+}
+
 const loginSchema=new mongoose.Schema({
     username:{
         type: String,
@@ -57,6 +68,27 @@ const loginSchema=new mongoose.Schema({
     otp:{
         type:Number,
         default: null
+    },
+    wallet:{
+        type:Number,
+        default:0
+    },
+    referral_code:{
+        type:String,
+        default: function generateRandomCouponCode(){
+            const length = 10;
+            const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let couponCode = "";
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                couponCode += charset.charAt(randomIndex);
+            }
+            return couponCode;
+        }
+    },
+    xyz:{
+        type:Number,
+        default:0
     }
 });
 const collection=mongoose.model("logincollection",loginSchema)

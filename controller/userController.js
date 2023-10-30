@@ -8,8 +8,14 @@ const Address= require("../model/addressmodel");
 const { Collection } = require("mongoose");
 const Orders=require("../model/ordermodel")
 const userHelper = require('../helper/razorPay');
+const CouponCollection=require("../model/couponmodel")
+
+let discount=''
+let coupon_code=''
 
 const home=async(req,res)=>{
+    discount=''
+    coupon_code=''
     const isAuthenticated=false
     const categories=await CategoryCollection.find({blocked:false})
     const products=await Products.find({blocked:false})
@@ -17,6 +23,8 @@ const home=async(req,res)=>{
 }
 
 const loadHomeAfterLogin= async(req,res)=>{
+    discount=''
+    coupon_code=''
     console.log("Reached home");
     const userId = req.query.userId;
     if (req.session.user) {
@@ -424,7 +432,8 @@ const confirm_password_check=async(req,res)=>{
 
 const allpage=async(req,res)=>{
     console.log("reached all wears");
-    
+    discount=''
+    coupon_code=''
     if(req.session.user){
         const isAuthenticated=true
         const categories=await CategoryCollection.find({blocked:false})
@@ -462,7 +471,8 @@ const showbycategory=async(req,res)=>{
 
 const ethinicpage=async(req,res)=>{
     console.log("reached ethinic wears");
-    
+    discount=''
+    coupon_code=''
     if(req.session.user){
         const isAuthenticated=true
         const type = "Ethinic"; // Change 'dress' to 'type'
@@ -505,7 +515,8 @@ const ethinicshowbycategory=async(req,res)=>{
 
 const westernpage=async(req,res)=>{
     console.log("reached western wears");
-    
+    discount=''
+    coupon_code=''
     if(req.session.user){
         const isAuthenticated=true
         const type = "Western"; // Change 'dress' to 'type'
@@ -589,7 +600,8 @@ const sortByPrice=async(req,res)=>{
 
 const sportspage=async(req,res)=>{
     console.log("reached sports wears");
-    
+    discount=''
+    coupon_code=''
     if(req.session.user){
         const isAuthenticated=true
         const type = "Sports"; // Change 'dress' to 'type'
@@ -637,7 +649,6 @@ const productview=async(req,res)=>{
         const isAuthenticated=true
         const categories=await CategoryCollection.find({blocked:false})
         const product = await Products.findOne({_id:id});
-        
         res.render("user/productview",{isAuthenticated,product,categories})
     }else{
         const isAuthenticated=false
@@ -651,6 +662,8 @@ const productview=async(req,res)=>{
 }
 
 const wishlist=async(req,res)=>{
+    discount=''
+    coupon_code=''
     console.log("Reached wishlist");
     const isAuthenticated=true
     const categories=await CategoryCollection.find({blocked:false})
@@ -837,6 +850,8 @@ const calculateCartTotal=(user)=>{
 }
 
 const cart = async (req, res) => {
+    discount=''
+    coupon_code=''
     console.log("Reached cart");
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate('cart.product');
@@ -863,9 +878,13 @@ const cartproductdelete=async(req,res)=>{
 
 }
 
-
 const placeorder = async (req, res) => {
+    discount=''
+    coupon_code=''
     const userId = req.session.user._id;
+    let offer=req.query.offer
+    const errmessage=req.query.errmessage
+    const msg=req.query.msg
     const user = await collection.findById(userId).populate('cart.product');
     const categories = await CategoryCollection.find({ blocked: false });
 
@@ -877,22 +896,63 @@ const placeorder = async (req, res) => {
         isAuthenticated: true,
         categories,
         total: cartSubtotal, // Pass the cart subtotal as 'total' to the template
+        offer,errmessage,msg
     });
+}
+
+const coupon=async(req,res)=>{
+    console.log("reached coupon list");
+    const userId=req.session.user._id
+    const unredeemedCoupons = await CouponCollection.find({redeemed_users: { $ne: userId },blocked:false});
+    const categories = await CategoryCollection.find({ blocked: false });
+    res.render("user/coupon",{Coupon:unredeemedCoupons,categories,isAuthenticated:true})
+}
+
+const applyCoupon=async(req,res)=>{
+    console.log("reached applyCoupon");
+    const userId=req.session.user._id
+    const user = await collection.findById(userId).populate('cart.product');
+    const categories = await CategoryCollection.find({ blocked: false });
+    // Calculate the cart subtotal using the defined function
+    const cartSubtotal = calculateCartSubtotal(user);
+    coupon_code=req.body.Coupon
+    const today=new Date()
+    const coupon=await CouponCollection.find({coupon_code:coupon_code})
+    if(coupon[0].min_order > cartSubtotal){
+        res.redirect("/placeorder?offer=0&&errmessage=Can't apply this coupon.Your Ordered amount is low&&msg")
+    }else if(coupon[0].valid_to<today){
+        res.redirect("/placeorder?offer=0&&errmessage=Coupon expired&&msg")
+    }else{
+        // await CouponCollection.findOneAndUpdate({ coupon_code: coupon_code }, { $push: { redeemed_users: userId } });
+        const amount=((coupon[0].discount_percentage/100)*cartSubtotal)
+        if(amount>coupon[0].max_discount){
+            discount=coupon[0].max_discount
+            res.render("user/placeorder", {isAuthenticated: true,categories,total: cartSubtotal,offer:'',discount,errmessage:'',msg:"Coupon applied Successfully"});
+        }else{
+            discount=amount
+            res.render("user/placeorder", {isAuthenticated: true,categories,total: cartSubtotal,offer:'',discount,errmessage:'',msg:"Coupon applied Successfully"});
+        }
+    }
 }
 
 const checkout=async(req,res)=>{
     console.log("reached checkout page");
     const err = req.query.err;
     const msg = req.query.msg;
+    let coupondiscount=discount
+    if(discount==''){
+        coupondiscount=0
+    }
+    
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate('cart.product');
     const useraddress = await Address.find({ userId, blocked: false });
     const categories = await CategoryCollection.find({ blocked: false });
     const cartSubtotal = calculateCartSubtotal(user);
     if (err === 'true') {
-        res.render("user/checkout", { errmessage : msg, message : "" ,isAuthenticated:true,categories,user,cartSubtotal,useraddress});
+        res.render("user/checkout", { errmessage : msg, message : "" ,isAuthenticated:true,categories,user,cartSubtotal,coupondiscount,useraddress});
     } else {
-        res.render("user/checkout", { errmessage : "", message : msg ,isAuthenticated:true,categories,user,cartSubtotal,useraddress});
+        res.render("user/checkout", { errmessage : "", message : msg ,isAuthenticated:true,categories,user,cartSubtotal,coupondiscount,useraddress});
     }
 }
   
@@ -1003,26 +1063,31 @@ const myaccount = async (req, res) => {
 const placedOrder = async (req, res) => {
     console.log("reached placedOrder");
     const categories = await CategoryCollection.find({ blocked: false });
-    
-    res.render("user/orderPlacedSuccessfully", {isAuthenticated: true,categories,errmessage: "",message: "Order Placed Successfully..!"});
     const userId = req.session.user._id;
     const user=await collection.findById(userId).populate('cart.product')
-    
+    await CouponCollection.findOneAndUpdate({ coupon_code: coupon_code }, { $push: { redeemed_users: userId } });
     await collection.findByIdAndUpdate(userId, { $set: { cart: [] } });
+    res.render("user/orderPlacedSuccessfully", {isAuthenticated: true,categories,errmessage: "",message: "Order Placed Successfully..!"});
     console.log("cart cleared");
 }
 
 let orderId = "";
 const OrderSubmit = async (req, res) => {
     console.log("reached OrderSubmit");
+    let Discount
     console.log(req.body.cartSubtotal);
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate('cart.product');
     const cartSubtotal = calculateCartSubtotal(user);
     console.log(cartSubtotal);
-    
+    if(discount==''){
+        Discount=0
+    }else{
+        Discount=discount
+    }
     
     const cartTotal = calculateCartTotal(user);
+    console.log(cartTotal);
     // Create an array of items from the user's cart
     const items = user.cart.map(cartItem => ({
         product_id: cartItem.product._id,
@@ -1041,14 +1106,28 @@ const OrderSubmit = async (req, res) => {
         mobileno:req.body.mobileno
     } 
     console.log("paymentType=",req.body.paymentType);
-    
-    const newOrder = new Orders({
-        user_id: userId,
-        address,
-        items,
-        actualTotalAmount: cartSubtotal,
-        totalAmount: cartTotal,
-    });
+    let newOrder
+    if(Discount==0){
+        newOrder = new Orders({
+            user_id: userId,
+            address,
+            items,
+            totalAmount: cartTotal,
+            actualTotalAmount: cartSubtotal,
+            discount:Discount,
+            finalAmount:cartSubtotal
+        });
+    }else{
+        newOrder = new Orders({
+            user_id: userId,
+            address,
+            items,
+            totalAmount: cartTotal,
+            actualTotalAmount: cartSubtotal,
+            discount:Discount,
+            finalAmount:cartSubtotal-Discount
+        });
+    }
     console.log("newOrder",newOrder);
     if(newOrder.actualTotalAmount==0){
         const response = {
@@ -1093,10 +1172,10 @@ const OrderSubmit = async (req, res) => {
             // return res.status(200).json(response);
         }else {
             await newOrder.save();
-            console.log("newOrder.actualTotalAmount:",newOrder.actualTotalAmount);
+            console.log("newOrder.finalAmount:",newOrder.finalAmount);
             orderId=newOrder._id
                 userHelper
-                  .generateRazorPay(newOrder._id, newOrder.actualTotalAmount)
+                  .generateRazorPay(newOrder._id, newOrder.finalAmount)
                   .then((response) => {
                     console.log("razorpay response is===>", response);
                     return res.json({ status: "RAZORPAY", response: response });
@@ -1153,22 +1232,23 @@ const OrderSubmit = async (req, res) => {
       const paymentFailureHandler = async (req, res) => {
         // let data=await Order.findOne({_id:orderId});
         console.log("order details are==>", orderId);
-        
+        const userId=req.session.user._id
+
         let data = await Orders.findOneAndUpdate(
           { _id: orderId }, // Query to find the document
           { $set: { order_status: "payment Failed" } },
           { new: true }
         );
-      
+        
         return res.status(200).json({
           redirectUrl: `/paymentFailure`, // Specify the desired redirect URL here
         });
       };
-      const paymentFailure = async (req, res) => {
+    const paymentFailure = async (req, res) => {
         console.log("reached paymentFailure");
-    const categories = await CategoryCollection.find({ blocked: false });
-    const orderUpdate = await Orders.findByIdAndUpdate({_id:orderId},{$set:{order_status:'Failed',payment_method:'online payment',payment_status:'failed'}})
-    res.render("user/paymentFailure", {isAuthenticated: true,categories,errmessage: "Payment Failed...",message: ""});
+        const categories = await CategoryCollection.find({ blocked: false });
+        const orderUpdate = await Orders.findByIdAndUpdate({_id:orderId},{$set:{order_status:'Failed',payment_method:'online payment',payment_status:'failed'}})
+        res.render("user/paymentFailure", {isAuthenticated: true,categories,errmessage: "Payment Failed...",message: ""});
       };
 
 
@@ -1183,11 +1263,13 @@ const orderDetails=async(req,res)=>{
 
 const cancelOrder=async(req,res)=>{
     console.log("reached cancelOrder");
+    const user=await collection.findById(req.session.user._id)
     const orderId=req.params.id
     const orders=await Orders.findById(orderId)
     if(orders.payment_method=='Cash On Delivery'){
         await Orders.findByIdAndUpdate(orderId, { order_status: "cancelled" , payment_status:"cancelled"});
     }else{
+        await collection.findByIdAndUpdate(req.session.user._id,{wallet: orders.finalAmount})
         await Orders.findByIdAndUpdate(orderId, { order_status: "cancelled" , payment_status:"refunded"});
     }
     const userId = req.session.user._id;
@@ -1210,8 +1292,11 @@ const cancelOrder=async(req,res)=>{
 
 const returnOrder=async(req,res)=>{
     console.log("reached returnOrder");
+    
     const orderId=req.params.id
     const returnReason=req.params.reason
+    const orders=await Orders.findById(orderId)
+    await collection.findByIdAndUpdate(req.session.user._id,{wallet: orders.finalAmount})
     await Orders.findByIdAndUpdate(orderId, { order_status: "returned",return_Reason:returnReason , payment_status:"refunded"});
     const userId = req.session.user._id;
     const order = await Orders.findById(orderId).populate({
@@ -1301,5 +1386,6 @@ module.exports={
     productview,wishlist,cart,resendOTP_for_forgrtpassword,confirmpassword,confirm_password_check,loadHomeAfterLogin,productQuantityUpdate,
     cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,
     deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,sortByPrice,profileEdit,changePassword,
-    validatePassword,paymentFailure,paymentFailureHandler,verifyOnlinePayment,updateWishlist,wishlistToCart,wishlistProductDelete
+    validatePassword,paymentFailure,paymentFailureHandler,verifyOnlinePayment,updateWishlist,wishlistToCart,wishlistProductDelete,
+    coupon,applyCoupon
 }

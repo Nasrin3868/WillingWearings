@@ -154,9 +154,9 @@ $(document).ready(function () {
                                         <td>
                                             <div width="15%" class="info pl-3 text-center">
                                                 <% if (coupon.blocked==true) { %>
-                                                    <a class="btn  btn-sm rounded" style="background-color: red;" href="/admin/categoryblock/<%= coupon._id %>">Block</a>
+                                                    <a class="btn  btn-sm rounded" style="background-color: red;color: white;" href="/admin/couponblock/<%= coupon._id %>">Block</a>
                                                 <% } else { %>
-                                                    <a class="btn  btn-sm rounded" style="background-color: green;" href="/admin/categoryblock/<%= coupon._id %>">Unblock</a>                                       
+                                                    <a class="btn  btn-sm rounded" style="background-color: green; color: white;" href="/admin/couponblock/<%= coupon._id %>">Unblock</a>                                       
                                                 <% } %>                                      
                                             </div>
                                         </td>
