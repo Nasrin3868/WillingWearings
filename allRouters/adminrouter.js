@@ -70,7 +70,7 @@ router.post("/remove-image", controller.removeImage);
 router.post("/addproduct", upload.array('images', 4), controller.addproduct);
 router.post("/editproduct", upload.array('images', 4), controller.editproduct);
 
-
-
+router.get("/referrallist",middleware.islogin,controller.referrallist)
+router.post("/editreferral",controller.editreferral)
 
 module.exports=router

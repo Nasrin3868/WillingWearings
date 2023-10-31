@@ -86,7 +86,7 @@ const loginSchema=new mongoose.Schema({
             return couponCode;
         }
     },
-    xyz:{
+    referral_count:{
         type:Number,
         default:0
     }

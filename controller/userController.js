@@ -9,6 +9,8 @@ const { Collection } = require("mongoose");
 const Orders=require("../model/ordermodel")
 const userHelper = require('../helper/razorPay');
 const CouponCollection=require("../model/couponmodel")
+const ReferralCollection=require("../model/referralmodel")
+
 
 let discount=''
 let coupon_code=''
@@ -170,13 +172,30 @@ const signup=async(req,res)=>{
 }
 
 
-
 const dosignup = async (req, res) => {
-    const data = {
-        username: req.body.username,
-        email: req.body.email,
-        mobile: req.body.mobile,
-        password: req.body.password,
+    const user=await collection.findOne({referral_code:req.body.referral})
+    console.log("code:",req.body.referral);
+    
+    console.log("user details:",user);
+    const referral=await ReferralCollection.findOne()
+    let data
+    if(user){
+        // const refferal_count=user.refferal_count++
+        data = {
+            username: req.body.username,
+            email: req.body.email,
+            mobile: req.body.mobile,
+            password: req.body.password,
+            wallet:referral.referee
+        }
+        await collection.findOneAndUpdate({referral_code:req.body.referral},{$inc: { wallet: referral.referee, referral_count: 1 }})
+    }else{
+        data = {
+            username: req.body.username,
+            email: req.body.email,
+            mobile: req.body.mobile,
+            password: req.body.password,
+        }
     }
     globalEmail=req.body.email
     const check = await collection.findOne({ email: data.email })
@@ -1292,7 +1311,7 @@ const cancelOrder=async(req,res)=>{
 
 const returnOrder=async(req,res)=>{
     console.log("reached returnOrder");
-    
+
     const orderId=req.params.id
     const returnReason=req.params.reason
     const orders=await Orders.findById(orderId)

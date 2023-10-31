@@ -22,48 +22,42 @@ $(document).ready(function () {
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        <form onsubmit="return referralAmountValidation()"  method="post" action="/admin/addcategory" id="createCategoryForm">
-                            <% if (errmessage) { %>
-                                <div class="alert alert-danger text-center" role="alert">
-                                    <%= errmessage %>
-                                </div>
-                            <% }%>
-                            <div class="mb-4">
-                                <label for="product_name" class="form-label">Name</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="name" name="name"/>
-                                <span id="nameError" style="color: red;"></span><br>
-                                <select class="form-select" name="category">
-                                    <% const uniqueCategoryTypes = Array.from(new Set(categories.map(category => category.type))) %>
-                                    <% uniqueCategoryTypes.forEach(function(categoryType) { %>
-                                        <option> <%= categoryType %> </option>
-                                    <% }); %>
-                                </select>
-                            </div>                            
-                            <div class="d-grid">
-                                <button class="btn btn-primary" type="submit">Create category</button>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Referral amount</h4>
                             </div>
-                        </form>
-                        <form onsubmit="return editnameValidation()"  method="post" action="/admin/editcategory" style="display: none;" id="editCategoryForm">
+                            <div class="card-body">
+                                <div class="row gx-2">
+                                    <div class="col-sm-6 mb-3">
+                                        <p class="fw-bold pb-10">Referrer:</p>
+                                        <p class="text-center fw-bold" style="font-size: x-large;;">Rs: <%= referral.referrer%></p>
+                                        <p class="fw-bold pb-10 pt-20">Referee:</p>
+                                        <p class="text-center fw-bold" style="font-size: x-large;;">Rs: <%= referral.referee %></p>
+                                        <div class="pt-25 d-flex justify-content-center">
+                                            <a onclick="showEditReferralForm('<%= referral.referrer%>','<%= referral.referee%>') " class="btn btn-primary btn-sm rounded" >Edit</a>
+                                        </div>
+                                    </div>
+                                </div> <!-- row.// -->
+                            </div>
+                        </div> 
+                        <form onsubmit="return referralValidation()"  method="post" action="/admin/editreferral" style="display: none;" id="editReferralForm">
                             <% if (errmessage) { %>
                                 <div class="alert alert-danger text-center" role="alert">
                                     <%= errmessage %>
                                 </div>
                             <% }%>
+                                <div class="mb-4">
+                                    <label for="product_name" class="form-label">Referrer:</label>
+                                    <input type="text" placeholder="Type here" class="form-control pt-20 pb-20" id="referrer" name="referrer" value="">
+                                    <span id="referrerError" style="color: red;"></span><br>
+                                    <label for="product_name" class="form-label pt-25">Referee</label>
+                                    <input type="text" placeholder="Type here" class="form-control pt-20 pb-20" id="referee" name="referee">
+                                    <span id="refereeError" style="color: red;"></span><br>
+                                </div>                            
+                                <div class="d-grid">
+                                    <button class="btn btn-primary" type="submit"  >Edit</button>
+                                </div>
                             <input type="hidden" id="editCategoryId" name="editCategoryId">
-                            <div class="mb-4">
-                                <label for="product_name" class="form-label">Name</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="editCategoryName" name="name">
-                                <span id="editnameError" style="color: red;"></span><br>
-                                <select class="form-select" name="editcategory" id="editcategoryType">
-                                    <% const uniqueCategoryTypesForEdit = Array.from(new Set(categories.map(category => category.type))) %>
-                                    <% uniqueCategoryTypesForEdit.forEach(function(categoryType) { %>
-                                        <option> <%= categoryType %> </option>
-                                    <% }); %>
-                                </select>
-                            </div>                            
-                            <div class="d-grid">
-                                <button class="btn btn-primary" type="submit"  >Edit category</button>
-                            </div>
                         </form>
                     </div>
                     <div class="col-md-9">
@@ -71,31 +65,15 @@ $(document).ready(function () {
                             <table class="table table-hover" id="example">
                                 <thead>
                                     <tr>
-                                        <th class="text-center" width="20%">Name</th>
-                                        <th class="text-center" width="20%">Type</th>
-                                        <th class="text-center" width="30%">Edit</th>
-                                        <th class="text-center">Status</th>
+                                        <th class="text-center" width="20%">User name</th>
+                                        <th class="text-center" width="20%">Referral count</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% categories.forEach(function(category){ %>
+                                    <% user.forEach(function(User){ %>
                                     <tr>
-                                        <td class="text-center" width="20%"><b><%= category.name %></b></td>
-                                        <td class="text-center" width="20%"><b><%= category.type %></b></td>
-                                        <td class="text-center">
-                                            <a onclick="showEditCategoryForm( '<%= category._id %>', '<%= category.name %>','<%= category.type %>') " class="btn btn-primary btn-sm rounded" >Edit</a>
-                                        </td>
-                                        <td>
-                                            <div width="20%" class="info pl-3 text-center">
-                                                <% if (category.blocked==true) { %>
-                                                    <a class="btn btn-primary btn-sm rounded" style="background-color: red;" href="/admin/categoryblock/<%= category._id %>">Block</a>
-                                                <% } else { %>
-                                                    <a class="btn btn-primary btn-sm rounded" style="background-color: green;" href="/admin/categoryblock/<%= category._id %>">Unblock</a>                                       
-                                                <% } %>                                      
-                                            </div>
-                                        </td>
-                                        
-                                        
+                                        <td class="text-center" width="20%"><b><%= User.username %></b></td>
+                                        <td class="text-center" width="20%"><b><%= User.referral_count %></b></td>
                                     </tr>
                                     <% }); %>
                                 </tbody>
@@ -109,96 +87,55 @@ $(document).ready(function () {
 
     <script>
 
-    function showEditCategoryForm(categoryId, categoryName, categoryType){
-        document.getElementById('createCategoryForm').style.display = 'none';
-        document.getElementById('editCategoryForm').style.display = 'block';
-        document.getElementById('editCategoryName').value = categoryName;
-        document.getElementById('editCategoryId').value = categoryId;
-        document.getElementById('editcategoryType').value = categoryType;
+    function showEditReferralForm(referrer,referee){
+        document.getElementById('editReferralForm').style.display = 'block';
+        document.getElementById('referrer').value = referrer;
+        document.getElementById('referee').value = referee;
 
 
         
     }
-    function categorynameValidation() {
+    
+    function referralValidation() {
       // Input fields
-      const name = document.getElementById('name');
-    
+      const referrer = document.getElementById('referrer');
+      const referee = document.getElementById('referee');
       // Error fields
-      const nameError = document.getElementById('nameError');
-    
+      const referralError = document.getElementById('referralError');
+      const refereeError = document.getElementById('refereeError');
       // Regex
-      const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
-    
-      let isValid = true; // A flag to track overall validation
-    
-      // Function to clear error message with a delay
-      function clearErrorWithDelay(errorField) {
-         setTimeout(() => {
-            errorField.innerHTML = '';
-         }, 8000); // 5000 milliseconds = 5 seconds
-      }
-    
-      // Function to validate email
-      function validatename() {
-         if (name.value.trim() === '') {
-            nameError.innerHTML = 'Enter category';
-            clearErrorWithDelay(nameError);
-            isValid = false;
-         } else if (!nameRegex.test(name.value)) {
-            nameError.innerHTML = 'Please enter a valid name with only letters and start with a capital letter.';
-            clearErrorWithDelay(nameError);
-            isValid = false;
-         } else {
-            nameError.innerHTML = ''; // Clear error message
-         }
-      }
-    
-      
-      // Validate fields one by one
-      validatename();
-      if (isValid) validatename();
-      return isValid;
-    }
+      const referralRegex = /^[1-9]\d{0,6}$/;
 
-    function editnameValidation() {
-      // Input fields
-      const name = document.getElementById('editCategoryName');
-    
-      // Error fields
-      const nameError = document.getElementById('editnameError');
-    
-      // Regex
-      const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
-    
-      let isValid = true; // A flag to track overall validation
-    
-      // Function to clear error message with a delay
-      function clearErrorWithDelay(errorField) {
-         setTimeout(() => {
-            errorField.innerHTML = '';
-         }, 8000); // 5000 milliseconds = 5 seconds
-      }
-    
-      // Function to validate email
-      function validatename() {
-         if (name.value.trim() === '') {
-            nameError.innerHTML = 'Enter category';
-            clearErrorWithDelay(nameError);
-            isValid = false;
-         } else if (!nameRegex.test(name.value)) {
-            nameError.innerHTML = 'Please enter a valid name with only letters and start with a capital letter.';
-            clearErrorWithDelay(nameError);
-            isValid = false;
-         } else {
-            nameError.innerHTML = ''; // Clear error message
-         }
-      }
-    
-      
-      // Validate fields one by one
-      validatename();
-      if (isValid) validatename();
-      return isValid;
+      if (referral === '' || referral.trim() === '') {
+            document.getElementById('referralError').innerHTML = 'Referral is required.';
+            setTimeout(function() {
+                document.getElementById('refereeError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if (!referral.match(referralRegex)) {
+            document.getElementById('referralError').innerHTML = 'Only numbers are allowded.';
+            setTimeout(function() {
+                document.getElementById('refereeError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if (referee === '' || referee.trim() === '') {
+            document.getElementById('refereeError').innerHTML = 'Referee is required.';
+            setTimeout(function() {
+                document.getElementById('refereeError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if (!referee.match(referralRegex)) {
+            document.getElementById('refereeError').innerHTML = 'Only numbers are allowded.';
+            setTimeout(function() {
+                document.getElementById('refereeError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        return true;
     }
 
     </script>

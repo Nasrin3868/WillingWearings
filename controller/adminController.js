@@ -13,7 +13,7 @@ const CategoryCollection=require("../model/categorymodel")
 const CouponCollection=require("../model/couponmodel")
 const path=require("path");
 const { log } = require("sharp/lib/libvips");
-
+const ReferralCollection=require("../model/referralmodel")
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -583,8 +583,29 @@ const yearlyOrder = async (req, res) => {
     res.render('admin/salesReport.ejs', { orders });
 };
 
+const referrallist=async(req,res)=>{
+    console.log("reached referrallist");
+    const referrals=await ReferralCollection.find()
+    if(referrals.length==0){
+        const referrals=new ReferralCollection({
+            referrer:0,
+            referee:0
+        })
+        await referrals.save()
+    }
+    const referral=await ReferralCollection.findOne()
+    const user=await collection.find()
+    res.render('admin/referrallist',{errmessage:'',referral,user})
+}
 
-
+const editreferral=async(req,res)=>{
+    console.log("reached editreferral");
+    const referrer=req.body.referrer
+    const referee=req.body.referee
+    await ReferralCollection.findOneAndUpdate({}, { $set: { referrer, referee } });
+    const referral=await ReferralCollection.find()
+    res.redirect("/admin/referrallist")
+}
 
 
 const removeImage = async (req, res) => {
@@ -620,6 +641,6 @@ module.exports={
     dashboard,addproductpage,addproduct,productredirection,signin,dosignin,editproductpage,userlist,user_block,
     toaddcategory,categoryredirection,category_block,editcategorypage,product_block,editproduct,logout,orderManagement,orderDetails,
     changestatus,removeImage,salesReport,dailyOrder,weeklyOrder,yearlyOrder,deleteImage,couponlistredirection,addcoupon,updateCoupon,couponblock,
-    UpdateOrderByDateForm
+    UpdateOrderByDateForm,referrallist,editreferral
     
 }
