@@ -897,6 +897,8 @@ const cartproductdelete=async(req,res)=>{
 
 }
 
+let categoryDiscount=''
+
 const placeorder = async (req, res) => {
     discount=''
     coupon_code=''
@@ -904,17 +906,40 @@ const placeorder = async (req, res) => {
     let offer=req.query.offer
     const errmessage=req.query.errmessage
     const msg=req.query.msg
-    const user = await collection.findById(userId).populate('cart.product');
-    const categories = await CategoryCollection.find({ blocked: false });
+    const user = await collection.findById(userId)
+    .populate({
+        path: 'cart.product',
+        populate: {
+            path: 'category',
+            model: 'CategoryCollection'
+        }
+    });
+    console.log("user:",user);
+    // Create a map to track category discounts
+    const categoryDiscountMap = new Map();
 
-    // Calculate the cart subtotal using the defined function
+    // Iterate through the user's cart to calculate the category discount
+    user.cart.forEach(cartItem => {
+        const categoryId = cartItem.product.category._id;
+        const discountPercentage = cartItem.product.category.discount_percentage;
+        const sales_price=cartItem.product.sellingprice
+
+        if (!categoryDiscountMap.has(categoryId)) {
+            categoryDiscountMap.set(categoryId, {discountPercentage,sales_price});
+        }
+    });
+    console.log(categoryDiscountMap);
+    // Sum the unique category discounts
+    categoryDiscount = parseFloat(Array.from(categoryDiscountMap.values()).reduce((acc, { discountPercentage, sales_price }) => acc + (discountPercentage / 100) * sales_price, 0).toFixed(2));
+
+    const categories = await CategoryCollection.find({ blocked: false });
     const cartSubtotal = calculateCartSubtotal(user);
 
-    // Pass the cart subtotal to the template
     res.render("user/placeorder", {
         isAuthenticated: true,
         categories,
-        total: cartSubtotal, // Pass the cart subtotal as 'total' to the template
+        total: cartSubtotal,
+        categoryDiscount,
         offer,errmessage,msg
     });
 }
@@ -946,10 +971,10 @@ const applyCoupon=async(req,res)=>{
         const amount=((coupon[0].discount_percentage/100)*cartSubtotal)
         if(amount>coupon[0].max_discount){
             discount=coupon[0].max_discount
-            res.render("user/placeorder", {isAuthenticated: true,categories,total: cartSubtotal,offer:'',discount,errmessage:'',msg:"Coupon applied Successfully"});
+            res.render("user/placeorder", {isAuthenticated: true,categories,total: cartSubtotal,offer:'',discount,categoryDiscount,errmessage:'',msg:"Coupon applied Successfully"});
         }else{
             discount=amount
-            res.render("user/placeorder", {isAuthenticated: true,categories,total: cartSubtotal,offer:'',discount,errmessage:'',msg:"Coupon applied Successfully"});
+            res.render("user/placeorder", {isAuthenticated: true,categories,total: cartSubtotal,offer:'',discount,categoryDiscount,errmessage:'',msg:"Coupon applied Successfully"});
         }
     }
 }
@@ -964,14 +989,21 @@ const checkout=async(req,res)=>{
     }
     
     const userId = req.session.user._id;
-    const user = await collection.findById(userId).populate('cart.product');
+    const user = await collection.findById(userId).populate('cart.product')
+    .populate({
+        path: 'cart.product',
+        populate: {
+            path: 'category',
+            model: 'CategoryCollection'
+        }
+    });
     const useraddress = await Address.find({ userId, blocked: false });
     const categories = await CategoryCollection.find({ blocked: false });
     const cartSubtotal = calculateCartSubtotal(user);
     if (err === 'true') {
-        res.render("user/checkout", { errmessage : msg, message : "" ,isAuthenticated:true,categories,user,cartSubtotal,coupondiscount,useraddress});
+        res.render("user/checkout", { errmessage : msg, message : "" ,isAuthenticated:true,categories,user,cartSubtotal,categoryDiscount,coupondiscount,useraddress});
     } else {
-        res.render("user/checkout", { errmessage : "", message : msg ,isAuthenticated:true,categories,user,cartSubtotal,coupondiscount,useraddress});
+        res.render("user/checkout", { errmessage : "", message : msg ,isAuthenticated:true,categories,user,cartSubtotal,categoryDiscount,coupondiscount,useraddress});
     }
 }
   
@@ -1096,7 +1128,14 @@ const OrderSubmit = async (req, res) => {
     let Discount
     console.log(req.body.cartSubtotal);
     const userId = req.session.user._id;
-    const user = await collection.findById(userId).populate('cart.product');
+    const user = await collection.findById(userId).populate('cart.product')
+    .populate({
+        path: 'cart.product',
+        populate: {
+            path: 'category',
+            model: 'CategoryCollection'
+        }
+    });
     const cartSubtotal = calculateCartSubtotal(user);
     console.log(cartSubtotal);
     if(discount==''){
@@ -1113,7 +1152,8 @@ const OrderSubmit = async (req, res) => {
         images:cartItem.product.images,
         sellingprice:cartItem.product.sellingprice,
         quantity: cartItem.quantity,
-        sales_price: cartItem.quantity * cartItem.product.sellingprice
+        sales_price: cartItem.quantity * cartItem.product.sellingprice,
+        category_discount: ((cartItem.product.category.discount_percentage/100)*cartItem.product.sellingprice).toFixed(2)
     }));
     const address={
         name:req.body.name,
@@ -1133,8 +1173,9 @@ const OrderSubmit = async (req, res) => {
             items,
             totalAmount: cartTotal,
             actualTotalAmount: cartSubtotal,
-            discount:Discount,
-            finalAmount:cartSubtotal
+            couponDIscount:Discount,
+            categoryDiscount,
+            finalAmount:(cartSubtotal-categoryDiscount).toFixed(2)
         });
     }else{
         newOrder = new Orders({
@@ -1143,8 +1184,9 @@ const OrderSubmit = async (req, res) => {
             items,
             totalAmount: cartTotal,
             actualTotalAmount: cartSubtotal,
-            discount:Discount,
-            finalAmount:cartSubtotal-Discount
+            couponDIscount:Discount,
+            categoryDiscount,
+            finalAmount:(cartSubtotal-Discount-categoryDiscount).toFixed(2)
         });
     }
     console.log("newOrder",newOrder);
@@ -1191,10 +1233,11 @@ const OrderSubmit = async (req, res) => {
             // return res.status(200).json(response);
         }else {
             await newOrder.save();
+            const finalAmount=newOrder.finalAmount
             console.log("newOrder.finalAmount:",newOrder.finalAmount);
             orderId=newOrder._id
                 userHelper
-                  .generateRazorPay(newOrder._id, newOrder.finalAmount)
+                  .generateRazorPay(newOrder._id, finalAmount)
                   .then((response) => {
                     console.log("razorpay response is===>", response);
                     return res.json({ status: "RAZORPAY", response: response });

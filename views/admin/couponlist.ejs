@@ -39,23 +39,23 @@ $(document).ready(function () {
 
                                 <label for="product_name" class="form-label">Offer percentage(only the number)</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="percentage" name="coupon_percentage"/>
-                                <span id="numberError" style="color: red;"></span><br>
+                                <span id="percentageError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Minimum Order</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="minorder" name="min_order"/>
-                                <span id="numberError" style="color: red;"></span><br>
+                                <span id="minorderError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Maximum Discount</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="maxdiscount" name="max_discount"/>
-                                <span id="numberError" style="color: red;"></span><br>
+                                <span id="discountError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Valid from:</label>
                                 <input type="date" placeholder="Type here" class="form-control" id="from" name="valid_from"/>
-                                <span id="dateError" style="color: red;"></span><br>
+                                <span id="fromError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Valid To:</label>
                                 <input type="date" placeholder="Type here" class="form-control" id="to" name="valid_to"/>
-                                <span id="dateError" style="color: red;"></span><br>
+                                <span id="toError" style="color: red;"></span><br>
                             </div>                            
                             <div class="d-grid">
                                 <button class="btn btn-primary" type="submit">Create coupon</button>
@@ -173,29 +173,331 @@ $(document).ready(function () {
 
     <script>
 
+function formatDate(dateString) {
+    var date = new Date(dateString);
+    var day = date.getDate();
+    var month = date.getMonth() + 1; // Months are 0-indexed
+    var year = date.getFullYear();
+
+    // Add leading zeros if day or month is less than 10
+    var formattedDate = (day < 10 ? '0' : '') + day + '-' +
+                       (month < 10 ? '0' : '') + month + '-' +
+                       year;
+
+    return formattedDate;
+}
+
     function showEditCouponForm(couponId,couponCode,percentage,minOrder,maxDiscount,validFrom,validTo,Description,){
         document.getElementById('createCouponForm').style.display = 'none';
         document.getElementById('editCouponForm').style.display = 'block';
-
+        
+        var validFromFormatted = formatDate(validFrom);
+        var validToFormatted = formatDate(validTo);
+        
+        console.log("Valid From:", validFromFormatted);
+        console.log("Valid To:", validToFormatted);
+        
         document.getElementById('editCouponId').value = couponId;
         document.getElementById('editcode').value = couponCode;
         document.getElementById('editdescription').value = Description;
         document.getElementById('editpercentage').value = percentage;
         document.getElementById('editminorder').value = minOrder;
         document.getElementById('editmaxdiscount').value = maxDiscount;
-        if (validFrom) {
-        validFrom = new Date(validFrom);
-        document.getElementById('editfrom').value = validFrom.toISOString().split('T')[0];
-        } else {
-            document.getElementById('editfrom').value = '';
+        document.getElementById('editfrom').value = validFromFormatted;
+        document.getElementById('editto').value = validToFormatted;
+        
+    }
+
+    function couponNameValidation(){
+        
+        var code = document.getElementById('code').value;
+        var description = document.getElementById('description').value;
+        var percentage = document.getElementById('percentage').value;
+        var minorder = document.getElementById('minorder').value;
+        var maxdiscount = document.getElementById('maxdiscount').value;
+        var from = document.getElementById('from').value;
+        var to = document.getElementById('to').value;
+
+        document.getElementById('codeError').innerHTML = '';
+        document.getElementById('descriptionError').innerHTML = '';
+        document.getElementById('percentageError').innerHTML = '';
+        document.getElementById('minorderError').innerHTML = '';
+        document.getElementById('discountError').innerHTML = '';
+        document.getElementById('fromError').innerHTML = '';
+        document.getElementById('toError').innerHTML = '';
+
+
+        const numRegex= /^[0-9]+$/
+        const descriptionRegex = /^.{1,100}$/;
+        const codeRegex= /^[A-Za-z0-9]*$/
+        
+
+        if(code ==''||code.trim()==''){
+            document.getElementById('codeError').innerHTML = 'coupon code is required.';
+            setTimeout(function() {
+                document.getElementById('codeError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(!code.match(codeRegex)){
+            document.getElementById('codeError').innerHTML = 'Enter a valid code with max. 10 count.';
+            setTimeout(function() {
+                document.getElementById('codeError').innerHTML = '';
+            }, 5000);
+            return false;
         }
 
-        if (validTo) {
-            validTo = new Date(validTo);
-            document.getElementById('editto').value = validTo.toISOString().split('T')[0];
-        } else {
-            document.getElementById('editto').value = '';
+        if(description ==''||description.trim()==''){
+            document.getElementById('descriptionError').innerHTML = 'coupon description is required.';
+            setTimeout(function() {
+                document.getElementById('descriptionError').innerHTML = '';
+            }, 5000);
+            return false;
         }
+
+        if(!description.match(descriptionRegex)){
+            document.getElementById('descriptionError').innerHTML = 'Enter a valid description (max. 100 letters).';
+            setTimeout(function() {
+                document.getElementById('descriptionError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(percentage ==''||percentage.trim()==''){
+            document.getElementById('percentageError').innerHTML = 'coupon percentage is required.';
+            setTimeout(function() {
+                document.getElementById('percentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!percentage.match(numRegex)){
+            document.getElementById('percentageError').innerHTML = 'Write only the percentage count (dont use % symbol)';
+            setTimeout(function() {
+                document.getElementById('percentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(percentage>75|| percentage<=0){
+            document.getElementById('percentageError').innerHTML = 'It should be less than 75% and greater than 0%';
+            setTimeout(function() {
+                document.getElementById('percentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+
+        if(minorder ==''||minorder.trim()==''){
+            document.getElementById('minorderError').innerHTML = 'coupon minorder is required.';
+            setTimeout(function() {
+                document.getElementById('minorderError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!minorder.match(numRegex)){
+            document.getElementById('minorderError').innerHTML = 'It should be a number.';
+            setTimeout(function() {
+                document.getElementById('minorderError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(minorder == 0){
+            document.getElementById('minorderError').innerHTML = 'It should be a greater than zero.';
+            setTimeout(function() {
+                document.getElementById('minorderError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(maxdiscount ==''||maxdiscount.trim()==''){
+            document.getElementById('discountError').innerHTML = 'coupon discount is required.';
+            setTimeout(function() {
+                document.getElementById('discountError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!maxdiscount.match(numRegex)){
+            document.getElementById('maxdiscountError').innerHTML = 'It should be a number.';
+            setTimeout(function() {
+                document.getElementById('maxdiscountError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(from.trim() == ''|| from ==''){
+            document.getElementById('fromError').innerHTML = 'Date is required.';
+            setTimeout(function() {
+                document.getElementById('fromError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(to.trim() ==''||to==''){
+            document.getElementById('toError').innerHTML = 'Date is required.';
+            setTimeout(function() {
+                document.getElementById('toError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        from=new Date(from);
+        to=new Date(to);
+        if(from>to){
+            document.getElementById('toError').innerHTML = `This date should be greater than 'from' date.`;
+            setTimeout(function() {
+                document.getElementById('toError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        return true
+    }
+
+    function editcouponNameValidation(){
+        
+        var code = document.getElementById('editcode').value;
+        var description = document.getElementById('editdescription').value;
+        var percentage = document.getElementById('editpercentage').value;
+        var minorder = document.getElementById('editminorder').value;
+        var maxdiscount = document.getElementById('editmaxdiscount').value;
+        var from = document.getElementById('editfrom').value;
+        var to = document.getElementById('editto').value;
+
+        document.getElementById('editcodeError').innerHTML = '';
+        document.getElementById('editdescriptionError').innerHTML = '';
+        document.getElementById('editpercentageError').innerHTML = '';
+        document.getElementById('editminorderError').innerHTML = '';
+        document.getElementById('editdiscountError').innerHTML = '';
+        document.getElementById('editfromError').innerHTML = '';
+        document.getElementById('edittoError').innerHTML = '';
+
+
+        const numRegex= /^[0-9]+$/
+        const descriptionRegex = /^.{1,100}$/;
+        const codeRegex= /^[A-Za-z0-9]*$/
+        
+
+        if(code ==''||code.trim()==''){
+            document.getElementById('editcodeError').innerHTML = 'coupon code is required.';
+            setTimeout(function() {
+                document.getElementById('editcodeError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(!code.match(codeRegex)){
+            document.getElementById('editcodeError').innerHTML = 'Enter a valid code with max. 10 count.';
+            setTimeout(function() {
+                document.getElementById('editcodeError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(description ==''||description.trim()==''){
+            document.getElementById('editdescriptionError').innerHTML = 'coupon description is required.';
+            setTimeout(function() {
+                document.getElementById('editdescriptionError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!description.match(descriptionRegex)){
+            document.getElementById('editdescriptionError').innerHTML = 'Enter a valid description (max. 100 letters).';
+            setTimeout(function() {
+                document.getElementById('editdescriptionError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(percentage ==''||percentage.trim()==''){
+            document.getElementById('editpercentageError').innerHTML = 'coupon percentage is required.';
+            setTimeout(function() {
+                document.getElementById('editpercentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!percentage.match(numRegex)){
+            document.getElementById('editpercentageError').innerHTML = 'Write only the percentage count (dont use % symbol)';
+            setTimeout(function() {
+                document.getElementById('editpercentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(percentage>75|| percentage<=0){
+            document.getElementById('editpercentageError').innerHTML = 'It should be less than 75% and greater than 0%';
+            setTimeout(function() {
+                document.getElementById('editpercentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+
+        if(minorder ==''||minorder.trim()==''){
+            document.getElementById('editminorderError').innerHTML = 'coupon minorder is required.';
+            setTimeout(function() {
+                document.getElementById('editminorderError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!minorder.match(numRegex)){
+            document.getElementById('editminorderError').innerHTML = 'It should be a number.';
+            setTimeout(function() {
+                document.getElementById('editminorderError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(minorder == 0){
+            document.getElementById('editminorderError').innerHTML = 'It should be a greater than zero.';
+            setTimeout(function() {
+                document.getElementById('editminorderError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(maxdiscount ==''||maxdiscount.trim()==''){
+            document.getElementById('editdiscountError').innerHTML = 'coupon discount is required.';
+            setTimeout(function() {
+                document.getElementById('editdiscountError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!maxdiscount.match(numRegex)){
+            document.getElementById('editmaxdiscountError').innerHTML = 'It should be a number.';
+            setTimeout(function() {
+                document.getElementById('editmaxdiscountError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(from.trim() == ''|| from ==''){
+            document.getElementById('editfromError').innerHTML = 'Date is required.';
+            setTimeout(function() {
+                document.getElementById('fromError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(to.trim() ==''||to==''){
+            document.getElementById('edittoError').innerHTML = 'Date is required.';
+            setTimeout(function() {
+                document.getElementById('edittoError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        from=new Date(from);
+        to=new Date(to);
+        if(from>to){
+            document.getElementById('edittoError').innerHTML = `This date should be greater than 'from' date.`;
+            setTimeout(function() {
+                document.getElementById('edittoError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        return true
     }
 
 

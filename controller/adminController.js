@@ -347,13 +347,18 @@ const user_block=async(req,res)=>{
 const toaddcategory=async(req,res)=>{
     const category=req.body.name
     const categorytype=req.body.category
+    const discount_percentage=req.body.category_percentage
+    const valid_from = new Date(req.body.valid_from);
+    valid_from.setHours(0, 0, 0, 1); 
+    const valid_to = new Date(req.body.valid_to);
+    valid_to.setHours(23, 59, 59, 999); 
     const data=await CategoryCollection.findOne({name:category})
     if (data) {
         const categories=await CategoryCollection.find()
         const create=true
         res.render('admin/categorylist', { categories,errmessage: "Category already exists",create });
     } else {
-        const newCategory = new CategoryCollection({ name: category, type: categorytype });
+        const newCategory = new CategoryCollection({ name: category, type: categorytype,discount_percentage,valid_from,valid_to });
         await newCategory.save();
         const categories = await CategoryCollection.find();
         const create = true;
@@ -385,15 +390,21 @@ const editcategorypage=async(req,res)=>{
     const name=req.body.name
     const id=req.body.editCategoryId
     const categoryType=req.body.editcategory
+    const discount_percentage=req.body.editcategory_percentage
+    const valid_from = new Date(req.body.editvalid_from);
+    valid_from.setHours(0, 0, 0, 1);
+    const valid_to = new Date(req.body.editvalid_to);
+    valid_to.setHours(23, 59, 59, 999); 
     console.log(name);
     console.log(id);
     const data=await CategoryCollection.findOne({name:name})
-    if (data) {
-        const categories=await CategoryCollection.find()
-        const create=true
-        res.render('admin/categorylist', { categories,errmessage: "Category already exists",create });
-    } else {
-        await CategoryCollection.findOneAndUpdate({ _id: id }, { name: name,type: categoryType });
+    // if (data) {
+    //     // const categories=await CategoryCollection.find()
+    //     // const create=true
+    //     // res.render('admin/categorylist', { categories,errmessage: "Category already exists",create });
+    // } else
+     {
+        await CategoryCollection.findOneAndUpdate({ _id: id }, { name: name,type: categoryType,discount_percentage,valid_from,valid_to });
         res.redirect('/admin/categorylist')
     }
     
@@ -413,9 +424,9 @@ const addcoupon=async(req,res)=>{
     const discount_percentage=req.body.coupon_percentage
     const min_order=req.body.min_order
     const max_discount=req.body.max_discount
-    const valid_from = new Date(req.body.editvalid_from);
+    const valid_from = new Date(req.body.valid_from);
     valid_from.setHours(0, 0, 0, 1); 
-    const valid_to = new Date(req.body.editvalid_to);
+    const valid_to = new Date(req.body.valid_to);
     valid_to.setHours(23, 59, 59, 999); 
     const data=await CouponCollection.findOne({coupon_code:coupon_code})
     if (data) {
@@ -536,9 +547,9 @@ const changestatus = async (req, res) => {
 
 const UpdateOrderByDateForm=async(req,res)=>{
     console.log("reached UpdateOrderByDateForm");
-    const startOfDay=req.body.orderFrom
+    const startOfDay=new Date(req.body.orderFrom)
     startOfDay.setHours(0, 0, 0, 1);
-    const endOfDay=req.body.orderTo
+    const endOfDay=new Date(req.body.orderTo)
     endOfDay.setHours(23, 59, 59, 999); 
     const orders = await Orders.find({created_on: { $gte: startOfDay, $lte: endOfDay }}).populate('address').populate('items.product_id').populate('user_id');
     res.render('admin/salesReport.ejs', { orders });

@@ -25,6 +25,11 @@ const mongoose = require('mongoose');
             type: Number,
             required: true,
           },
+          category_discount:{
+            type: Number,
+            default:0,
+            required: true
+          }
         },
     ],
     payment_method: {
@@ -44,9 +49,15 @@ const mongoose = require('mongoose');
        type: Number,
        required:true
     },
-    discount:{
+    couponDiscount:{
        type: Number,
+       default:0,
        required:true
+    },
+    categoryDiscount:{
+      type: Number,
+      default:0,
+      required:true
     },
     finalAmount:{
       type: Number,

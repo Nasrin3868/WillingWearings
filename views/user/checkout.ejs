@@ -161,34 +161,41 @@
                                     <tr>
                                         <th colspan="2">Product</th>
                                         <th>Total</th>
+                                        <th colspan="2">category Offer</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <% user.cart.forEach(cartItem => { %>
-                                    <tr>
+                                        <tr>
                                         <td class="image product-thumbnail"><img src="<%= cartItem.product.images[0] %>" alt="#"></td>
                                         <td>
                                             <h5><a href="shop-product-full.html"><%= cartItem.product.name %></a></h5> <span class="product-qty">x <%= cartItem.quantity %></span>
                                         </td>
                                         <td>Rs.<%= cartItem.product.sellingprice * cartItem.quantity %></td>
+                                        <td width="8%"><%= cartItem.product.category.discount_percentage %> %</td>
+                                        <td>Rs.<%= ((cartItem.product.category.discount_percentage/100)*cartItem.product.sellingprice).toFixed(2) %></td>
                                     </tr>
                                     <% }); %>
                                     <tr>
                                         <th>SubTotal</th>
-                                        <td class="product-subtotal" colspan="2">Rs.<%= cartSubtotal %></td>
+                                        <td class="product-subtotal" colspan="4">Rs.<%= cartSubtotal %></td>
                                     </tr>
                                     <tr>
                                         <th>Shipping</th>
-                                        <td colspan="2"><em>Free Shipping</em></td>
+                                        <td colspan="4"><em>Free Shipping</em></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Category Discount</th>
+                                        <td class="product-subtotal" colspan="4">Rs.<%= categoryDiscount.toFixed(2) %></td>
                                     </tr>
                                     <tr>
                                         <th>Coupon Discount</th>
-                                        <td class="product-subtotal" colspan="2">Rs.<%= coupondiscount %></td>
+                                        <td class="product-subtotal" colspan="4">Rs.<%= coupondiscount.toFixed(2) %></td>
                                     </tr>
                                     
                                     <tr>
                                         <th>Total</th>
-                                        <td colspan="2" class="product-subtotal"><span class="font-xl text-brand fw-900">Rs.<%= cartSubtotal-coupondiscount %></span></td>
+                                        <td colspan="4" class="product-subtotal"><span class="font-xl text-brand fw-900">Rs.<%= (cartSubtotal-coupondiscount-categoryDiscount).toFixed(2) %></span></td>
                                     </tr>
 
                                 </tbody>

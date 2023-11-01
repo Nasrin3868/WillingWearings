@@ -109,16 +109,17 @@
                                     <thead>
                                         <tr>
                                             <th width="40%">Product</th>
-                                            <th width="20%">Unit Price</th>
-                                            <th width="20%">Quantity</th>
-                                            <th width="20%" class="text-end">Total</th>
+                                            <th width="20%" class="text-center">Unit Price</th>
+                                            <th width="10%" class="text-center">Quantity</th>
+                                            <th width="15%" class="text-center">Total</th>
+                                            <th width="20%" class="text-center">Category offer</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <!-- Iterate through items of the order -->
                                         <% orders.items.forEach(order => { %>
                                             <tr>
-                                                <td>
+                                                <td width="40%">
                                                     <a class="itemside" href="#">
                                                         <div class="left">
                                                             <!-- Check if orders.product_id has images before accessing -->
@@ -132,9 +133,10 @@
                                                         <div class="info"> <%= order.product_id.name %> </div>
                                                     </a>
                                                 </td>
-                                                <td> RS.<%= order.sellingprice %> </td>
-                                                <td> <%= order.quantity %> </td>
-                                                <td class="text-end"> Rs.<%= order.sales_price %> </td>
+                                                <td width="20%" class="text-center"> RS.<%= order.sellingprice %> </td>
+                                                <td width="10%" class="text-center"> <%= order.quantity %> </td>
+                                                <td width="15%" class="text-center"> Rs.<%= order.sales_price %> </td>
+                                                <td width="20%" class="text-center"> Rs.<%= order.category_discount %> </td>
                                             </tr>
                                         <% }) %>
                                         <tr>
@@ -142,19 +144,27 @@
                                                 <article class="float-end">
                                                     <dl class="dlist">
                                                         <dt>Subtotal:</dt>
-                                                        <dd><%= orders.actualTotalAmount %></dd>
+                                                        <dd class="text-start">Rs.<%= orders.actualTotalAmount %></dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Shipping cost:</dt>
-                                                        <dd>0</dd>
+                                                        <dd class="text-start">Rs.0</dd>
+                                                    </dl>
+                                                    <dl class="dlist">
+                                                        <dt>Category discount:</dt>
+                                                        <dd class="text-start">Rs.<%= orders.categoryDiscount %></dd>
+                                                    </dl>
+                                                    <dl class="dlist">
+                                                        <dt>coupon discount:</dt>
+                                                        <dd class="text-start">Rs.<%= orders.couponDiscount %></dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Grand total:</dt>
-                                                        <dd> <b class="h5"><%= orders.actualTotalAmount %></b> </dd>
+                                                        <dd class="text-start"> <b class="h5">Rs.<%= orders.finalAmount %></b> </dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt class="text-muted">Status:</dt>
-                                                        <dd>
+                                                        <dd class="text-start">
                                                             <% if (orders.order_status == 'cancelled'||orders.order_status == 'returned') { %>
                                                                 <span class="badge rounded-pill alert-warning"><%= orders.order_status %></span>
                                                             <% }else if (orders.order_status == 'cancel(seller)_defect') { %>

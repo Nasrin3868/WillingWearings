@@ -97,26 +97,34 @@ $(document).ready(function () {
     }
     
     function referralValidation() {
+        // alert("saj:",document.getElementById('referrer').value)
       // Input fields
-      const referrer = document.getElementById('referrer');
-      const referee = document.getElementById('referee');
+      const referrer = document.getElementById('referrer').value;
+      const referee = document.getElementById('referee').value;
       // Error fields
-      const referralError = document.getElementById('referralError');
-      const refereeError = document.getElementById('refereeError');
+      document.getElementById('referrerError');
+      document.getElementById('refereeError');
       // Regex
-      const referralRegex = /^[1-9]\d{0,6}$/;
+      const referralRegex = /^[1-9]\d{0,10}$/;
 
-      if (referral === '' || referral.trim() === '') {
-            document.getElementById('referralError').innerHTML = 'Referral is required.';
+      if (referrer === '' || referrer.trim() === '') {
+            document.getElementById('referrerError').innerHTML = 'Referral is required.';
             setTimeout(function() {
-                document.getElementById('refereeError').innerHTML = '';
+                document.getElementById('referrerError').innerHTML = '';
             }, 5000);
             return false;
         }
-        if (!referral.match(referralRegex)) {
-            document.getElementById('referralError').innerHTML = 'Only numbers are allowded.';
+        if (!referrer.match(referralRegex)) {
+            document.getElementById('referrerError').innerHTML = 'Only positive numbers are allowded.';
             setTimeout(function() {
-                document.getElementById('refereeError').innerHTML = '';
+                document.getElementById('referrerError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(referrer>1000){
+            document.getElementById('referrerError').innerHTML = 'It should be less than 1000.';
+            setTimeout(function() {
+                document.getElementById('referrerError').innerHTML = '';
             }, 5000);
             return false;
         }

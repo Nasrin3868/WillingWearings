@@ -38,6 +38,17 @@ $(document).ready(function () {
                                         <option> <%= categoryType %> </option>
                                     <% }); %>
                                 </select>
+                                <label for="product_name" class="form-label pt-20">Offer percentage ( less than 10% )</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="percentage" name="category_percentage"/>
+                                <span id="percentageError" style="color: red;"></span><br>
+
+                                <label for="product_name" class="form-label">Valid from:</label>
+                                <input type="date" placeholder="Type here" class="form-control" id="from" name="valid_from"/>
+                                <span id="fromError" style="color: red;"></span><br>
+
+                                <label for="product_name" class="form-label">Valid To:</label>
+                                <input type="date" placeholder="Type here" class="form-control" id="to" name="valid_to"/>
+                                <span id="toError" style="color: red;"></span><br>
                             </div>                            
                             <div class="d-grid">
                                 <button class="btn btn-primary" type="submit">Create category</button>
@@ -60,6 +71,17 @@ $(document).ready(function () {
                                         <option> <%= categoryType %> </option>
                                     <% }); %>
                                 </select>
+                                <label for="product_name" class="form-label pt-20">Offer percentage ( less than 10% )</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="editpercentage" name="editcategory_percentage"/>
+                                <span id="editnumberError" style="color: red;"></span><br>
+
+                                <label for="product_name" class="form-label">Valid from:</label>
+                                <input type="date" placeholder="Type here" class="form-control" id="editfrom" name="editvalid_from"/>
+                                <span id="editdateError" style="color: red;"></span><br>
+
+                                <label for="product_name" class="form-label">Valid To:</label>
+                                <input type="date" placeholder="Type here" class="form-control" id="editto" name="editvalid_to"/>
+                                <span id="editdateError" style="color: red;"></span><br>
                             </div>                            
                             <div class="d-grid">
                                 <button class="btn btn-primary" type="submit"  >Edit category</button>
@@ -71,19 +93,43 @@ $(document).ready(function () {
                             <table class="table table-hover" id="example">
                                 <thead>
                                     <tr>
-                                        <th class="text-center" width="20%">Name</th>
-                                        <th class="text-center" width="20%">Type</th>
-                                        <th class="text-center" width="30%">Edit</th>
-                                        <th class="text-center">Status</th>
+                                        <th class="text-center" width="15%">Name</th>
+                                        <th class="text-center" width="15%">Type</th>
+                                        <th class="text-center" width="15%">Discount</th>
+                                        <th class="text-center" width="15%">Valid from</th>
+                                        <th class="text-center" width="15%">Valid to</th>
+                                        <th class="text-center" width="20%">Edit</th>
+                                        <th class="text-center" width="20%">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <% categories.forEach(function(category){ %>
                                     <tr>
-                                        <td class="text-center" width="20%"><b><%= category.name %></b></td>
-                                        <td class="text-center" width="20%"><b><%= category.type %></b></td>
-                                        <td class="text-center">
-                                            <a onclick="showEditCategoryForm( '<%= category._id %>', '<%= category.name %>','<%= category.type %>') " class="btn btn-primary btn-sm rounded" >Edit</a>
+                                        <td class="text-center" width="15%"><b><%= category.name %></b></td>
+                                        <td class="text-center" width="15%"><b><%= category.type %></b></td>
+                                        <td class="text-center" width="15%"><b><%= category.discount_percentage %></b></td>
+                                        <td class="text-center" width="15%">
+                                            <b>
+                                                <script>
+                                                    var dateString = '<%= category.valid_from %>'; 
+                                                    var date = new Date(dateString);
+                                                    var formattedDate = date.toLocaleDateString(); 
+                                                    document.write(formattedDate);
+                                                </script>
+                                            </b>
+                                        </td>
+                                        <td class="text-center" width="15%">
+                                            <b>
+                                                <script>
+                                                    var dateString = '<%= category.valid_to %>'; 
+                                                    var date = new Date(dateString);
+                                                    var formattedDate = date.toLocaleDateString(); 
+                                                    document.write(formattedDate);
+                                                </script>
+                                            </b>
+                                        </td>
+                                        <td class="text-center" width="20%">
+                                            <a onclick="showEditCategoryForm( '<%= category._id %>', '<%= category.name %>','<%= category.type %>','<%= category.discount_percentage %>','<%= category.valid_from %>','<%= category.valid_to %>') " class="btn btn-primary btn-sm rounded" >Edit</a>
                                         </td>
                                         <td>
                                             <div width="20%" class="info pl-3 text-center">
@@ -109,96 +155,180 @@ $(document).ready(function () {
 
     <script>
 
-    function showEditCategoryForm(categoryId, categoryName, categoryType){
+    function showEditCategoryForm(categoryId, categoryName, categoryType,percentage,validFrom,validTo){
         document.getElementById('createCategoryForm').style.display = 'none';
         document.getElementById('editCategoryForm').style.display = 'block';
         document.getElementById('editCategoryName').value = categoryName;
         document.getElementById('editCategoryId').value = categoryId;
         document.getElementById('editcategoryType').value = categoryType;
+        document.getElementById('editpercentage').value = percentage;
 
 
         
     }
     function categorynameValidation() {
-      // Input fields
-      const name = document.getElementById('name');
-    
-      // Error fields
-      const nameError = document.getElementById('nameError');
-    
-      // Regex
-      const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
-    
-      let isValid = true; // A flag to track overall validation
-    
-      // Function to clear error message with a delay
-      function clearErrorWithDelay(errorField) {
-         setTimeout(() => {
-            errorField.innerHTML = '';
-         }, 8000); // 5000 milliseconds = 5 seconds
-      }
-    
-      // Function to validate email
-      function validatename() {
-         if (name.value.trim() === '') {
-            nameError.innerHTML = 'Enter category';
-            clearErrorWithDelay(nameError);
-            isValid = false;
-         } else if (!nameRegex.test(name.value)) {
-            nameError.innerHTML = 'Please enter a valid name with only letters and start with a capital letter.';
-            clearErrorWithDelay(nameError);
-            isValid = false;
-         } else {
-            nameError.innerHTML = ''; // Clear error message
-         }
-      }
-    
-      
-      // Validate fields one by one
-      validatename();
-      if (isValid) validatename();
-      return isValid;
+     
+        var name = document.getElementById('name').value;
+        var percentage = document.getElementById('percentage').value;
+        var from = document.getElementById('from').value;
+        var to = document.getElementById('to').value;
+
+        document.getElementById('nameError').innerHTML = '';
+        document.getElementById('percentageError').innerHTML = '';
+        document.getElementById('fromError').innerHTML = '';
+        document.getElementById('toError').innerHTML = '';
+
+        const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
+        const numRegex= /^[0-9]+$/
+        const codeRegex= /^[A-Za-z0-9]*$/
+        
+
+        if(name==''||name.trim()==''){
+            document.getElementById('nameError').innerHTML = 'Name is required.';
+            setTimeout(function() {
+                document.getElementById('nameError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(!name.match(nameRegex)){
+            document.getElementById('nameError').innerHTML = 'Please enter a valid name with only letters and start with a capital letter.';
+            setTimeout(function() {
+                document.getElementById('nameError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(percentage ==''||percentage.trim()==''){
+            document.getElementById('percentageError').innerHTML = 'Percentage is required.';
+            setTimeout(function() {
+                document.getElementById('percentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!percentage.match(numRegex)){
+            document.getElementById('percentageError').innerHTML = 'Write only the count (dont use % symbol).';
+            setTimeout(function() {
+                document.getElementById('percentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(percentage>50){
+            document.getElementById('percentageError').innerHTML = 'It should be less than 10%.';
+            setTimeout(function() {
+                document.getElementById('percentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+
+        if(from.trim() == ''|| from ==''){
+            document.getElementById('fromError').innerHTML = 'Date is required.';
+            setTimeout(function() {
+                document.getElementById('fromError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(to.trim() ==''||to==''){
+            document.getElementById('toError').innerHTML = 'Date is required.';
+            setTimeout(function() {
+                document.getElementById('toError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        from=new Date(from);
+        to=new Date(to);
+        if(from>to){
+            document.getElementById('toError').innerHTML = `This date should be greater than 'from' date.`;
+            setTimeout(function() {
+                document.getElementById('toError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        return true
     }
 
     function editnameValidation() {
-      // Input fields
-      const name = document.getElementById('editCategoryName');
-    
-      // Error fields
-      const nameError = document.getElementById('editnameError');
-    
-      // Regex
-      const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
-    
-      let isValid = true; // A flag to track overall validation
-    
-      // Function to clear error message with a delay
-      function clearErrorWithDelay(errorField) {
-         setTimeout(() => {
-            errorField.innerHTML = '';
-         }, 8000); // 5000 milliseconds = 5 seconds
-      }
-    
-      // Function to validate email
-      function validatename() {
-         if (name.value.trim() === '') {
-            nameError.innerHTML = 'Enter category';
-            clearErrorWithDelay(nameError);
-            isValid = false;
-         } else if (!nameRegex.test(name.value)) {
-            nameError.innerHTML = 'Please enter a valid name with only letters and start with a capital letter.';
-            clearErrorWithDelay(nameError);
-            isValid = false;
-         } else {
-            nameError.innerHTML = ''; // Clear error message
-         }
-      }
-    
-      
-      // Validate fields one by one
-      validatename();
-      if (isValid) validatename();
-      return isValid;
+        
+        var name = document.getElementById('editCategoryName').value;
+        var percentage = document.getElementById('editpercentage').value;
+        var from = document.getElementById('editfrom').value;
+        var to = document.getElementById('editto').value;
+
+        document.getElementById('editnameError').innerHTML = '';
+        document.getElementById('editpercentageError').innerHTML = '';
+        document.getElementById('editfromError').innerHTML = '';
+        document.getElementById('edittoError').innerHTML = '';
+
+
+        const numRegex= /^[0-9]+$/
+        const codeRegex= /^[A-Za-z0-9]*$/
+        const nameRegex = /^[A-Z][a-zA-Z\s]*$/;
+
+        if(name==''||name.trim()==''){
+            document.getElementById('editnameError').innerHTML = 'Name is required.';
+            setTimeout(function() {
+                document.getElementById('editnameError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(!name.match(nameRegex)){
+            document.getElementById('editnameError').innerHTML = 'Please enter a valid name with only letters and start with a capital letter.';
+            setTimeout(function() {
+                document.getElementById('editnameError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        
+        if(percentage ==''||percentage.trim()==''){
+            document.getElementById('editpercentageError').innerHTML = 'Discount percentage is required.';
+            setTimeout(function() {
+                document.getElementById('editpercentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(!percentage.match(numRegex)){
+            document.getElementById('editpercentageError').innerHTML = 'Write only the percentage count (dont use % symbol)';
+            setTimeout(function() {
+                document.getElementById('editpercentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(percentage>75|| percentage<=0){
+            document.getElementById('editpercentageError').innerHTML = 'It should be less than 75% and greater than 0%';
+            setTimeout(function() {
+                document.getElementById('editpercentageError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        if(from.trim() == ''|| from ==''){
+            document.getElementById('editfromError').innerHTML = 'Date is required.';
+            setTimeout(function() {
+                document.getElementById('fromError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        if(to.trim() ==''||to==''){
+            document.getElementById('edittoError').innerHTML = 'Date is required.';
+            setTimeout(function() {
+                document.getElementById('edittoError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        from=new Date(from);
+        to=new Date(to);
+        if(from>to){
+            document.getElementById('edittoError').innerHTML = `This date should be greater than 'from' date.`;
+            setTimeout(function() {
+                document.getElementById('edittoError').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+        return true
     }
 
     </script>

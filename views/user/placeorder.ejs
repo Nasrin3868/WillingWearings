@@ -77,7 +77,13 @@
                                 </tr>
                                 <% if (offer !='') { %>
                                     <tr>
-                                        <td class="cart_total_label">Coupon offer</td>
+                                        <td class="cart_total_label">Category discount</td>
+                                        <td class="cart_total_amount">
+                                            <i class="ti-gift mr-5"></i> <%= categoryDiscount %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cart_total_label">Coupon discount</td>
                                         <td class="cart_total_amount">
                                             <i class="ti-gift mr-5"></i> <%= offer %>
                                         </td>
@@ -86,13 +92,19 @@
                                         <td class="cart_total_label">Total</td>
                                         <td class="cart_total_amount">
                                             <strong>
-                                                <span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs.<%= total %> </span>
+                                                <span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs.<%= (total-categoryDiscount).toFixed(2) %> </span>
                                             </strong>
                                         </td>
                                     </tr>
                                 <% } else { %>
                                     <tr>
-                                        <td class="cart_total_label">Coupon offer</td>
+                                        <td class="cart_total_label">Category discount</td>
+                                        <td class="cart_total_amount">
+                                            <i class="ti-gift mr-5"></i> <%= categoryDiscount %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cart_total_label">Coupon discount</td>
                                         <td class="cart_total_amount">
                                             <i class="ti-gift mr-5"></i> <%= discount %>
                                         </td>
@@ -101,7 +113,7 @@
                                         <td class="cart_total_label">Total</td>
                                         <td class="cart_total_amount">
                                             <strong>
-                                                <span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs.<%= total-discount %> </span>
+                                                <span id="cart-subtotal" class="font-lg fw-900 text-brand">Rs.<%= (total-discount-categoryDiscount).toFixed(2) %> </span>
                                             </strong>
                                         </td>
                                     </tr>
