@@ -387,6 +387,7 @@ const category_block=async(req,res)=>{
 
 const editcategorypage=async(req,res)=>{
     console.log("reached editcategory");
+    
     const name=req.body.name
     const id=req.body.editCategoryId
     const categoryType=req.body.editcategory

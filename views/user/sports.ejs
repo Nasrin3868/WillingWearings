@@ -16,11 +16,23 @@
                 <div class="widget-category mb-30">
                     <h5 class="section-title style-1 mb-30 wow fadeIn animated">Price Range</h5>
                     <ul class="categories">
-                        <li><a href="shop-grid-right.html">0- Rs.1500</a></li>
-                        <li><a href="shop-grid-right.html">Rs.1500-Rs.3000</a></li>
-                        <li><a href="shop-grid-right.html">Rs.3000-Rs.4500</a></li>
-                        <li><a href="shop-grid-right.html">Rs.4500-Rs.6000</a></li>
-                        <li><a href="shop-grid-right.html">Rs.6000+</a></li>
+                        <% if (value=='all') { %>
+                            <% if (!user) { %>
+                                <li><a href="/sports?range=high">High to low</a></li>
+                                <li><a href="/sports?range=low">Low to high</a></li>
+                            <% }else{%>
+                                <li><a href="/sports?range=high">High to low</a></li>
+                                <li><a href="/sports?range=low">Low to high</a></li>
+                            <% } %>
+                        <% }else{%>
+                            <% if (!user) { %>
+                                <li><a href="/sportsshowbycategory/<%= categoryname %>?range=high">High to low</a></li>
+                                <li><a href="/sportsshowbycategory/<%= categoryname %>?range=low">Low to high</a></li>
+                            <% }else{%>
+                                <li><a href="/sportsshowbycategory/<%= categoryname %>?range=high">High to low</a></li>
+                                <li><a href="/sportsshowbycategory/<%= categoryname %>?range=low">Low to high</a></li>
+                            <% } %>
+                        <% } %>
                     </ul>
                 </div>
                 <div class="banner-img wow fadeIn mb-45mb-lg-0 animated d-lg-block d-none">
@@ -61,7 +73,15 @@
                                                 </a>
                                             </div>
                                             <div class="product-action-1">
-                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" href="/wishlist"><i class="fi-rs-heart"></i></a>
+                                                <% if (!user) { %>
+                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="/wishlist"><i class="fi-rs-heart"></i></a>
+                                                <% }else{%>
+                                                        <% if (user.wishlist&& user.wishlist.includes(product._id)) { %>
+                                                            <a aria-label="Remove from Wishlist" class="action-btn hover-up" onclick="itemsToWishlist('<%= product._id%>')" id="wishlist-link-<%= product._id%>" ><i class="fi-rs-heart"></i></a>
+                                                        <% }else{%>
+                                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="itemsToWishlist('<%= product._id%>')" id="wishlist-link-<%= product._id%>"><i class="fi-rs-heart"></i></a>
+                                                        <%} %>
+                                                <% } %>
                                             </div>
                                         </div>
                                         <div class="product-content-wrap">
@@ -79,12 +99,25 @@
                                                 <span class="old-price"><%= product.price %></span>
                                             </div>
                                             <div class="product-action-1 show">
-                                                <% if (product.stock==0) { %>
-                                                    <p style="color: red;">Out of Stock</p>
+                                                <% if (!user) { %>
+                                                    <a aria-label="Add To Cart" class="action-btn hover-up" href="/cart"><i class="fi-rs-shopping-bag-add"></i></a>
                                                 <% }else{%>
-                                                    <a aria-label="Add To Cart" class="action-btn hover-up" onclick="itemsToCart('<%= product._id%>')"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                    <% if (product.stock==0) { %>
+                                                        <p style="color: red;">Out of Stock</p>
+                                                    <% }else{%>
+                                                        <a aria-label="Add To Cart" class="action-btn hover-up" onclick="itemsToCart('<%= product._id%>')"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                    <% } %>
                                                 <% } %>
                                             </div>
+                                            <% if(user!=''){%>
+                                                <div>
+                                                    <% user.cart.forEach(cartProduct => { %>
+                                                        <% if (cartProduct.product._id.toString() === product._id.toString()) { %>
+                                                            <small>Added to cart</small>
+                                                        <% } %>
+                                                    <% }); %>
+                                                </div>
+                                            <%} %>
                                         </div>
                                     </div>
                                 </div>
@@ -158,6 +191,11 @@ $(document).ready(function() {
 
 
 function itemsToCart(productId){
+    Swal.fire({
+            icon: 'success',
+            title: 'Added..',
+            text: 'Item added into cart.',
+        });
             fetch(`/quantityIncrease/${productId}`, {
                 method: 'POST'
             })
@@ -170,4 +208,27 @@ function itemsToCart(productId){
                 console.error('Error:', error);
             });
         }
+
+        async function itemsToWishlist(productId){
+            console.log("reached itemsToWishlist");
+            const response=await fetch(`/updateWishlist/${productId}`,{
+                method:'POST',
+            })
+            const result =await response.json();
+            if(result.status){
+                const wishlistBtn = $(`#wishlist-link-${productId}`);
+                wishlistBtn.find('i').toggleClass('in-wishlist');
+                
+                if (wishlistBtn.attr('aria-label') === 'Add To Wishlist') {
+                    wishlistBtn.attr('aria-label', 'Remove from Wishlist');
+                    wishlistBtn.css('background-color', '#088178');
+
+                } else {
+                    wishlistBtn.attr('aria-label', 'Add To Wishlist');
+                    wishlistBtn.css('background-color', '');
+
+                }
+            }
+        }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

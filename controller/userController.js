@@ -21,6 +21,13 @@ const home=async(req,res)=>{
     const isAuthenticated=false
     const categories=await CategoryCollection.find({blocked:false})
     const products=await Products.find({blocked:false})
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     res.render("user/home",{isAuthenticated,products,categories,user:''})
 }
 
@@ -29,10 +36,18 @@ const loadHomeAfterLogin= async(req,res)=>{
     coupon_code=''
     console.log("Reached home");
     const userId = req.query.userId;
+    const value='home'
     if (req.session.user) {
         const isAuthenticated = true;
         const categories = await CategoryCollection.find({ blocked: false });
         const products = await Products.find({ blocked: false });
+        if(req.query.range){
+            if(req.query.range=='high'){
+                products.sort((a, b) => b.sellingprice - a.sellingprice);
+            }else if(req.query.range=='low'){
+                products.sort((a, b) => a.sellingprice - b.sellingprice)
+            }
+        }
         const user=await collection.findById(req.session.user).populate('cart.product')
         console.log("user:",user)
         res.render("user/home", { isAuthenticated, products, categories,user});
@@ -453,38 +468,42 @@ const allpage=async(req,res)=>{
     console.log("reached all wears");
     discount=''
     coupon_code=''
+    const categories=await CategoryCollection.find({blocked:false})
+    const products=await Products.find({blocked:false})
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     if(req.session.user){
-        const isAuthenticated=true
-        const categories=await CategoryCollection.find({blocked:false})
-        const products=await Products.find({blocked:false})
-        const user=req.session.user
-        res.render("user/all",{isAuthenticated,products,categories,user})
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/all",{isAuthenticated:true,products,categories,user,value:'all'})
     }else{
-        const isAuthenticated=false
-        const categories=await CategoryCollection.find({blocked:false})
-        const products=await Products.find({blocked:false})        
-        res.render("user/all",{isAuthenticated,products,categories})   
+        res.render("user/all",{isAuthenticated:false,products,categories,user:'',value:'all'})   
     }    
 }
 
 const showbycategory=async(req,res)=>{
     console.log("reached showbycategory")
+    const categoryname=req.params.name
+    const category = await CategoryCollection.findOne({ name: categoryname,blocked: false });
+    const categoryId = category._id;
+    const products = await Products.find({ blocked: false, category: categoryId});
+    const categories = await CategoryCollection.find({ blocked: false});  
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     if(req.session.user){
-        const categoryname=req.params.name   
-        const isAuthenticated=true
-        const category = await CategoryCollection.findOne({ name: categoryname, blocked: false });
-        const categoryId = category._id;
-        const products = await Products.find({ blocked: false, category: categoryId});
-        const categories = await CategoryCollection.find({ blocked: false});
-        res.render("user/all",{isAuthenticated,products,categories})
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/all",{isAuthenticated:true,products,categories,user,value:'all_cat',categoryname})
     }else{
-        const isAuthenticated=false
-        const categoryname=req.params.name
-        const category = await CategoryCollection.findOne({ name: categoryname,blocked: false });
-        const categoryId = category._id;
-        const products = await Products.find({ blocked: false, category: categoryId});
-        const categories = await CategoryCollection.find({ blocked: false});       
-        res.render("user/all",{isAuthenticated,products,categories})   
+        res.render("user/all",{isAuthenticated:false,products,categories,user:'',value:'all_cat',categoryname})   
     }
 }
 
@@ -492,43 +511,45 @@ const ethinicpage=async(req,res)=>{
     console.log("reached ethinic wears");
     discount=''
     coupon_code=''
+    const type = "Ethinic"; // Change 'dress' to 'type'
+    const categories = await CategoryCollection.find({ blocked: false, type });
+    const categoryIds = categories.map(category => category._id);
+    const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     if(req.session.user){
-        const isAuthenticated=true
-        const type = "Ethinic"; // Change 'dress' to 'type'
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const categoryIds = categories.map(category => category._id);
-        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
-        res.render("user/ethinic", { isAuthenticated, products, categories });
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/ethinic", { isAuthenticated:true, products, categories,user,value:'all' });
     }else{
-        const isAuthenticated=false
-        const type = "Ethinic"; // Change 'dress' to 'type'
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const categoryIds = categories.map(category => category._id);
-        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
-        res.render("user/ethinic",{isAuthenticated,products,categories})   
+        res.render("user/ethinic",{isAuthenticated:false,products,categories,user:'',value:'all'})   
     }    
 }
 
 const ethinicshowbycategory=async(req,res)=>{
     console.log("reached ethinicshowbycategory")
+    const categoryname=req.params.name
+    const type = "Ethinic";
+    const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+    const categoryId = category._id;
+    const products = await Products.find({ blocked: false, category: categoryId, type });
+    const categories = await CategoryCollection.find({ blocked: false, type });
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     if(req.session.user){
-        const categoryname=req.params.name  
-        const isAuthenticated=true
-        const type = "Ethinic";
-        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
-        const categoryId = category._id;
-        const products = await Products.find({ blocked: false, category: categoryId, type });
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        res.render("user/ethinic",{isAuthenticated,products,categories})
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/ethinic",{isAuthenticated:true,products,categories,user,categoryname,value:'all_cat'})
     }else{
-        const isAuthenticated=false
-        const categoryname=req.params.name
-        const type = "Ethinic";
-        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
-        const categoryId = category._id;
-        const products = await Products.find({ blocked: false, category: categoryId, type });
-        const categories = await CategoryCollection.find({ blocked: false, type });       
-        res.render("user/ethinic",{isAuthenticated,products,categories})   
+        res.render("user/ethinic",{isAuthenticated:false,products,categories,user:'',categoryname,value:'all_cat'})   
     }
 }
 
@@ -536,146 +557,111 @@ const westernpage=async(req,res)=>{
     console.log("reached western wears");
     discount=''
     coupon_code=''
+    const type = "Western"; // Change 'dress' to 'type'
+    const categories = await CategoryCollection.find({ blocked: false, type });
+    const categoryIds = categories.map(category => category._id);
+    const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     if(req.session.user){
-        const isAuthenticated=true
-        const type = "Western"; // Change 'dress' to 'type'
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const categoryIds = categories.map(category => category._id);
-        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
-        res.render("user/western", { isAuthenticated, products, categories });
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/western", { isAuthenticated:true, products, categories,user,value:'all' });
     }else{
-        const isAuthenticated=false
-        const type = "Western"; // Change 'dress' to 'type'
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const categoryIds = categories.map(category => category._id);
-        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
-            
-        res.render("user/western",{isAuthenticated,products,categories})   
+        res.render("user/western",{isAuthenticated:false,products,categories,user:'',value:'all'})   
     }    
 }
 
 const westernshowbycategory=async(req,res)=>{
     console.log("reached westernshowbycategory")
+    const categoryname=req.params.name
+    const type = "Western";
+    const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+    const categoryId = category._id;
+    const products = await Products.find({ blocked: false, category: categoryId, type });
+    const categories = await CategoryCollection.find({ blocked: false, type }); 
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     if(req.session.user){
-        const categoryname=req.params.name  
-        const isAuthenticated=true
-        const type = "Western";
-        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
-        const categoryId = category._id;
-        const products = await Products.find({ blocked: false, category: categoryId, type });
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        res.render("user/western",{isAuthenticated,products,categories})
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/western",{isAuthenticated:true,products,categories,user,categoryname,value:'all_cat'})
     }else{
-        const isAuthenticated=false
-        const categoryname=req.params.name
-        const type = "Western";
-        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
-        const categoryId = category._id;
-        const products = await Products.find({ blocked: false, category: categoryId, type });
-        const categories = await CategoryCollection.find({ blocked: false, type });        
-        res.render("user/western",{isAuthenticated,products,categories})   
+        const isAuthenticated=false       
+        res.render("user/western",{isAuthenticated:false,products,categories,user:'',categoryname,value:'all_cat'})   
     }
 }
-
-const sortByPrice=async(req,res)=>{
-    console.log("reached sortByPrice");
-    const category=req.params.category
-    const price=req.params.price
-    if(req.session.user){
-        const name=req.params.name  
-        const isAuthenticated=true
-        const type = "Western";
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const products = await Products.find({ blocked: false,category:{name:category}, type ,price: { $gte: price - 1500, $lte: price }});
-        res.render("user/western",{isAuthenticated,products,categories})
-    }else{
-        const isAuthenticated=false
-        const name=req.params.name
-        const type = "Western";
-        const categories = await CategoryCollection.find({ blocked: false, type });      
-        const products = await Products.find({ blocked: false,category:{name:category}, type ,price: { $gte: price - 1500, $lte: price }});
-        res.render("user/western",{isAuthenticated,products,categories})   
-    }
-}
-
-// const westernShowByPrice=async(req,res)=>{
-//     console.log("reache westernShowByPrice");
-//     if(req.session.user){
-//         const name=req.params.name  
-//         const isAuthenticated=true
-//         const type = "Western";
-//         const categories = await CategoryCollection.find({ blocked: false, type });
-//         const products = await Products.find({ blocked: false,category:name, type });
-//         res.render("user/western",{isAuthenticated,products,categories})
-//     }else{
-//         const isAuthenticated=false
-//         const name=req.params.name
-//         const type = "Western";
-//         const categories = await CategoryCollection.find({ blocked: false, type });
-//         const products = await Products.find({ blocked: false,category:name, type });        
-//         res.render("user/western",{isAuthenticated,products,categories})   
-//     }
-// }
 
 const sportspage=async(req,res)=>{
     console.log("reached sports wears");
     discount=''
     coupon_code=''
+    const type = "Sports"; // Change 'dress' to 'type'
+    const categories = await CategoryCollection.find({ blocked: false, type });
+    const categoryIds = categories.map(category => category._id);
+    const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     if(req.session.user){
-        const isAuthenticated=true
-        const type = "Sports"; // Change 'dress' to 'type'
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const categoryIds = categories.map(category => category._id);
-        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
-        res.render("user/sports",{isAuthenticated,products,categories})
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/sports",{isAuthenticated:true,products,categories,user,value:'all'})
     }else{
         const isAuthenticated=false
-        const type = "Sports"; // Change 'dress' to 'type'
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        const categoryIds = categories.map(category => category._id);
-        const products = await Products.find({ blocked: false, category: { $in: categoryIds } });
-        res.render("user/sports",{isAuthenticated,products,categories})   
+        res.render("user/sports",{isAuthenticated:false,products,categories,user:'',value:'all'})   
     }    
 }
 
 const Sportsshowbycategory=async(req,res)=>{
     console.log("reached Sportsshowbycategory")
+    const categoryname=req.params.name
+    const type = "Sports";
+    const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
+    const categoryId = category._id;
+    const products = await Products.find({ blocked: false, category: categoryId, type });
+    const categories = await CategoryCollection.find({ blocked: false, type });
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
     if(req.session.user){
-        const categoryname=req.params.name  
-        const isAuthenticated=true
-        const type = "Sports";
-        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
-        const categoryId = category._id;
-        const products = await Products.find({ blocked: false, category: categoryId, type });
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        res.render("user/sports",{isAuthenticated,products,categories})
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/sports",{isAuthenticated:true,products,categories,user,categoryname,value:'all_cat'})
     }else{
-        const isAuthenticated=false
-        const categoryname=req.params.name
-        const type = "Sports";
-        const category = await CategoryCollection.findOne({ name: categoryname, type, blocked: false });
-        const categoryId = category._id;
-        const products = await Products.find({ blocked: false, category: categoryId, type });
-        const categories = await CategoryCollection.find({ blocked: false, type });
-        res.render("user/sports",{isAuthenticated,products,categories})   
+        res.render("user/sports",{isAuthenticated:false,products,categories,user:'',categoryname,value:'all_cat'})   
     }
 }
 
 const productview=async(req,res)=>{
     console.log("reached productview")
-    if(req.session.user){
+        if(req.session.user){
         const id=req.params.id  
         const isAuthenticated=true
         const categories=await CategoryCollection.find({blocked:false})
         const product = await Products.findOne({_id:id});
-        res.render("user/productview",{isAuthenticated,product,categories})
+        const user=await collection.findById(req.session.user._id).populate('wishlist').populate('cart.product')
+        res.render("user/productview",{isAuthenticated,product,categories,user})
     }else{
         const isAuthenticated=false
         const id=req.params.id  
         const categories=await CategoryCollection.find({blocked:false})
-        const product = await Products.findOne({_id:id});
-        
-        res.render("user/productview",{isAuthenticated,product,categories})  
+        const product = await Products.findOne({_id:id});        
+        res.render("user/productview",{isAuthenticated,product,categories,user:''})  
     }
 
 }
@@ -923,9 +909,13 @@ const placeorder = async (req, res) => {
         const categoryId = cartItem.product.category._id;
         const discountPercentage = cartItem.product.category.discount_percentage;
         const sales_price=cartItem.product.sellingprice
-
-        if (!categoryDiscountMap.has(categoryId)) {
-            categoryDiscountMap.set(categoryId, {discountPercentage,sales_price});
+        const from=cartItem.product.category.valid_from
+        const to=cartItem.product.category.valid_to
+        const today=new Date()
+        if(today>=from&&today<=to){
+            if (!categoryDiscountMap.has(categoryId)) {
+                categoryDiscountMap.set(categoryId, {discountPercentage,sales_price});
+            }
         }
     });
     console.log(categoryDiscountMap);
@@ -997,13 +987,14 @@ const checkout=async(req,res)=>{
             model: 'CategoryCollection'
         }
     });
+    const today=new Date()
     const useraddress = await Address.find({ userId, blocked: false });
     const categories = await CategoryCollection.find({ blocked: false });
     const cartSubtotal = calculateCartSubtotal(user);
     if (err === 'true') {
-        res.render("user/checkout", { errmessage : msg, message : "" ,isAuthenticated:true,categories,user,cartSubtotal,categoryDiscount,coupondiscount,useraddress});
+        res.render("user/checkout", { errmessage : msg, message : "" ,isAuthenticated:true,categories,user,cartSubtotal,categoryDiscount,today,coupondiscount,useraddress});
     } else {
-        res.render("user/checkout", { errmessage : "", message : msg ,isAuthenticated:true,categories,user,cartSubtotal,categoryDiscount,coupondiscount,useraddress});
+        res.render("user/checkout", { errmessage : "", message : msg ,isAuthenticated:true,categories,user,cartSubtotal,categoryDiscount,today,coupondiscount,useraddress});
     }
 }
   
@@ -1166,6 +1157,7 @@ const OrderSubmit = async (req, res) => {
     } 
     console.log("paymentType=",req.body.paymentType);
     let newOrder
+    console.log("coupon discount:",Discount);
     if(Discount==0){
         newOrder = new Orders({
             user_id: userId,
@@ -1173,7 +1165,7 @@ const OrderSubmit = async (req, res) => {
             items,
             totalAmount: cartTotal,
             actualTotalAmount: cartSubtotal,
-            couponDIscount:Discount,
+            couponDiscount: Discount,
             categoryDiscount,
             finalAmount:(cartSubtotal-categoryDiscount).toFixed(2)
         });
@@ -1184,7 +1176,7 @@ const OrderSubmit = async (req, res) => {
             items,
             totalAmount: cartTotal,
             actualTotalAmount: cartSubtotal,
-            couponDIscount:Discount,
+            couponDiscount: Discount,
             categoryDiscount,
             finalAmount:(cartSubtotal-Discount-categoryDiscount).toFixed(2)
         });
@@ -1231,6 +1223,28 @@ const OrderSubmit = async (req, res) => {
             // };
             // return res.json({ status: "COD", response: response  });
             // return res.status(200).json(response);
+        }else if(req.body.paymentType=='WalletPayment'){
+            for (const cartItem of user.cart) {
+                const product = cartItem.product;
+                const orderedQuantity = cartItem.quantity;
+                const newStock = product.stock - orderedQuantity;
+                if (newStock < 0) {
+                    return res.redirect('/checkout?err=true&msg=Insufficient stock for ' + product.name);
+                }
+                product.stock = newStock;
+                await product.save();
+            }
+            await newOrder.save();
+            orderId=newOrder._id
+            console.log("newOrder._id:",newOrder._id);
+            user.cart = [];
+            await user.save();
+            await collection.findByIdAndUpdate(userId,{wallet:user.wallet-newOrder.finalAmount})
+            await Orders.findByIdAndUpdate(orderId,{ $set:{payment_status:'paid',payment_method:'wallet payment'}})
+            return res.json({
+                status: "COD",
+                redirectUrl: "/placedOrder",
+              });
         }else {
             await newOrder.save();
             const finalAmount=newOrder.finalAmount
@@ -1447,7 +1461,7 @@ module.exports={
     allpage,showbycategory,ethinicpage,ethinicshowbycategory,westernpage,westernshowbycategory,sportspage,Sportsshowbycategory,
     productview,wishlist,cart,resendOTP_for_forgrtpassword,confirmpassword,confirm_password_check,loadHomeAfterLogin,productQuantityUpdate,
     cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,
-    deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,sortByPrice,profileEdit,changePassword,
+    deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,profileEdit,changePassword,
     validatePassword,paymentFailure,paymentFailureHandler,verifyOnlinePayment,updateWishlist,wishlistToCart,wishlistProductDelete,
-    coupon,applyCoupon
+    coupon,applyCoupon,
 }

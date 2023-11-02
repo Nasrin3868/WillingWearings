@@ -51,7 +51,6 @@ const mongoose = require('mongoose');
     },
     couponDiscount:{
        type: Number,
-       default:0,
        required:true
     },
     categoryDiscount:{

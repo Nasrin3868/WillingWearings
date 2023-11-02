@@ -84,10 +84,36 @@
                                             <a onclick="itemsToCart('<%= product._id%>')" class="btn btn-fill-out btn-block hover-up">Add to cart</a>
                                         <% } %>
                                         <div class="product-extra-link2">
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-                                            <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+
+                                            <div class="product-action-1">
+                                                <% if (!user) { %>
+                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="/wishlist"><i class="fi-rs-heart"></i></a>
+                                                <% }else{%>
+                                                        <% if (user.wishlist&& user.wishlist.includes(product._id)) { %>
+                                                            <a aria-label="Remove from Wishlist" class="action-btn hover-up" style="background-color: #088178;" onclick="itemsToWishlist('<%= product._id%>')" id="wishlist-link-<%= product._id%>" ><i class="fi-rs-heart"></i></a>
+                                                        <% }else{%>
+                                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="itemsToWishlist('<%= product._id%>')" id="wishlist-link-<%= product._id%>"><i class="fi-rs-heart"></i></a>
+                                                        <%} %>
+                                                <% } %>
+                                            </div>
                                         </div>
                                     </div>
+                                    <% if(user!=''){%>
+                                        <div class="pt-20">
+                                            <% user.wishlist.forEach(wishlists => { %>
+                                                <% if (wishlists._id.toString() === product._id.toString()) { %>
+                                                    <small>Added to wishlist</small>
+                                                <% } %>
+                                            <% }); %>
+                                        </div>
+                                        <div class="pt-10">
+                                            <% user.cart.forEach(cartProduct => { %>
+                                                <% if (cartProduct.product._id.toString() === product._id.toString()) { %>
+                                                    <small>Added to cart</small>
+                                                <% } %>
+                                            <% }); %>
+                                        </div>
+                                    <%} %>
                                     
                                     <ul class="product-meta font-xs color-grey mt-50">
                                         <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
@@ -591,7 +617,12 @@
 <%-include("../partials/userfooter")-%>
 
 <script>
-function itemsToCart(productId){
+        function itemsToCart(productId){
+            Swal.fire({
+                icon: 'success',
+                title: 'Added..',
+                text: 'Item added into cart.',
+            });
             fetch(`/quantityIncrease/${productId}`, {
                 method: 'POST'
             })
@@ -605,4 +636,27 @@ function itemsToCart(productId){
             });
         }
 
+        async function itemsToWishlist(productId){
+            console.log("reached itemsToWishlist");
+            const response=await fetch(`/updateWishlist/${productId}`,{
+                method:'POST',
+            })
+            const result =await response.json();
+            if(result.status){
+                const wishlistBtn = $(`#wishlist-link-${productId}`);
+                wishlistBtn.find('i').toggleClass('in-wishlist');
+                
+                if (wishlistBtn.attr('aria-label') === 'Add To Wishlist') {
+                    wishlistBtn.attr('aria-label', 'Remove from Wishlist');
+                    wishlistBtn.css('background-color', '#088178');
+
+                } else {
+                    wishlistBtn.attr('aria-label', 'Add To Wishlist');
+                    wishlistBtn.css('background-color', '');
+
+                }
+            }
+        }
+
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

@@ -172,8 +172,14 @@
                                             <h5><a href="shop-product-full.html"><%= cartItem.product.name %></a></h5> <span class="product-qty">x <%= cartItem.quantity %></span>
                                         </td>
                                         <td>Rs.<%= cartItem.product.sellingprice * cartItem.quantity %></td>
+
+                                        <% if (today>cartItem.product.category.valid_to||today < cartItem.product.category.valid_from ) { %>
+                                            <td width="8%">0 %</td>
+                                            <td>Rs.0</td>
+                                        <% } else { %>
                                         <td width="8%"><%= cartItem.product.category.discount_percentage %> %</td>
                                         <td>Rs.<%= ((cartItem.product.category.discount_percentage/100)*cartItem.product.sellingprice).toFixed(2) %></td>
+                                        <% } %>
                                     </tr>
                                     <% }); %>
                                     <tr>
@@ -213,7 +219,12 @@
                             
                                 <div class="custome-radio">
                                     <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5" value="COD">
-                                    <label class="form-check-label" for="exampleRadios5" id="cashondelivery" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Cash On Delivery</label>
+                                    <label class="form-check-label" for="exampleRadios5" id="cashondelivery" data-bs-toggle="collapse" data-target="#cod" aria-controls="cod">Cash On Delivery</label>
+                                </div>
+
+                                <div class="custome-radio">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" value="WalletPayment">
+                                    <label class="form-check-label" for="exampleRadios4" id="walletPayment" data-bs-toggle="collapse" data-target="#walletPayment" aria-controls="walletPayment">Wallet payment</label>
                                 </div>
                         </div>
                         <button onclick="submitPlaceOrder('<%= cartSubtotal-coupondiscount %>')" class="btn btn-fill-out btn-block mt-30">Place Order</button>
@@ -233,6 +244,11 @@
 let address='',name='',state='',district='',city='',pincode='',mobileno=''
 let paymentType
 
+let wallet= '<%= user.wallet%>'
+let total='<%= (cartSubtotal-coupondiscount-categoryDiscount).toFixed(2) %>'
+
+console.log("wallet:",wallet);
+console.log("total:",total);
 function submitForm(username,useraddress,userstate,userdistrict,usercity,userpincode,usermobileno) {
     paymentType = document.querySelector('input[name="payment_option"]:checked').value;
     name=username
@@ -255,6 +271,20 @@ function submitPlaceOrder(cartSubtotal) {
             text: 'Please select an address!',
         });
         return;
+    }
+    if(paymentType=='WalletPayment'){
+        const walletAmount = parseFloat(wallet);
+        const totalAmount = parseFloat(total); 
+        console.log("wallet:",wallet);
+        console.log("total:",total);
+        if(totalAmount > walletAmount){
+            Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Insufficience balance in you wallet!',
+        });
+        return;
+        }
     }
     // Use the correct variable name addressId
     // const addressIdToSend = addressId;

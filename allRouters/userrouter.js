@@ -25,8 +25,6 @@ router.post("/otpcheck",controller.otpchecks)
 router.post("/resendOTP_for_forgrtpassword",controller.resendOTP_for_forgrtpassword)
 router.get("/confirmpassword",controller.confirmpassword)
 router.post("/confirm_password_check",controller.confirm_password_check)
-// router.post("/signup")
-
 
 router.get("/all",controller.allpage)
 router.get("/showbycategory/:name",controller.showbycategory)
@@ -36,8 +34,6 @@ router.get("/ethinicshowbycategory/:name",controller.ethinicshowbycategory)
 
 router.get("/western",controller.westernpage)
 router.get("/westernshowbycategory/:name",controller.westernshowbycategory)
-// router.get("/westernShowByPrice",controller.westernShowByPrice)
-router.get("/sortByPrice/:category/:price",controller.sortByPrice)
 
 router.get("/sports",controller.sportspage)
 router.get("/Sportsshowbycategory/:name",controller.Sportsshowbycategory)
@@ -45,7 +41,7 @@ router.get("/Sportsshowbycategory/:name",controller.Sportsshowbycategory)
 router.get("/productview/:id",controller.productview)
 
 router.get("/wishlist",middleware.cartAuth,controller.wishlist)
-router.post("/updateWishlist/:id",controller.updateWishlist)
+router.post("/updateWishlist/:id",middleware.cartAuth,controller.updateWishlist)
 router.post("/wishlistToCart/:id",controller.wishlistToCart)
 router.get("/wishlistProductDelete/:id",middleware.cartAuth,controller.wishlistProductDelete)
 
