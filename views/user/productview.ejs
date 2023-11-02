@@ -78,10 +78,14 @@
                                     
                                     <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                     <div class="detail-extralink">
-                                        <% if (product.stock === 0) { %>
-                                            <a  style="color: red;">Out of Stock</a>
-                                        <% } else { %>
-                                            <a onclick="itemsToCart('<%= product._id%>')" class="btn btn-fill-out btn-block hover-up">Add to cart</a>
+                                        <% if (!user) { %>
+                                            <a href="/cart" class="btn btn-fill-out btn-block hover-up">Add to cart</a>
+                                        <% }else{%>
+                                            <% if (product.stock==0) { %>
+                                                <p style="color: red;">Out of Stock</p>
+                                            <% }else{%>
+                                                <a onclick="itemsToCart('<%= product._id%>')" class="btn btn-fill-out btn-block hover-up">Add to cart</a>
+                                            <% } %>
                                         <% } %>
                                         <div class="product-extra-link2">
 

@@ -205,7 +205,7 @@ function formatDate(dateString) {
         document.getElementById('editmaxdiscount').value = maxDiscount;
         document.getElementById('editfrom').value = validFromFormatted;
         document.getElementById('editto').value = validToFormatted;
-        
+
     }
 
     function couponNameValidation(){
@@ -474,14 +474,14 @@ function formatDate(dateString) {
             return false;
         }
 
-        if(from.trim() == ''|| from ==''){
+        if(from.trim() === ''|| from ===''){
             document.getElementById('editfromError').innerHTML = 'Date is required.';
             setTimeout(function() {
                 document.getElementById('fromError').innerHTML = '';
             }, 5000);
             return false;
         }
-        if(to.trim() ==''||to==''){
+        if(to.trim() ===''||to===''){
             document.getElementById('edittoError').innerHTML = 'Date is required.';
             setTimeout(function() {
                 document.getElementById('edittoError').innerHTML = '';
