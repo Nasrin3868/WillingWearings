@@ -463,6 +463,35 @@ const confirm_password_check=async(req,res)=>{
         }
     })
 }
+let searchname=''
+const searchProducts=async(req,res)=>{
+    searchname = req.body.search;
+    res.redirect("/searchCategory")
+    // const searchname = req.body.search;
+    // res.redirect(`/searchCategory?name=${searchname}`)
+}
+
+const searchProduct=async(req,res)=>{
+    console.log("reached searchCategory");
+    const name = searchname;
+    // const name = req.query.name;
+    const regex = new RegExp(`^${name}`, "i");
+    const products = await Products.find({ name: { $regex: regex } })
+    const categories=await CategoryCollection.find({blocked:false})
+    if(req.query.range){
+        if(req.query.range=='high'){
+            products.sort((a, b) => b.sellingprice - a.sellingprice);
+        }else if(req.query.range=='low'){
+            products.sort((a, b) => a.sellingprice - b.sellingprice)
+        }
+    }
+    if(req.session.user){
+        const user=await collection.findById(req.session.user).populate('cart.product')
+        res.render("user/searchProduct",{isAuthenticated:true,products,categories,user,value:'all'})
+    }else{
+        res.render("user/searchProduct",{isAuthenticated:false,products,categories,user:'',value:'all'})   
+    }
+}  
 
 const allpage=async(req,res)=>{
     console.log("reached all wears");
@@ -798,26 +827,6 @@ const productQuantityUpdate = async (req, res) => {
     }
 }
 
-// const productQuantityUpdate=async (req,res)=>{
-//     console.log("reached productQuantityUpdate");
-   
-//     if(req.session.user){
-//     const userId = req.session.user._id;
-//     const cartItem = req.body;
-//     console.log(cartItem)
-//     const msg = "product updated"
-//     const user = await collection.findOne({ _id: userId });
-//     const CartItem = user.cart.find(item => item.product.toString() === cartItem);
-//     CartItem.quantity = quantity;
-//     console.log(CartItem);
-//     await user.save();
-//     res.json(msg)
-//     }else{
-//         const msg= "product not updated"
-//         res.json(msg)
-//     }
-    
-// }
 
 const cartUpdate = async (req, res) => {
     console.log("reached cartupdate");
@@ -1463,5 +1472,5 @@ module.exports={
     cartUpdate,doCart,calculateCartSubtotal,calculateCartTotal,placeorder,checkout,cartproductdelete,addAddress,newAddress,editAddress,editedAddress,
     deleteAddress,myaccount,OrderSubmit,placedOrder,orderDetails,cancelOrder,returnOrder,quantityIncrease,profileEdit,changePassword,
     validatePassword,paymentFailure,paymentFailureHandler,verifyOnlinePayment,updateWishlist,wishlistToCart,wishlistProductDelete,
-    coupon,applyCoupon,
+    coupon,applyCoupon,searchProducts,searchProduct
 }

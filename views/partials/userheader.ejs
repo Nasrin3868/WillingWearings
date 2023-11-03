@@ -43,9 +43,12 @@
                                         <option value="/showbycategory/<%= category.name %>"><%= category.name %></option>
                                     <% }); %>
                                 </select>
-                                <input type="text" id="categorySearchInput" placeholder="Search for items...">
                             </form>
-                            
+                            <form method="post" action="/searchCategory" onsubmit="return validateName()" id="productSearchForm">
+                                <input type="text" id="categorySearchInput" placeholder="Search for items by name..." name="search">
+                                <button type="submit"></button>
+                                <span id="searchError" style="color: red;"></span><br>
+                            </form>
                         </div>
                         <div class="header-action-right">
                             <div class="header-action-2">
@@ -118,17 +121,42 @@
     <script>
         document.getElementById('categorySearchForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            const searchInput = document.getElementById('categorySearchInput').value.toLowerCase();
+            // const searchInput = document.getElementById('categorySearchInput').value.toLowerCase();
             const categoryOptions = document.querySelectorAll('.select-active option');
     
-            for (const option of categoryOptions) {
-                const categoryName = option.textContent.toLowerCase();
-                if (categoryName === searchInput) {
-                    location.href = option.value;
-                    break;
-                }
-            }
+            // for (const option of categoryOptions) {
+            //     const categoryName = option.textContent.toLowerCase();
+            //     if (categoryName === searchInput) {
+            //         location.href = option.value;
+            //         break;
+            //     }
+            // }
         });
 
+        function validateName(){
+            var categorySearchInput = document.getElementById('categorySearchInput').value;
+
+            document.getElementById('searchError').innerHTML = '';
+
+            const nameRegex = /^[a-zA-Z\s]*$/;
+            
+            if(categorySearchInput==''||categorySearchInput.trim()==''){
+                document.getElementById('searchError').innerHTML = 'Name is required.';
+                setTimeout(function() {
+                    document.getElementById('searchError').innerHTML = '';
+                }, 5000);
+                return false;
+            }
+
+            if(!categorySearchInput.match(nameRegex)){
+                document.getElementById('searchError').innerHTML = 'Name is required.';
+                setTimeout(function() {
+                    document.getElementById('searchError').innerHTML = '';
+                }, 5000);
+                return false;
+            }
+
+            return true
+        }
         
     </script>

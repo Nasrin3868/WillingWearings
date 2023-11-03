@@ -26,6 +26,9 @@ router.post("/resendOTP_for_forgrtpassword",controller.resendOTP_for_forgrtpassw
 router.get("/confirmpassword",controller.confirmpassword)
 router.post("/confirm_password_check",controller.confirm_password_check)
 
+router.post("/searchCategory",controller.searchProducts)
+router.get("/searchCategory",controller.searchProduct)
+
 router.get("/all",controller.allpage)
 router.get("/showbycategory/:name",controller.showbycategory)
 
