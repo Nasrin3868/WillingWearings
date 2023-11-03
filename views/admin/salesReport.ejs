@@ -13,7 +13,7 @@ $(document).ready(function () {
 
 <section class="content-main">
 <div class="card mb-4">
-    <header class="card-header">
+    <header class="card-header" id="header">
         <h4 class="card-title">Latest orders</h4>
         <div class="row align-items-center">
             <div class="col-md-3">
@@ -103,7 +103,9 @@ $(document).ready(function () {
 <script>
 
     document.getElementById("invoice").addEventListener("click",()=>{
+        document.getElementById('header').style.display = 'none';
         window.print()
+        document.getElementById('header').style.display = 'block';
     })
     
     function validateform(){

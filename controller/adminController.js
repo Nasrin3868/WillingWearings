@@ -387,7 +387,6 @@ const category_block=async(req,res)=>{
 
 const editcategorypage=async(req,res)=>{
     console.log("reached editcategory");
-    
     const name=req.body.name
     const id=req.body.editCategoryId
     const categoryType=req.body.editcategory
@@ -425,6 +424,7 @@ const addcoupon=async(req,res)=>{
     const discount_percentage=req.body.coupon_percentage
     const min_order=req.body.min_order
     const max_discount=req.body.max_discount
+    console.log("validFrom: ",req.body.valid_from);
     const valid_from = new Date(req.body.valid_from);
     valid_from.setHours(0, 0, 0, 1); 
     const valid_to = new Date(req.body.valid_to);
@@ -450,6 +450,7 @@ const updateCoupon=async(req,res)=>{
     const discount_percentage=req.body.editcoupon_percentage
     const min_order=req.body.editmin_order
     const max_discount=req.body.editmax_discount
+    console.log("validFrom: ",req.body.editvalid_from);
     const valid_from = new Date(req.body.editvalid_from);
     valid_from.setHours(0, 0, 0, 1);
     const valid_to = new Date(req.body.editvalid_to);

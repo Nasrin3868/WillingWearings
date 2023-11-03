@@ -66,6 +66,7 @@ $(document).ready(function () {
                                 <thead>
                                     <tr>
                                         <th class="text-center" width="20%">User name</th>
+                                        <th class="text-center" width="20%">User email</th>
                                         <th class="text-center" width="20%">Referral count</th>
                                     </tr>
                                 </thead>
@@ -73,6 +74,7 @@ $(document).ready(function () {
                                     <% user.forEach(function(User){ %>
                                     <tr>
                                         <td class="text-center" width="20%"><b><%= User.username %></b></td>
+                                        <td class="text-center" width="20%"><b><%= User.email %></b></td>
                                         <td class="text-center" width="20%"><b><%= User.referral_count %></b></td>
                                     </tr>
                                     <% }); %>

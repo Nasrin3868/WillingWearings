@@ -61,7 +61,6 @@ router.get("/checkout",middleware.cartAuth,controller.checkout)
 router.get("/cartproductdelete/:id",middleware.cartAuth,controller.cartproductdelete)
 
 router.get("/addAddress",middleware.cartAuth,controller.addAddress)
-
 router.post("/newAddress",controller.newAddress)
 router.get("/editAddress/:id",middleware.cartAuth,controller.editAddress)
 router.post("/editedAddress/:id",middleware.cartAuth,controller.editedAddress)

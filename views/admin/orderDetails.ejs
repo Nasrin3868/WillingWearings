@@ -1,3 +1,4 @@
+
 <%-include("../partials/adminheader")-%>
 
 <div class="container ">
@@ -51,9 +52,9 @@
                                 <option value="cancel(seller)_incorrect address">Cancel:Incorrect address</option>
 
                             </select>
-                            <a class="btn btn-primary" href="#" onclick="saveStatus('<%= orders._id %>')">Save</a>
-                            <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
-                        <% } %>     
+                            <a class="btn btn-primary" id="save" href="#" onclick="saveStatus('<%= orders._id %>')">Save</a>
+                        <% } %> 
+                            <button class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print" id="invoice"></i></button>
                         </div>
                     </div>
                 </header> <!-- card-header end// -->
@@ -197,13 +198,6 @@
                                     Phone: +1 (800) 555-154-52
                                 </p>
                             </div>
-                            <div class="h-25 pt-4">
-                                <div class="mb-3">
-                                    <label>Notes</label>
-                                    <textarea class="form-control" name="notes" id="notes" placeholder="Type some note"></textarea>
-                                </div>
-                                <button class="btn btn-primary">Save note</button>
-                            </div>
                         </div> <!-- col// -->
                     </div>
                 </div> <!-- card-body end// -->
@@ -211,9 +205,29 @@
         </section> <!-- content-main end// -->
     </div>
 </div>
-
+<div id="footer">
 <%-include("../partials/adminfooter")-%>
+</div>
 <script>
+
+document.getElementById("invoice").addEventListener("click",()=>{
+    // if(statusSelect){
+    // document.getElementById('statusSelect').style.display = 'none';
+    // document.getElementById('save').style.display = 'none';
+    // }
+    document.getElementById('invoice').style.display = 'none';
+    document.getElementById('footer').style.display = 'none';
+
+        window.print()
+
+    document.getElementById('invoice').style.display = 'block';
+    document.getElementById('footer').style.display = 'block';
+    // if(statusSelect){
+    // document.getElementById('statusSelect').style.display = 'block';
+    // document.getElementById('save').style.display = 'block';
+    // }
+    })
+
     function saveStatus(orderID) {
         const statusSelect = document.getElementById('statusSelect');
         const selectedOption = statusSelect.value;

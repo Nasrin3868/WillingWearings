@@ -61,8 +61,7 @@ $(document).ready(function () {
                                 <button class="btn btn-primary" type="submit">Create coupon</button>
                             </div>
                         </form>
-
-                        <form onsubmit="return editcouponNameValidation()"  method="post" action="/admin/updateCoupon" style="display: none;" id="editCouponForm">
+                        <form onsubmit="return editcouponValidation()" method="post" action="/admin/updateCoupon" style="display: none;" id="editCouponForm">
                             <% if (errmessage) { %>
                                 <div class="alert alert-danger text-center" role="alert">
                                     <%= errmessage %>
@@ -80,23 +79,23 @@ $(document).ready(function () {
 
                                 <label for="product_name" class="form-label">Offer percentage(only the number)</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="editpercentage" name="editcoupon_percentage"/>
-                                <span id="editnumberError" style="color: red;"></span><br>
+                                <span id="editpercentageError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Minimum Order</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="editminorder" name="editmin_order"/>
-                                <span id="editnumberError" style="color: red;"></span><br>
+                                <span id="editminorderError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Maximum Discount</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="editmaxdiscount" name="editmax_discount"/>
-                                <span id="editnumberError" style="color: red;"></span><br>
+                                <span id="editdiscountError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Valid from:</label>
                                 <input type="date" placeholder="Type here" class="form-control" id="editfrom" name="editvalid_from"/>
-                                <span id="editdateError" style="color: red;"></span><br>
+                                <span id="editfromError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Valid To:</label>
                                 <input type="date" placeholder="Type here" class="form-control" id="editto" name="editvalid_to"/>
-                                <span id="editdateError" style="color: red;"></span><br>
+                                <span id="edittoError" style="color: red;"></span><br>
                             </div>                            
                             <div class="d-grid">
                                 <button class="btn btn-primary" type="submit">Edit coupon</button>
@@ -180,10 +179,7 @@ function formatDate(dateString) {
     var year = date.getFullYear();
 
     // Add leading zeros if day or month is less than 10
-    var formattedDate = (day < 10 ? '0' : '') + day + '-' +
-                       (month < 10 ? '0' : '') + month + '-' +
-                       year;
-
+    var formattedDate = year +'-'+ (month < 10?'0':'') + month +'-'+ (day<10?'0':'') + day  ;
     return formattedDate;
 }
 
@@ -354,15 +350,16 @@ function formatDate(dateString) {
         return true
     }
 
-    function editcouponNameValidation(){
+    
+    function editcouponValidation() {
         
-        var code = document.getElementById('editcode').value;
-        var description = document.getElementById('editdescription').value;
-        var percentage = document.getElementById('editpercentage').value;
-        var minorder = document.getElementById('editminorder').value;
-        var maxdiscount = document.getElementById('editmaxdiscount').value;
-        var from = document.getElementById('editfrom').value;
-        var to = document.getElementById('editto').value;
+        const code = document.getElementById('editcode').value;
+        const description = document.getElementById('editdescription').value;
+        const percentage = document.getElementById('editpercentage').value;
+        const minorder = document.getElementById('editminorder').value;
+        const maxdiscount = document.getElementById('editmaxdiscount').value;
+        const from = document.getElementById('editfrom').value;
+        const to = document.getElementById('editto').value;
 
         document.getElementById('editcodeError').innerHTML = '';
         document.getElementById('editdescriptionError').innerHTML = '';

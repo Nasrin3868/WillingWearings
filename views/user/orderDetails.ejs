@@ -5,13 +5,13 @@
         gap: 10px;
     }
 </style>
-
+<div id="header">
 <%-include("../partials/userheader")-%>
-
+</div>
 <div class="container ">
     <div class="row justify-content-center align-items-center pt-50 pb-50">
         <section class="content-main">
-            <div class="content-header pb-20" >
+                <div class="content-header pb-20" >
                 <div>
                     <h2 class="content-title card-title">Order detail</h2>
                     <p>Details for Order ID: <%= orders._id %></p>
@@ -114,9 +114,10 @@
                                     <thead>
                                         <tr>
                                             <th width="40%">Product</th>
-                                            <th width="20%">Unit Price</th>
-                                            <th width="20%">Quantity</th>
-                                            <th width="20%" class="text-end">Total</th>
+                                            <th width="20%" class="text-center">Unit Price</th>
+                                            <th width="10%" class="text-center">Quantity</th>
+                                            <th width="15%" class="text-center">Total</th>
+                                            <th width="20%" class="text-center">Category offer</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -137,25 +138,34 @@
                                                         <div class="info"> <%= order.product_id.name %> </div>
                                                     </a>
                                                 </td>
-                                                <td> RS.<%= order.sellingprice %> </td>
-                                                <td> <%= order.quantity %> </td>
-                                                <td class="text-end"> Rs.<%= order.sales_price %> </td>
+                                                <td width="20%" class="text-center"> RS.<%= order.sellingprice %> </td>
+                                                <td width="10%" class="text-center"> <%= order.quantity %> </td>
+                                                <td width="15%" class="text-center"> Rs.<%= order.sales_price %> </td>
+                                                <td width="20%" class="text-center"> Rs.<%= order.category_discount %> </td>
                                             </tr>
                                         <% }) %>
                                         <tr>
-                                            <td colspan="4">
-                                                <article class="float-end">
+                                            <td colspan="5">
+                                                <article class="text-end">
                                                     <dl class="dlist">
                                                         <dt>Subtotal:</dt>
-                                                        <dd><%= orders.actualTotalAmount %></dd>
+                                                        <dd >Rs.<%= orders.actualTotalAmount %></dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Shipping cost:</dt>
-                                                        <dd>0</dd>
+                                                        <dd class="text-end">Rs.0</dd>
+                                                    </dl>
+                                                    <dl class="dlist">
+                                                        <dt>Category discount:</dt>
+                                                        <dd class="text-end">Rs.<%= orders.categoryDiscount %></dd>
+                                                    </dl>
+                                                    <dl class="dlist">
+                                                        <dt>coupon discount:</dt>
+                                                        <dd class="text-end">Rs.<%= orders.couponDiscount %></dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt>Grand total:</dt>
-                                                        <dd> <b class="h5"><%= orders.actualTotalAmount %></b> </dd>
+                                                        <dd class="text-end"> <b class="h5">Rs.<%= orders.finalAmount %></b> </dd>
                                                     </dl>
                                                     <dl class="dlist">
                                                         <dt class="text-muted">Status:</dt>
@@ -195,12 +205,8 @@
                                     Phone: +1 (800) 555-154-52
                                 </p>
                             </div>
-                            <div class="h-25 pt-4">
-                                <div class="mb-3">
-                                    <label>Notes</label>
-                                    <textarea class="form-control" name="notes" id="notes" placeholder="Type some note"></textarea>
-                                </div>
-                                <button class="btn btn-primary">Save note</button>
+                            <div class="pb-30 pt-50">
+                                <button class="btn btn-fill-out btn-block hover-up " id="invoice"><i >Print</i></button>
                             </div>
                         </div> <!-- col// -->
                     </div>
@@ -209,10 +215,23 @@
         </section> <!-- content-main end// -->
     </div>
 </div>
-
+<div id="footer">
 <%-include("../partials/userfooter")-%>
-
+</div>
 <script>
+
+document.getElementById("invoice").addEventListener("click",()=>{
+    document.getElementById('invoice').style.display = 'none';
+    document.getElementById('header').style.display = 'none';
+    document.getElementById('footer').style.display = 'none';
+
+        window.print()
+
+    document.getElementById('invoice').style.display = 'block';
+    document.getElementById('header').style.display = 'block';
+    document.getElementById('footer').style.display = 'block';
+    })
+
     function cancelOrder(orderID) {
         fetch(`/cancelOrder/${orderID}`, {
             method: 'POST'

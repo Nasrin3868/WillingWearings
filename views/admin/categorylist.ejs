@@ -54,7 +54,7 @@ $(document).ready(function () {
                                 <button class="btn btn-primary" type="submit">Create category</button>
                             </div>
                         </form>
-                        <form onsubmit="return editnameValidation()"  method="post" action="/admin/editcategory" style="display: none;" id="editCategoryForm">
+                        <form onsubmit="return editCategoryValidation()"  method="post" action="/admin/editcategory" style="display: none;" id="editCategoryForm">
                             <% if (errmessage) { %>
                                 <div class="alert alert-danger text-center" role="alert">
                                     <%= errmessage %>
@@ -73,15 +73,15 @@ $(document).ready(function () {
                                 </select>
                                 <label for="product_name" class="form-label pt-20">Offer percentage ( less than 10% )</label>
                                 <input type="text" placeholder="Type here" class="form-control" id="editpercentage" name="editcategory_percentage"/>
-                                <span id="editnumberError" style="color: red;"></span><br>
+                                <span id="editpercentageError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Valid from:</label>
                                 <input type="date" placeholder="Type here" class="form-control" id="editfrom" name="editvalid_from"/>
-                                <span id="editdateError" style="color: red;"></span><br>
+                                <span id="editfromError" style="color: red;"></span><br>
 
                                 <label for="product_name" class="form-label">Valid To:</label>
                                 <input type="date" placeholder="Type here" class="form-control" id="editto" name="editvalid_to"/>
-                                <span id="editdateError" style="color: red;"></span><br>
+                                <span id="edittoError" style="color: red;"></span><br>
                             </div>                            
                             <div class="d-grid">
                                 <button class="btn btn-primary" type="submit"  >Edit category</button>
@@ -155,16 +155,31 @@ $(document).ready(function () {
 
     <script>
 
+    function formatDate(dateString) {
+        var date = new Date(dateString);
+        var day = date.getDate();
+        var month = date.getMonth() + 1; // Months are 0-indexed
+        var year = date.getFullYear();
+
+        // Add leading zeros if day or month is less than 10
+        var formattedDate = year +'-'+ (month < 10?'0':'') + month +'-'+ (day<10?'0':'') + day  ;
+        return formattedDate;
+    }
+
     function showEditCategoryForm(categoryId, categoryName, categoryType,percentage,validFrom,validTo){
         document.getElementById('createCategoryForm').style.display = 'none';
         document.getElementById('editCategoryForm').style.display = 'block';
+
+        var validFromFormatted = formatDate(validFrom);
+        var validToFormatted = formatDate(validTo);
+
         document.getElementById('editCategoryName').value = categoryName;
         document.getElementById('editCategoryId').value = categoryId;
         document.getElementById('editcategoryType').value = categoryType;
         document.getElementById('editpercentage').value = percentage;
+        document.getElementById('editfrom').value = validFromFormatted;
+        document.getElementById('editto').value = validToFormatted;
 
-
-        
     }
     function categorynameValidation() {
      
@@ -249,7 +264,7 @@ $(document).ready(function () {
         return true
     }
 
-    function editnameValidation() {
+    function editCategoryValidation() {
         
         var name = document.getElementById('editCategoryName').value;
         var percentage = document.getElementById('editpercentage').value;
