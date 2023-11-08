@@ -21,9 +21,13 @@
                             <tbody>
                                 <% userdata.wishlist.forEach(wishlist => { %>
                                     <tr>
-                                        <td class="image product-thumbnail"><img src="<%= wishlist.images[0] %>" alt="Product Image"></td>
+                                        <td class="image product-thumbnail">
+                                            <a href="/productview/<%= wishlist._id %>">
+                                                <img src="<%= wishlist.images[0] %>" alt="Product Image">
+                                            </a>
+                                        </td>
                                         <td class="product-des product-name">
-                                            <h5 class="product-name"><a href="shop-product-right.html"><%= wishlist.name %></a></h5>
+                                            <h5 class="product-name"><a style="color: rgb(16, 117, 137);"><%= wishlist.name %></a></h5>
                                             <p  class="font-xs"><%= wishlist.description %></p>
                                         </td>
                                         <td class="price" data-title="Price"><span><%= wishlist.price %> </span></td>

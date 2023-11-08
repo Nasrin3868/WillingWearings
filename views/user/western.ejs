@@ -78,7 +78,7 @@
                                             <h2><a href="#"><%= product.name %></a></h2>
                                             <div class="rating-result" title="90%">
                                                 <span>
-                                                    <span><%= product.discount %></span>
+                                                    <span><%= product.discount %>% Off</span>
                                                 </span>
                                             </div>
                                             <div class="product-price">
@@ -197,7 +197,6 @@ function itemsToCart(productId){
         }
 
         async function itemsToWishlist(productId){
-            console.log("reached itemsToWishlist");
             const response=await fetch(`/updateWishlist/${productId}`,{
                 method:'POST',
             })

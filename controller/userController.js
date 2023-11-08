@@ -37,8 +37,8 @@ const home = async (req, res) => {
       user: "",
     });
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
@@ -46,7 +46,6 @@ const loadHomeAfterLogin = async (req, res) => {
   try {
     discount = "";
     coupon_code = "";
-    console.log("Reached home");
     const userId = req.query.userId;
     const value = "home";
     if (req.session.user) {
@@ -63,14 +62,13 @@ const loadHomeAfterLogin = async (req, res) => {
       const user = await collection
         .findById(req.session.user)
         .populate("cart.product");
-      console.log("user:", user);
       res.render("user/home", { isAuthenticated, products, categories, user });
     } else {
       res.redirect("/");
     }
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
@@ -118,8 +116,8 @@ const login = async (req, res) => {
       }
     }
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
@@ -127,8 +125,8 @@ const logout = async (req, res) => {
   try {
     res.redirect("/home");
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
@@ -143,7 +141,6 @@ const dologin = async (req, res) => {
     const data = await collection.findOne({ email: emails });
     if (data) {
       otps = data.otp;
-      console.log(otps);
     }
 
     if (data && data.blocked == false) {
@@ -169,7 +166,6 @@ const dologin = async (req, res) => {
             });
 
             if (!email) {
-              console.log("Email is missing");
               res.redirect(`/register?err=${true}&msg=Email is missing`);
             }
 
@@ -203,7 +199,6 @@ const dologin = async (req, res) => {
               // Invalidate the OTP after 1 minute
               setTimeout(() => {
                 generatedOTP = null;
-                console.log("OTP invalidated after 1 minute");
               }, 1 * 60 * 1000);
             }
             sendOTP();
@@ -219,14 +214,13 @@ const dologin = async (req, res) => {
       res.redirect(`/login?err=${true}&msg=User not found`);
     }
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const signup = async (req, res) => {
   try {
-    console.log("reached signup");
     const err = req.query.err;
     const msg = req.query.msg;
     const categories = await CategoryCollection.find({ blocked: false });
@@ -242,17 +236,15 @@ const signup = async (req, res) => {
       res.render("user/signup", { isAuthenticated, categories });
     }
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const dosignup = async (req, res) => {
   try {
     const user = await collection.findOne({ referral_code: req.body.referral });
-    console.log("code:", req.body.referral);
 
-    console.log("user details:", user);
     const referral = await ReferralCollection.findOne();
     let data;
     if (user) {
@@ -306,21 +298,18 @@ const dosignup = async (req, res) => {
         }
       });
     }
-    console.log("Reached signup");
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 let generatedOTP = "";
 
 const sendOtp = async (req, res) => {
-  console.log("reached otp");
   const isAuthenticated = false;
   const categories = await CategoryCollection.find({ blocked: false });
   res.render("user/otp", { isAuthenticated, categories });
-  console.log("OTP Send");
   try {
     const email = globalEmail;
     console.log(email);
@@ -337,7 +326,6 @@ const sendOtp = async (req, res) => {
     });
 
     if (!email) {
-      console.log("Email is missing");
       res.redirect(`/register?err=${true}&msg=Email is missing`);
     }
 
@@ -371,7 +359,6 @@ const sendOtp = async (req, res) => {
       // Invalidate the OTP after 1 minute
       setTimeout(() => {
         generatedOTP = null;
-        console.log("OTP invalidated after 1 minute");
       }, 1 * 60 * 1000);
     }
     sendOTP();
@@ -382,7 +369,6 @@ const sendOtp = async (req, res) => {
 
 const validateotp = async (req, res) => {
   try {
-    console.log("reached validateotp");
     if (generatedOTP === req.body.enterotp) {
       // Save OTP to MongoDB
       const email = globalEmail;
@@ -402,8 +388,8 @@ const validateotp = async (req, res) => {
       });
     }
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
@@ -411,14 +397,13 @@ const resendotp = async (req, res) => {
   try {
     res.redirect("/otp");
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const Toemail = async (req, res) => {
   try {
-    console.log("reached emailprint for forgetpassword");
     const isAuthenticated = false;
     const categories = await CategoryCollection.find({ blocked: false });
     res.render("user/forgetpassword", {
@@ -427,14 +412,13 @@ const Toemail = async (req, res) => {
       categories,
     });
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const checkemail = async (req, res) => {
   try {
-    console.log("reached check email for forgetpassword");
     globalEmail = req.body.email;
     const data = await collection.findOne({ email: globalEmail });
     const categories = await CategoryCollection.find({ blocked: false });
@@ -447,7 +431,6 @@ const checkemail = async (req, res) => {
           categories,
         });
       } else {
-        console.log("reached to check email is valid");
         const isAuthenticated = false;
         res.redirect("/otpcheck");
       }
@@ -460,17 +443,15 @@ const checkemail = async (req, res) => {
       });
     }
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const otpcheckpage = async (req, res) => {
   const isAuthenticated = false;
   const categories = await CategoryCollection.find({ blocked: false });
-  console.log("reached otp for forget password");
   res.render("user/otp_password", { isAuthenticated, categories });
-  console.log("OTP Send");
   try {
     console.log(globalEmail);
     const email = globalEmail;
@@ -485,7 +466,6 @@ const otpcheckpage = async (req, res) => {
       },
     });
     if (!email) {
-      console.log("Email is missing");
       res.redirect(`/forgetpassword?err=${true}&msg=Email is missing`);
     }
     // Function to generate and send OTP
@@ -514,7 +494,6 @@ const otpcheckpage = async (req, res) => {
       // Invalidate the OTP after 1 minute
       setTimeout(() => {
         generatedOTP = null;
-        console.log("OTP invalidated after 1 minute");
       }, 1 * 60 * 1000);
     }
     sendOTP();
@@ -525,7 +504,6 @@ const otpcheckpage = async (req, res) => {
 
 const otpchecks = async (req, res) => {
   try {
-    console.log("reached otpcheck");
     const categories = await CategoryCollection.find({ blocked: false });
     if (generatedOTP === req.body.enterotp) {
       res.redirect("/confirmpassword");
@@ -539,8 +517,8 @@ const otpchecks = async (req, res) => {
       });
     }
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
@@ -548,8 +526,8 @@ const resendOTP_for_forgrtpassword = async (req, res) => {
   try {
     res.redirect("/otpcheck");
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
@@ -559,8 +537,8 @@ const confirmpassword = async (req, res) => {
     const isAuthenticated = false;
     res.render("user/confirmpassword", { isAuthenticated, categories });
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
@@ -570,7 +548,6 @@ const confirm_password_check = async (req, res) => {
     const isAuthenticated = false;
     const password = req.body.password;
     const email = globalEmail;
-    console.log(email);
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, async (err, hashedpassword) => {
       if (err) {
@@ -591,14 +568,13 @@ const confirm_password_check = async (req, res) => {
       }
     });
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const myaccount = async (req, res) => {
   try {
-    console.log("reached myaccount");
     const categories = await CategoryCollection.find({ blocked: false });
     const userId = req.session.user._id;
     const user = await collection.findById(userId);
@@ -625,33 +601,29 @@ const myaccount = async (req, res) => {
       order: ordersWithQuantity,
     });
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const profileEdit = async (req, res) => {
   try {
-    console.log("reached profileEdit");
     const username = req.body.name;
-    const email = req.body.email;
     const mobile = req.body.mobile;
     const userId = req.session.user._id;
     const user = await collection.findByIdAndUpdate(userId, {
       username: username,
-      email: email,
       mobile: mobile,
     });
     res.redirect("/myaccount");
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const changePassword = async (req, res) => {
   try {
-    console.log("reached changePassword");
     const categories = await CategoryCollection.find({ blocked: false });
     res.render("user/currentPassword", {
       isAuthenticated: true,
@@ -660,14 +632,13 @@ const changePassword = async (req, res) => {
       message: "",
     });
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const validatePassword = async (req, res) => {
   try {
-    console.log("reached validatePassword");
     const { password, newpassword, confirmpassword } = req.body;
     const userId = req.session.user._id;
     const user = await collection.findById(userId);
@@ -687,13 +658,12 @@ const validatePassword = async (req, res) => {
       });
     }
   } catch (error) {
-    res.render("user/page404error")
     console.log(error.message);
+    res.render("user/page404error")
   }
 };
 
 const error_page = async (req, res) => {
-  console.log("reached error_page");
   res.render("user/page404error");
 };
 

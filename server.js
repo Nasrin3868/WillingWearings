@@ -38,8 +38,9 @@ app.set("view engine","ejs")
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
-app.use("/",userrouter)
 app.use("/admin",adminrouter)
+app.use("/",userrouter)
+
  
 
 app.listen(port,()=>{

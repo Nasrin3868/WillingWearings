@@ -31,11 +31,13 @@
                                     <% userdata.cart.forEach(cartItem => { %>
                                         <tr>
                                             <td class="image product-thumbnail">
-                                                <img src="<%= cartItem.product.images[0] %>" alt="Product Image">
+                                                <a href="/productview/<%= cartItem.product._id %>">
+                                                    <img src="<%= cartItem.product.images[0] %>" alt="Product Image">
+                                                </a>
                                             </td>
                                             <td class="product-des product-name">
                                                 <h5 class="product-name">
-                                                    <a href="shop-product-right.html"><%= cartItem.product.name %></a>
+                                                    <a style="color: rgb(12, 111, 129);"><%= cartItem.product.name %></a>
                                                 </h5>
                                                 <p class="font-xs"><%= cartItem.product.description %></p>
                                             </td>
@@ -55,7 +57,7 @@
                                                 </div>
                                             </td>
                                             <td class="text-right" data-title="Cart">
-                                                <span id="total-price-<%= cartItem.product._id %>">Rs.<span id="total-<%= cartItem.product._id %>"><%= cartItem.product.sellingprice * cartItem.quantity %></span></span>
+                                                <span id="total-price-<%= cartItem.product._id %>">Rs.<span id="total-<%= cartItem.product._id %>"><%= ((cartItem.product.sellingprice * cartItem.quantity).toFixed(2)) %></span></span>
                                             </td>
                                             <td class="action" data-title="Remove">
                                                 <a href="/cartproductdelete/<%= cartItem.product._id %>" class="text-muted"><i class="fi-rs-trash"></i></a>
@@ -164,7 +166,6 @@ updateCartItemInDatabase(updatedCartItem)
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Cart item updated successfully:', data);
         })
         .catch(error => {
             console.error('Error updating cart item:', error);

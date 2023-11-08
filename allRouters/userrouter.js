@@ -101,8 +101,8 @@ router.get("/changePassword",middleware.cartAuth,controller.changePassword)
 router.post("/validatePassword",controller.validatePassword)
 
 //error-page
-// router.get("*",(req,res)=>{
-//     res.render("user/page404error")
-// })
+router.get("*",(req,res)=>{
+    res.render("user/page404error")
+})
 
 module.exports=router

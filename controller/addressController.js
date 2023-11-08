@@ -17,6 +17,7 @@ const addAddress = async (req, res) => {
     const categories = await CategoryCollection.find({ blocked: false });
     res.render("user/addAddress", { isAuthenticated: true, categories, org });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -54,6 +55,7 @@ const newAddress = async (req, res) => {
       res.redirect(`/checkout?err=${""}&msg=New address added successfully`);
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -71,6 +73,7 @@ const editAddress = async (req, res) => {
       org,
     });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -104,6 +107,7 @@ const editedAddress = async (req, res) => {
       res.redirect("/checkout");
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -120,6 +124,7 @@ const deleteAddress = async (req, res) => {
     }
     res.redirect("/myaccount");
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };

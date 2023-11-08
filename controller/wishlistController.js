@@ -27,6 +27,7 @@ const wishlist = async (req, res) => {
       userdata: user,
     });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -46,6 +47,7 @@ const updateWishlist = async (req, res) => {
     await user.save();
     return res.json({ status: true });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -95,6 +97,7 @@ const wishlistToCart = async (req, res) => {
     await user.save();
     res.json({ status: true });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -111,6 +114,7 @@ const wishlistProductDelete = async (req, res) => {
     await user.save();
     res.redirect("/wishlist");
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };

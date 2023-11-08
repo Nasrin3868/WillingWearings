@@ -247,8 +247,6 @@ let paymentType
 let wallet= '<%= user.wallet%>'
 let total='<%= (cartSubtotal-coupondiscount-categoryDiscount).toFixed(2) %>'
 
-console.log("wallet:",wallet);
-console.log("total:",total);
 function submitForm(username,useraddress,userstate,userdistrict,usercity,userpincode,usermobileno) {
     
     name=username
@@ -258,14 +256,12 @@ function submitForm(username,useraddress,userstate,userdistrict,usercity,userpin
     city=usercity
     pincode=userpincode
     mobileno=usermobileno
-    console.log(name,address,state);
 }
 
 function submitPlaceOrder(cartSubtotal) {
     paymentType = document.querySelector('input[name="payment_option"]:checked').value;
     const apiUrl = '/OrderSubmit';
     if (address==='') {
-        console.log("name=" ,address);
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
@@ -276,8 +272,6 @@ function submitPlaceOrder(cartSubtotal) {
     if(paymentType=='WalletPayment'){
         const walletAmount = parseFloat(wallet);
         const totalAmount = parseFloat(total); 
-        console.log("wallet:",wallet);
-        console.log("total:",total);
         if(totalAmount > walletAmount){
             Swal.fire({
             icon: 'error',
@@ -300,7 +294,6 @@ function submitPlaceOrder(cartSubtotal) {
    
     .then(response => response.json())
     .then(data => {
-    console.log(data)
     if(data.status=="COD"){
             window.location.href = data.redirectUrl;
     }else if(data.status=="RAZORPAY"){
@@ -309,7 +302,6 @@ function submitPlaceOrder(cartSubtotal) {
     }
 function razorpayPayment(order) {
 
-console.log("reached razorpayPayment");
 var options = {
 "key": "rzp_test_badyxeiy422xF7", // Enter the Key ID generated from the Dashboard
 "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
@@ -332,7 +324,6 @@ verifyPayment(response, order)
 },
 "modal": {
     "ondismiss": function(){
-        console.log("reached closeorder");
         closeorder()
     }
 },
@@ -386,7 +377,6 @@ razorpay.open();
 
  async function verifyPayment(payment, order) {
   
-    console.log("verifyPayment function get called")
             const response = await fetch('/verify-payment', {
                 method: 'POST',
                 headers: {
@@ -400,13 +390,11 @@ razorpay.open();
             if (result.status === 'paymentSuccess') {
                 window.location.href=`/placedOrder?orderId=${result.placedOrderId}`
                 
-                console.log("payment success")
             } else if (result.status === 'paymentFailed') {
                 window.location.href="/paymentFailure"
                 console.log("payment failed")
             } else {
                 
-                console.log("payment error")
             }
         }
 

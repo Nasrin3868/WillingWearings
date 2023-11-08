@@ -25,7 +25,6 @@ const placeorder = async (req, res) => {
         model: "CategoryCollection",
       },
     });
-    console.log("user:", user);
     // Create a map to track category discounts
     const categoryDiscountMap = new Map();
 
@@ -44,7 +43,6 @@ const placeorder = async (req, res) => {
         });
       }
     });
-    console.log(categoryDiscountMap);
     // Sum the unique category discounts
     categoryDiscount = parseFloat(
       Array.from(categoryDiscountMap.values())
@@ -69,13 +67,13 @@ const placeorder = async (req, res) => {
       msg,
     });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 
 const coupon = async (req, res) => {
   try {
-    console.log("reached coupon list");
     const userId = req.session.user._id;
     const unredeemedCoupons = await CouponCollection.find({
       redeemed_users: { $ne: userId },
@@ -88,13 +86,13 @@ const coupon = async (req, res) => {
       isAuthenticated: true,
     });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 
 const applyCoupon = async (req, res) => {
   try {
-    console.log("reached applyCoupon");
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate("cart.product");
     const categories = await CategoryCollection.find({ blocked: false });
@@ -139,13 +137,13 @@ const applyCoupon = async (req, res) => {
       }
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 
 const checkout = async (req, res) => {
   try {
-    console.log("reached checkout page");
     const err = req.query.err;
     const msg = req.query.msg;
     let coupondiscount = discount;
@@ -196,13 +194,13 @@ const checkout = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 
 const placedOrder = async (req, res) => {
   try {
-    console.log("reached placedOrder");
     const orderId=req.query.orderId
     const categories = await CategoryCollection.find({ blocked: false });
     const userId = req.session.user._id;
@@ -219,8 +217,8 @@ const placedOrder = async (req, res) => {
       orderId,
       message: "Order Placed Successfully..!",
     });
-    console.log("cart cleared");
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -228,9 +226,7 @@ const placedOrder = async (req, res) => {
 let orderId = "";
 const OrderSubmit = async (req, res) => {
   try {
-    console.log("reached OrderSubmit");
     let Discount;
-    console.log(req.body.cartSubtotal);
     const userId = req.session.user._id;
     const user = await collection
       .findById(userId)
@@ -243,7 +239,6 @@ const OrderSubmit = async (req, res) => {
         },
       });
     const cartSubtotal = cartController.calculateCartSubtotal(user);
-    console.log(cartSubtotal);
     if (discount == "") {
       Discount = 0;
     } else {
@@ -251,7 +246,6 @@ const OrderSubmit = async (req, res) => {
     }
 
     const cartTotal = cartController.calculateCartTotal(user);
-    console.log(cartTotal);
     // Create an array of items from the user's cart
     const items = user.cart.map((cartItem) => ({
       product_id: cartItem.product._id,
@@ -273,9 +267,7 @@ const OrderSubmit = async (req, res) => {
       pincode: req.body.pincode,
       mobileno: req.body.mobileno,
     };
-    console.log("paymentType=", req.body.paymentType);
     let newOrder;
-    console.log("coupon discount:", Discount);
     if (Discount == 0) {
       newOrder = new Orders({
         user_id: userId,
@@ -299,7 +291,6 @@ const OrderSubmit = async (req, res) => {
         finalAmount: (cartSubtotal - Discount - categoryDiscount).toFixed(2),
       });
     }
-    console.log("newOrder", newOrder);
     if (newOrder.actualTotalAmount == 0) {
       const response = {
         message: "Something went wrong, go to checkoutpage",
@@ -324,7 +315,6 @@ const OrderSubmit = async (req, res) => {
         }
         await newOrder.save();
         orderId = newOrder._id;
-        console.log("newOrder._id:", newOrder._id);
         user.cart = [];
         await user.save();
         return res.json({
@@ -346,7 +336,6 @@ const OrderSubmit = async (req, res) => {
         }
         await newOrder.save();
         orderId = newOrder._id;
-        console.log("newOrder._id:", newOrder._id);
         user.cart = [];
         await user.save();
         await collection.findByIdAndUpdate(userId, {
@@ -365,24 +354,22 @@ const OrderSubmit = async (req, res) => {
           $set: { payment_method: "online payment" },
         });
         const finalAmount = newOrder.finalAmount;
-        console.log("newOrder.finalAmount:", newOrder.finalAmount);
         orderId = newOrder._id;
         userHelper
           .generateRazorPay(newOrder._id, finalAmount)
           .then((response) => {
-            console.log("razorpay response is===>", response);
             return res.json({ status: "RAZORPAY", response: response });
           });
       }
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 
 const closepayment = async (req, res) => {
   try {
-    console.log("reached closepayment");
     await Orders.updateMany(
       {
         $and: [
@@ -393,6 +380,7 @@ const closepayment = async (req, res) => {
       { $set: { payment_status: "canceled payment" } }
     );
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -400,7 +388,6 @@ const closepayment = async (req, res) => {
 const verifyOnlinePayment = async (req, res) => {
   try {
     let data = req.body;
-    console.log(data);
     const userId = req.session.user._id;
     const user = await collection.findById(userId).populate("cart.product");
     for (const cartItem of user.cart) {
@@ -421,7 +408,6 @@ const verifyOnlinePayment = async (req, res) => {
     userHelper
       .verifyOnlinePayment(data)
       .then(() => {
-        console.log("this is a payment success block");
 
         let paymentSuccess = true;
         userHelper.updatePaymentStatus(receiptId, paymentSuccess).then(() => {
@@ -429,16 +415,14 @@ const verifyOnlinePayment = async (req, res) => {
         });
       })
       .catch((err) => {
-        console.log("this is a payment failure block");
-        console.log("Rejected");
         if (err) {
-          console.log(err.message);
 
           let paymentSuccess = false;
           userHelper.updatePaymentStatus(receiptId, paymentSuccess);
         }
       });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -446,7 +430,6 @@ const verifyOnlinePayment = async (req, res) => {
 const paymentFailureHandler = async (req, res) => {
   try {
     // let data=await Order.findOne({_id:orderId});
-    console.log("order details are==>", orderId);
     const userId = req.session.user._id;
 
     let data = await Orders.findOneAndUpdate(
@@ -459,12 +442,12 @@ const paymentFailureHandler = async (req, res) => {
       redirectUrl: `/paymentFailure`, // Specify the desired redirect URL here
     });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 const paymentFailure = async (req, res) => {
   try {
-    console.log("reached paymentFailure");
     const categories = await CategoryCollection.find({ blocked: false });
     const orderUpdate = await Orders.findByIdAndUpdate(
       { _id: orderId },
@@ -483,13 +466,13 @@ const paymentFailure = async (req, res) => {
       message: "",
     });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 
 const orderDetails = async (req, res) => {
   try {
-    console.log("reached orderDetails");
     const orderId = req.params.id;
     const orders = await Orders.findById({ _id: orderId })
       .populate("address")
@@ -502,13 +485,13 @@ const orderDetails = async (req, res) => {
       orders,
     });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 
 const cancelOrder = async (req, res) => {
   try {
-    console.log("reached cancelOrder");
     const user = await collection.findById(req.session.user._id);
     const orderId = req.params.id;
     const orders = await Orders.findById(orderId);
@@ -545,13 +528,13 @@ const cancelOrder = async (req, res) => {
     }
     res.redirect(`/orderDetails/${orderId}`);
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
 
 const returnOrder = async (req, res) => {
   try {
-    console.log("reached returnOrder");
 
     const orderId = req.params.id;
     const returnReason = req.params.reason;
@@ -583,6 +566,7 @@ const returnOrder = async (req, res) => {
     }
     res.redirect(`/orderDetails/${orderId}`);
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };

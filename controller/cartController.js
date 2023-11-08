@@ -35,6 +35,7 @@ const doCart = async (req, res) => {
     await user.save();
     const userdata = await collection.findById(userId).populate("cart.product");
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -63,6 +64,7 @@ const productQuantityUpdate = async (req, res) => {
       return res.redirect("/login");
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -83,6 +85,7 @@ const cartUpdate = async (req, res) => {
     await user.save();
     return res.status(200).json({ message: "Cart updated successfully" });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
     return res.status(500).json({ error: "Internal Server Error" });
   }
@@ -96,6 +99,7 @@ const calculateCartSubtotal = (user) => {
     });
     return cartSubtotal;
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -108,6 +112,7 @@ const calculateCartTotal = (user) => {
     });
     return cartTotal;
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -129,6 +134,7 @@ const cart = async (req, res) => {
       cartSubtotal: cartSubtotal,
     });
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -165,6 +171,7 @@ const quantityIncrease = async (req, res) => {
     }
     await user.save();
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -181,6 +188,7 @@ const cartproductdelete = async (req, res) => {
     await user.save();
     res.redirect("/cart");
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };

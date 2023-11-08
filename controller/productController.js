@@ -7,6 +7,7 @@ const searchProducts = async (req, res) => {
     const searchname = req.body.search;
     res.redirect(`/searchCategory?searchname=${searchname}`);
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -48,6 +49,7 @@ const searchProduct = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -86,6 +88,7 @@ const allpage = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -133,6 +136,7 @@ const showbycategory = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -176,6 +180,7 @@ const ethinicpage = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -226,6 +231,7 @@ const ethinicshowbycategory = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -269,6 +275,7 @@ const westernpage = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -320,6 +327,7 @@ const westernshowbycategory = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -364,6 +372,7 @@ const sportspage = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -414,6 +423,7 @@ const Sportsshowbycategory = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };
@@ -448,6 +458,7 @@ const productview = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error.message);
     res.render("user/page404error")
   }
 };

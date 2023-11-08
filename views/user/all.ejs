@@ -190,7 +190,6 @@
         }
 
         async function itemsToWishlist(productId){
-            console.log("reached itemsToWishlist");
             const response=await fetch(`/updateWishlist/${productId}`,{
                 method:'POST',
             })
