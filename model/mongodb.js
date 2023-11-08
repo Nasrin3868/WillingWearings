@@ -1,6 +1,7 @@
 const mongoose=require("mongoose")
+require('dotenv').config()
 mongoose
-    .connect("mongodb://127.0.0.1:27017/willing_wearings")
+    .connect(process.env.mongodb_url)
     .then(()=>{
         console.log("mongodb connected");
     })
@@ -8,17 +9,6 @@ mongoose
         console.log("error something went wrong");
         console.log(err)
     });
-
-function generateRandomCouponCode() {
-    const length = 10;
-    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let couponCode = "";
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length);
-        couponCode += charset.charAt(randomIndex);
-    }
-    return couponCode;
-}
 
 const loginSchema=new mongoose.Schema({
     username:{

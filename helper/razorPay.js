@@ -1,11 +1,12 @@
 const Razorpay = require('razorpay');
 const Crypto = require('crypto');
 const Orders=require("../model/ordermodel")
+require('dotenv').config()
 
 
 var instance = new Razorpay({
-   key_id: 'rzp_test_badyxeiy422xF7',
-   key_secret: '1eGiPaPEtI8Wl7Uk1gNj6uZF',
+   key_id: process.env.razor_key_id,
+   key_secret:  process.env.razor_key_secret,
  });
 const generateRazorPay = async(orderId,total)=>{
    return new Promise((resolve,reject)=>{
@@ -25,7 +26,7 @@ const generateRazorPay = async(orderId,total)=>{
 const verifyOnlinePayment = async(details)=>{
    console.log('VerifyOnlinPayment: ',details);
    return new Promise((resolve,reject)=>{
-      let hmac = Crypto.createHmac('sha256','1eGiPaPEtI8Wl7Uk1gNj6uZF');
+      let hmac = Crypto.createHmac('sha256',process.env.razor_key_secret);
       // Merging the two id's that come from the client side
       // console.log('Razorpay order Id : ',details.payment.razorpay_order_id);
       // console.log('Razorpay Payment Id : ',details.payment.razorpay_payment_id);

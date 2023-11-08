@@ -17,11 +17,11 @@
                     <ul class="categories">
                         <% if (value=='all') { %>
                             <% if (!user) { %>
-                                <li><a href="/searchCategory?range=high">High to low</a></li>
-                                <li><a href="/searchCategory?range=low">Low to high</a></li>
+                                <li><a href="/searchCategory?range=high&&searchname=<%= name %>">High to low</a></li>
+                                <li><a href="/searchCategory?range=low&&searchname=<%= name %>">Low to high</a></li>
                             <% }else{%>
-                                <li><a href="/searchCategory?range=high">High to low</a></li>
-                                <li><a href="/searchCategory?range=low">Low to high</a></li>
+                                <li><a href="/searchCategory?range=high&&searchname=<%= name %>">High to low</a></li>
+                                <li><a href="/searchCategory?range=low&&searchname=<%= name %>">Low to high</a></li>
                             <% } %>
                         <% }else{%>
                             <% if (!user) { %>
@@ -90,7 +90,7 @@
                                             <h2><a href="#"><%= product.name %></a></h2>
                                             <div class="rating-result" title="90%">
                                                 <span>
-                                                    <span>90%</span>
+                                                    <span><%= product.discount %>% Off</span>
                                                 </span>
                                             </div>
                                             <div class="product-price">

@@ -213,17 +213,17 @@
                                 <h5>Payment</h5>
                             </div>
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="" value="onlinePayment">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked=""  value="onlinePayment" >
                                     <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#bankTranfer" aria-controls="bankTranfer">Online Payment</label>
                                 </div>
                             
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5" value="COD">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5" value="COD" >
                                     <label class="form-check-label" for="exampleRadios5" id="cashondelivery" data-bs-toggle="collapse" data-target="#cod" aria-controls="cod">Cash On Delivery</label>
                                 </div>
 
                                 <div class="custome-radio">
-                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" value="WalletPayment">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios4" value="WalletPayment" >
                                     <label class="form-check-label" for="exampleRadios4" id="walletPayment" data-bs-toggle="collapse" data-target="#walletPayment" aria-controls="walletPayment">Wallet payment</label>
                                 </div>
                         </div>
@@ -250,9 +250,9 @@ let total='<%= (cartSubtotal-coupondiscount-categoryDiscount).toFixed(2) %>'
 console.log("wallet:",wallet);
 console.log("total:",total);
 function submitForm(username,useraddress,userstate,userdistrict,usercity,userpincode,usermobileno) {
-    paymentType = document.querySelector('input[name="payment_option"]:checked').value;
+    
     name=username
-    address = useraddress; // Set the global variable addressId
+    address = useraddress; 
     state=userstate
     district=userdistrict
     city=usercity
@@ -262,6 +262,7 @@ function submitForm(username,useraddress,userstate,userdistrict,usercity,userpin
 }
 
 function submitPlaceOrder(cartSubtotal) {
+    paymentType = document.querySelector('input[name="payment_option"]:checked').value;
     const apiUrl = '/OrderSubmit';
     if (address==='') {
         console.log("name=" ,address);
@@ -308,7 +309,7 @@ function submitPlaceOrder(cartSubtotal) {
     }
 function razorpayPayment(order) {
 
-
+console.log("reached razorpayPayment");
 var options = {
 "key": "rzp_test_badyxeiy422xF7", // Enter the Key ID generated from the Dashboard
 "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
@@ -329,8 +330,16 @@ verifyPayment(response, order)
 "notes": {
 "address": "Razorpay Corporate Office"
 },
+"modal": {
+    "ondismiss": function(){
+        console.log("reached closeorder");
+        closeorder()
+    }
+},
 
 };
+
+
 console.log('options are',options);
 var razorpay = new Razorpay(options);
 razorpay.on('payment.failed', function (response) {
@@ -364,6 +373,17 @@ razorpay.on('payment.failed', function (response) {
 
 razorpay.open();
  }
+
+ async function closeorder(){
+    const response = await fetch('/closepayment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ }),
+            })
+ }
+
  async function verifyPayment(payment, order) {
   
     console.log("verifyPayment function get called")
@@ -374,16 +394,11 @@ razorpay.open();
                 },
                 body: JSON.stringify({ payment, order }),
             })
-            // .then((data)=>{
-            //   alert(data.redirectUrl,data.message)
-            //     window.location.href=data.redirectUrl
-            // })
 
-            
             const result = await response.json();
 
             if (result.status === 'paymentSuccess') {
-                window.location.href="/placedOrder"
+                window.location.href=`/placedOrder?orderId=${result.placedOrderId}`
                 
                 console.log("payment success")
             } else if (result.status === 'paymentFailed') {

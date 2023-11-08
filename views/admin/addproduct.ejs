@@ -34,11 +34,18 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="mb-4">
+                                    <label class="form-label">Discount percentage(%)</label>
+                                    <input placeholder="Rs." type="text" class="form-control" id="product_discount" name="discount">
+                                    <span id="discount-error" style="color: red;"></span>
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-4">
+                                <div class="mb-4">
                                     <label class="form-label">Selling price</label>
                                     <input placeholder="Rs." type="text" class="form-control" id="product_sellingprice" name="sellingprice">
                                     <span id="sellingprice-error" style="color: red;"></span>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-lg-4">
                                 <div class="mb-4">
                                     <label class="form-label">Size</label>
@@ -129,16 +136,18 @@
         document.getElementById('name-error').innerHTML = '';
         document.getElementById('description-error').innerHTML = '';
         document.getElementById('price-error').innerHTML = '';
-        document.getElementById('sellingprice-error').innerHTML = '';
+        // document.getElementById('sellingprice-error').innerHTML = '';
         document.getElementById('stock-error').innerHTML = '';
         document.getElementById('colour-error').innerHTML = '';
+        document.getElementById('discount-error').innerHTML = '';
 
         var name = document.getElementById('product_name').value;
         var description = document.getElementById('product_description').value;
         var price = document.getElementById('product_price').value;
-        var sellingprice = document.getElementById('product_sellingprice').value;
+        // var sellingprice = document.getElementById('product_sellingprice').value;
         var stock = document.getElementById('product_stock').value;
         var colour = document.getElementById('product_colour').value;
+        var discount = document.getElementById('product_discount').value;
 
         var nameRegex = /^[A-Z][A-Za-z ]{0,19}$/;
         if (name === '' || name.trim() === '') {
@@ -170,15 +179,40 @@
             return false;
         }
 
-        var sellingpriceRegex = /^[1-9]\d{0,6}$/;
-        if (sellingprice === '' || sellingprice.trim() === '') {
-            document.getElementById('sellingprice-error').innerHTML = 'Selling price is required.';
+        const numRegex= /^[0-9]+$/
+        if(discount ==''||discount.trim()==''){
+            document.getElementById('discount-error').innerHTML = 'Discount percentage is required.';
+            setTimeout(function() {
+                document.getElementById('discount-error').innerHTML = '';
+            }, 5000);
             return false;
         }
-        if (!sellingprice.match(sellingpriceRegex)) {
-            document.getElementById('sellingprice-error').innerHTML = 'Enter a valid price.';
+
+        if(!discount.match(numRegex)){
+            document.getElementById('discount-error').innerHTML = 'Write only the percentage count (dont use % symbol)';
+            setTimeout(function() {
+                document.getElementById('discount-error').innerHTML = '';
+            }, 5000);
             return false;
         }
+
+        if(discount>91){
+            document.getElementById('discount-error').innerHTML = 'Discount should be upto 90% ';
+            setTimeout(function() {
+                document.getElementById('discount-error').innerHTML = '';
+            }, 5000);
+            return false;
+        }
+
+        // var sellingpriceRegex = /^[1-9]\d{0,6}$/;
+        // if (sellingprice === '' || sellingprice.trim() === '') {
+        //     document.getElementById('sellingprice-error').innerHTML = 'Selling price is required.';
+        //     return false;
+        // }
+        // if (!sellingprice.match(sellingpriceRegex)) {
+        //     document.getElementById('sellingprice-error').innerHTML = 'Enter a valid price.';
+        //     return false;
+        // }
 
         var stockRegex = /^[0-9]\d{0,6}$/;
         if (stock === '' || stock.trim() === '') {

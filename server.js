@@ -11,6 +11,7 @@ const loger=require("morgan")
 const randomstring = require('randomstring');
 const session = require("express-session");
 const { v4: uuidv4 } = require("uuid");
+require('dotenv').config()
 
 const nocache=require("nocache")
 app.use(nocache())
@@ -30,7 +31,7 @@ app.use(
 
 
 
-const port=6868
+const port=process.env.port_no
 
 
 app.set("view engine","ejs")
@@ -39,6 +40,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 
 app.use("/",userrouter)
 app.use("/admin",adminrouter)
+ 
 
 app.listen(port,()=>{
     console.log(`http://localhost:${port}`);

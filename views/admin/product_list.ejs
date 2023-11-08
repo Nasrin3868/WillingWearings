@@ -34,6 +34,7 @@ $(document).ready(function () {
                             <th>Product details</th>
                             <th style="width: 10%;">Stock</th>
                             <th style="width: 10%;">Actual_price</th>
+                            <th style="width: 10%;">Discount(%)</th>
                             <th style="width: 10%;">Selling_price</th>
                             <th style="width: 15%;">Status</th>
                             <th style="width: 15%;">Actions</th>
@@ -60,6 +61,7 @@ $(document).ready(function () {
                                 </td>
                                 <td style="width: 10%;"><%= product.stock %></td>
                                 <td style="width: 10%;"><%= product.price %>/-</td>
+                                <td style="width: 10%;"><%= product.discount %></td>
                                 <td style="width: 10%;"><%= product.sellingprice %>/-</td>
                                 <td style="width: 15%;">
                                     <% if (product.blocked == true) { %>

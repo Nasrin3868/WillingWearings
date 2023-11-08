@@ -7,15 +7,15 @@
                 <div class="banner-img banner-big wow fadeIn animated f-none">
                     <img src="/assets/imgs/banner/banner-4.png" alt="">
                     <div class="banner-text d-md-block d-none">
-                        <h4 class="mb-15 mt-40 text-brand">Repair Services</h4>
-                        <h1 class="fw-600 mb-20">We're an Apple <br>Authorised Service Provider</h1>
-                        <a href="shop-grid-right.html" class="btn">Learn More <i class="fi-rs-arrow-right"></i></a>
+                        <h4 class="mb-15 mt-40 text-brand">Women Clothing</h4>
+                        <h1 class="fw-600 mb-20">We're welcoming <br> you to Willing Wearings</h1>
+                        <a href="/all" class="btn">Feel happy to buy <i class="fi-rs-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
         </section>
         
-        <section class="banners mb-15 pt-15">
+        <!-- <section class="banners mb-15 pt-15">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 col-md-6">
@@ -50,7 +50,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section> -->
         <section class="product-tabs pt-25 pb-20 wow fadeIn animated">
             <div class="container">
                 <div class="row">
@@ -75,29 +75,15 @@
                                 <% } %>
                             </ul>
                         </div>
-                        <div class="banner-img wow fadeIn mb-45mb-lg-0 animated d-lg-block d-none">
-                            <img src="/assets/imgs/banner/banner-11.jpg" alt="">
+                        <div class="banner-img wow fadeIn mb-45mb-lg-0 animated d-lg-block d-none ">
+                            <img src="assets/imgs/banner/banner-11.jpg" alt="">
                             <div class="banner-text">
                                 <span>Women Zone</span>
-                                <h4>Save 17% on <br>Office Dress</h4>
-                                <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
+                                <h4>Save upto <br>10% on <br>Each Category</h4>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-9">
-                        <div class="tab-header">
-                            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="nav-tab-one" data-bs-toggle="tab" data-bs-target="#tab-one" type="button" role="tab" aria-controls="tab-one" aria-selected="true">Featured</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="nav-tab-two" data-bs-toggle="tab" data-bs-target="#tab-two" type="button" role="tab" aria-controls="tab-two" aria-selected="false">Popular</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="nav-tab-three" data-bs-toggle="tab" data-bs-target="#tab-three" type="button" role="tab" aria-controls="tab-three" aria-selected="false">New added</button>
-                                </li>
-                            </ul>
-                        </div>
                         <!--End nav-tabs-->
                         <div class="tab-content wow fadeIn animated" id="myTabContent">
                             <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
@@ -131,7 +117,7 @@
                                                     <h2><a href="#"><%= product.name %></a></h2>
                                                     <div class="rating-result" title="90%">
                                                         <span>
-                                                            <span>90%</span>
+                                                            <span><%= product.discount %>% Off</span>
                                                         </span>
                                                     </div>
                                                     <div class="product-price">
@@ -192,7 +178,7 @@
                 </div>
             </div>
         </section>
-        <section class="section-padding">
+        <!-- <section class="section-padding">
             <div class="container ">
                 <h3 class="section-title mb-20 wow fadeIn animated"><span>Featured</span> Brands</h3>
                 <div class="carausel-6-columns-cover position-relative wow fadeIn animated">
@@ -224,7 +210,7 @@
             </div>
         </section>
         
-        
+         -->
     </main>
     
     <%-include("../partials/userfooter")-%>    

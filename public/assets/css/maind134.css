@@ -3479,6 +3479,7 @@ table .product-thumbnail img {
   position: relative;
   display: inline-block;
   border: 1px solid #cce7d0;
+  padding: 12px;
 }
 
 .product-cart-wrap .product-action-1 button.small, .product-cart-wrap .product-action-1 a.action-btn.small {
@@ -4467,6 +4468,7 @@ table .product-thumbnail img {
   margin: 0 3px;
   transition: all 0.5s ease-out 0s;
   -webkit-transition: all 0.5s ease-out 0s;
+  padding-top: 10px;
 }
 
 .product-extra-link2 a:hover {
@@ -5856,8 +5858,7 @@ h6.post-title {
   border-width: 0 0 3px 0;
   border-style: solid;
   font-size: 16px;
-  background-image: url(../imgs/theme/icons/search.png);
-  background-repeat: no-repeat;
+    background-repeat: no-repeat;
   background-position: center left;
   padding-left: 35px;
   font-style: italic;
@@ -5879,8 +5880,11 @@ h6.post-title {
 
 .search-style-2 form button {
   position: absolute;
-  right: 0px;
+  left: 0px;
   top: 50%;
+  background-image: url(../imgs/theme/icons/search.png);
+  background-repeat: no-repeat;
+  background-position: center left;
   -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
   background-color: transparent;

@@ -13,14 +13,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-5">
-                    <!-- Subscribe Form -->
-                    <form class="form-subcriber d-flex wow fadeIn animated">
-                        <input type="email" class="form-control bg-white font-small" placeholder="Enter your email">
-                        <button class="btn bg-dark text-white" type="submit">Subscribe</button>
-                    </form>
-                    <!-- End Subscribe Form -->
-                </div>
             </div>
         </div>
     </section>
@@ -30,7 +22,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="widget-about font-md mb-md-5 mb-lg-0">
                         <div class="logo logo-width-1 wow fadeIn animated">
-                            <a href="index.html"><img src="/assets/imgs/theme/logo.svg" alt="logo"></a>
+                            <a href="/home"><img src="/assets/imgs/theme/logo.svg" alt="logo"></a>
                         </div>
                         <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
                         <p class="wow fadeIn animated">
@@ -66,12 +58,20 @@
                 <div class="col-lg-2  col-md-3">
                     <h5 class="widget-title wow fadeIn animated">My Account</h5>
                     <ul class="footer-list wow fadeIn animated">
-                        <li><a href="#">Sign In</a></li>
-                        <li><a href="#">View Cart</a></li>
-                        <li><a href="#">My Wishlist</a></li>
-                        <li><a href="#">Track My Order</a></li>
-                        <li><a href="#">Help</a></li>
-                        <li><a href="#">Order</a></li>
+                        <% if (isAuthenticated==true) { %>
+                            <li><a href="/myaccount">MY Account</a></li>
+                            <li><a href="/cart">View Cart</a></li>
+                            <li><a href="/wishlist">My Wishlist</a></li>
+                            <li><a href="/myaccount">Track My Order</a></li>
+                            <li><a href="/myaccount">Order</a></li>
+                        <% } else { %>
+                            <li><a href="/login">Sign In</a></li>
+                            <li><a href="/login">View Cart</a></li>
+                            <li><a href="/login">My Wishlist</a></li>
+                            <li><a href="/login">Track My Order</a></li>
+                            <li><a href="/login">Help</a></li>
+                            <li><a href="/login">Order</a></li>
+                        <% } %>
                     </ul>
                 </div>
                 <div class="col-lg-4">
