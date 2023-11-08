@@ -319,7 +319,7 @@ const OrderSubmit = async (req, res) => {
         await user.save();
         return res.json({
           status: "COD",
-          redirectUrl: "/placedOrder?orderId=${orderId}",
+          redirectUrl: `/placedOrder?orderId=${orderId}`,
         });
       } else if (req.body.paymentType == "WalletPayment") {
         for (const cartItem of user.cart) {

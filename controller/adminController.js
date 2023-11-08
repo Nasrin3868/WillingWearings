@@ -114,7 +114,7 @@ const dashboard = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -124,7 +124,7 @@ const addproductpage = async (req, res) => {
     res.render("admin/addproduct.ejs", { categories });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -196,7 +196,7 @@ const addproduct = async (req, res) => {
     res.redirect("/admin/productredirection");
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -206,7 +206,7 @@ const productredirection = async (req, res) => {
     res.render("admin/product_list.ejs", { products });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -216,7 +216,7 @@ const signin = async (req, res) => {
     res.render("admin/adminsignup", { errmessage: "", message: "" });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -249,7 +249,7 @@ const editproductpage = async (req, res) => {
     res.render("admin/editproduct.ejs", { product, categories });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -331,7 +331,7 @@ const editproduct = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -342,7 +342,7 @@ const deleteImage = async (req, res) => {
     res.redirect(`/admin/edit-product/${productId}`);
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -352,7 +352,7 @@ const userlist = async (req, res) => {
     res.render("admin/userlist", { users });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -369,7 +369,7 @@ const user_block = async (req, res) => {
     res.redirect("/admin/user_list");
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -406,7 +406,7 @@ const toaddcategory = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
   // res.redirect('/admin/categoryredirection')
 };
@@ -422,7 +422,7 @@ const categoryredirection = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -439,7 +439,7 @@ const category_block = async (req, res) => {
     res.redirect("/admin/categorylist");
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -469,7 +469,7 @@ const editcategorypage = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -480,7 +480,7 @@ const couponlistredirection = async (req, res) => {
     res.render("admin/couponlist.ejs", { Coupon, errmessage: "", create });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -519,7 +519,7 @@ const addcoupon = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -551,7 +551,7 @@ const updateCoupon = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -570,7 +570,7 @@ const couponblock = async (req, res) => {
     res.redirect("/admin/couponlist");
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -587,7 +587,7 @@ const product_block = async (req, res) => {
     res.redirect("/admin/product_list");
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -599,7 +599,7 @@ const logout = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -612,7 +612,7 @@ const orderManagement = async (req, res) => {
     res.render("admin/orderManagement", { orders });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -626,7 +626,7 @@ const orderDetails = async (req, res) => {
     res.render("admin/orderDetails", { orders });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -678,7 +678,7 @@ const changestatus = async (req, res) => {
     res.redirect(`/admin/orderDetails/${orderId}`);
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -698,7 +698,7 @@ const UpdateOrderByDateForm = async (req, res) => {
     res.render("admin/salesReport.ejs", { orders });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -712,7 +712,7 @@ const salesReport = async (req, res) => {
     res.render("admin/salesReport.ejs", { orders });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -733,7 +733,7 @@ const dailyOrder = async (req, res) => {
     res.render("admin/salesReport.ejs", { orders });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -760,7 +760,7 @@ const weeklyOrder = async (req, res) => {
     res.render("admin/salesReport.ejs", { orders });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -780,7 +780,7 @@ const yearlyOrder = async (req, res) => {
     res.render("admin/salesReport.ejs", { orders });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -796,7 +796,7 @@ const invoice = async (req, res) => {
     res.render("admin/invoice.ejs", { orders, totalFinalAmount });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -815,7 +815,7 @@ const referrallist = async (req, res) => {
     res.render("admin/referrallist", { errmessage: "", referral, user });
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
@@ -831,7 +831,7 @@ const editreferral = async (req, res) => {
     res.redirect("/admin/referrallist");
   } catch (error) {
     console.log(error.message);
-    res.render("admin/page404error");
+    res.render("adm/page404error");
   }
 };
 
